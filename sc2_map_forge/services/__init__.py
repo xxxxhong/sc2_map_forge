@@ -14,6 +14,13 @@ import time
 from dataclasses import dataclass, field
 from typing import Optional
 
+# 预加载 sentence_transformers，避免在生成过程中首次 import
+# 导致 __pycache__ 写入触发 Reflex 热重载
+try:
+    import sentence_transformers as _st  # noqa: F401
+except ImportError:
+    pass
+
 # ── 类型定义 ──
 
 
@@ -64,6 +71,11 @@ class GenerationResult:
 import logging
 
 logger = logging.getLogger(__name__)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
 
 
 def create_llm_client(provider: ProviderConfig):
@@ -231,7 +243,8 @@ def run_stage_api_lib(queries: list[str]) -> str:
         from sentence_transformers import SentenceTransformer
         logger.info("[Stage 3] 加载 embedding 模型...")
         embedding_model = SentenceTransformer(
-            "BAAI/bge-base-en-v1.5", cache_folder="models"
+            "BAAI/bge-base-en-v1.5",
+            cache_folder=str(__import__("pathlib").Path.home() / ".smac_ast" / "models"),
         )
 
         # 必选核心函数

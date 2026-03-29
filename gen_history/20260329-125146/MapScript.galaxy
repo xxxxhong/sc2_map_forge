@@ -1,0 +1,462 @@
+```galaxy
+// MapScript.galaxy
+// StarCraft II Scenario: "The Proxy's Gambit"
+// Stratagem: 借刀杀人 (Kill with a Borrowed Knife)
+
+// Include necessary libraries
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/UnitLib"
+
+// Global Variables
+int g_phase = 0;
+int g_provocationTimer = 0;
+bool g_rocksDestroyed = false;
+bool g_conflictTriggered = false;
+int g_playerUnitsLost = 0;
+int g_goldenArmadaCount = 5;
+int g_taldarimCount = 5;
+region g_centralRegion;
+region g_westRegion;
+region g_eastRegion;
+point g_chokePoint;
+point g_rockBarrierPoint;
+
+// Unit Groups
+unitgroup g_playerUnits = null;
+unitgroup g_goldenArmada = null;
+unitgroup g_taldarim = null;
+unitgroup g_allProtoss = null;
+
+// Constants
+const int PHASE1_END = 120; // 2 minutes in seconds
+const int PHASE2_END = 300; // 5 minutes in seconds
+const int PHASE3_END = 480; // 8 minutes in seconds
+const int GAME_TIMEOUT = 600; // 10 minutes
+const int MAX_PLAYER_LOSSES = 4; // Can lose up to 4 units
+const int VICTORY_SURVIVAL_COUNT = 6; // Need at least 6 units
+
+// Initialization Function
+void InitMap() {
+    // Create regions based on terrain analysis
+    g_centralRegion = RegionCreateBox(Point(0, 0), Point(256, 256)); // Central choke area
+    g_westRegion = RegionCreateBox(Point(-128, 0), Point(0, 128)); // Golden Armada base
+    g_eastRegion = RegionCreateBox(Point(0, 0), Point(128, 128)); // Tal'darim base
+    
+    // Set choke point (high ground overlooking central area)
+    g_chokePoint = Point(128, 128);
+    
+    // Rock barrier location between factions
+    g_rockBarrierPoint = Point(64, 64);
+    
+    // Initialize unit groups
+    g_playerUnits = UnitGroupCreate();
+    g_goldenArmada = UnitGroupCreate();
+    g_taldarim = UnitGroupCreate();
+    g_allProtoss = UnitGroupCreate();
+    
+    // Setup initial units
+    SetupPlayerForces();
+    SetupProtossForces();
+    
+    // Start game timer
+    TriggerAddEventTimer(TriggerCreate(), 1.0, true, c_timeUnitSeconds);
+    TriggerAddAction(TriggerGetCurrent(), GameTimer);
+    
+    // Victory/Defeat monitoring
+    TriggerAddEventUnitDied(TriggerCreate(), null);
+    TriggerAddAction(TriggerGetCurrent(), UnitDeathMonitor);
+    
+    // Phase progression trigger
+    TriggerAddEventTimer(TriggerCreate(), 30.0, true, c_timeUnitSeconds);
+    TriggerAddAction(TriggerGetCurrent(), PhaseCheck);
+    
+    // Display initial message
+    TransmissionCreate(Text("Spectre Team"), Text("Command, this is Spectre Team. We've identified two hostile Protoss factions in the area. The Tal'darim renegades and Golden Armada loyalists are unaware of each other's presence. Our orders: make sure they become intimately acquainted. Let their zealotry do our work for us."), 0, 10.0);
+}
+
+// Setup Player Forces
+void SetupPlayerForces() {
+    point startPos = Point(160, 160); // High ground position
+    
+    // Create Ghosts
+    for (int i = 0; i < 4; i++) {
+        unit u = UnitCreate(1, "Ghost", startPos, 270);
+        UnitGroupAdd(g_playerUnits, u);
+        UnitSetEnergy(u, 100);
+        UnitAbilityCommand(u, "GhostCloak", true);
+    }
+    
+    // Create Ravens
+    for (int i = 0; i < 2; i++) {
+        unit u = UnitCreate(1, "Raven", startPos, 270);
+        UnitGroupAdd(g_playerUnits, u);
+    }
+    
+    // Create Hellions
+    for (int i = 0; i < 3; i++) {
+        unit u = UnitCreate(1, "Hellion", startPos, 270);
+        UnitGroupAdd(g_playerUnits, u);
+    }
+    
+    // Create SCV
+    unit scv = UnitCreate(1, "SCV", startPos, 270);
+    UnitGroupAdd(g_playerUnits, scv);
+    
+    // Give player control
+    UnitGroupSetOwner(g_playerUnits, 1, true);
+}
+
+// Setup Protoss Forces
+void SetupProtossForces() {
+    // Golden Armada Loyalists (West Base)
+    point gaPos = Point(32, 96);
+    
+    // 2x Zealot
+    for (int i = 0; i < 2; i++) {
+        unit u = UnitCreate(2, "Zealot", gaPos, 90);
+        UnitGroupAdd(g_goldenArmada, u);
+        UnitGroupAdd(g_allProtoss, u);
+    }
+    
+    // 1x Stalker
+    unit stalker = UnitCreate(2, "Stalker", gaPos, 90);
+    UnitGroupAdd(g_goldenArmada, stalker);
+    UnitGroupAdd(g_allProtoss, stalker);
+    
+    // 1x Sentry
+    unit sentry = UnitCreate(2, "Sentry", gaPos, 90);
+    UnitGroupAdd(g_goldenArmada, sentry);
+    UnitGroupAdd(g_allProtoss, sentry);
+    
+    // 1x High Templar
+    unit templar = UnitCreate(2, "HighTemplar", gaPos, 90);
+    UnitGroupAdd(g_goldenArmada, templar);
+    UnitGroupAdd(g_allProtoss, templar);
+    
+    // Tal'darim Renegades (East Base)
+    point tdPos = Point(96, 32);
+    
+    // 2x Adept
+    for (int i = 0; i < 2; i++) {
+        unit u = UnitCreate(3, "Adept", tdPos, 270);
+        UnitGroupAdd(g_taldarim, u);
+        UnitGroupAdd(g_allProtoss, u);
+    }
+    
+    // 1x Immortal
+    unit immortal = UnitCreate(3, "Immortal", tdPos, 270);
+    UnitGroupAdd(g_taldarim, immortal);
+    UnitGroupAdd(g_allProtoss, immortal);
+    
+    // 1x Disruptor
+    unit disruptor = UnitCreate(3, "Disruptor", tdPos, 270);
+    UnitGroupAdd(g_taldarim, disruptor);
+    UnitGroupAdd(g_allProtoss, disruptor);
+    
+    // 1x Dark Templar (Cloaked)
+    unit dt = UnitCreate(3, "DarkTemplar", tdPos, 270);
+    UnitGroupAdd(g_taldarim, dt);
+    UnitGroupAdd(g_allProtoss, dt);
+    UnitAbilityCommand(dt, "DarkTemplarCloak", true);
+    
+    // Set AI behavior
+    UnitGroupSetOwner(g_goldenArmada, 2, true);
+    UnitGroupSetOwner(g_taldarim, 3, true);
+    
+    // Make factions hostile to each other
+    PlayerSetAlliance(2, 3, c_allianceEnemy);
+    PlayerSetAlliance(3, 2, c_allianceEnemy);
+    
+    // Both hostile to player
+    PlayerSetAlliance(2, 1, c_allianceEnemy);
+    PlayerSetAlliance(3, 1, c_allianceEnemy);
+}
+
+// Game Timer Function
+void GameTimer() {
+    g_provocationTimer += 1;
+    
+    // Check for timeout defeat
+    if (g_provocationTimer >= GAME_TIMEOUT) {
+        Defeat("Failed to eliminate Protoss forces within time limit.");
+    }
+    
+    // Check for provocation failure
+    if (g_provocationTimer >= 360 && !g_conflictTriggered) { // 6 minutes
+        Defeat("Failed to provoke conflict between Protoss factions.");
+    }
+}
+
+// Phase Check Function
+void PhaseCheck() {
+    if (g_phase == 0 && g_provocationTimer >= PHASE1_END) {
+        g_phase = 1;
+        TransmissionCreate(Text("Spectre Team"), Text("Phase 1 Complete: Enemy positions scouted. Moving to provocation phase."), 0, 5.0);
+        
+        // Trigger Phase 2 actions
+        TriggerAddEventTimer(TriggerCreate(), 5.0, false, c_timeUnitSeconds);
+        TriggerAddAction(TriggerGetCurrent(), ExecuteProvocation);
+    }
+    else if (g_phase == 1 && g_provocationTimer >= PHASE2_END) {
+        g_phase = 2;
+        TransmissionCreate(Text("Spectre Team"), Text("Phase 2 Complete: Both factions provoked. Preparing to remove barrier."), 0, 5.0);
+    }
+    else if (g_phase == 2 && g_provocationTimer >= PHASE3_END) {
+        g_phase = 3;
+        TransmissionCreate(Text("Spectre Team"), Text("Phase 3 Complete: Engagement in progress. Prepare for mop-up."), 0, 5.0);
+    }
+}
+
+// Execute Provocation (Phase 2)
+void ExecuteProvocation() {
+    // Find suitable Ghost for sniping
+    unit sniperGhost = null;
+    unitgroup ghosts = UnitGroupFilter(g_playerUnits, "Ghost", true);
+    
+    if (UnitGroupCount(ghosts) > 0) {
+        sniperGhost = UnitGroupGetUnit(ghosts, 0);
+        
+        // Find Tal'darim target (preferably Adept)
+        unitgroup taldarimUnits = UnitGroupCopy(g_taldarim);
+        unit target = UnitGroupGetUnit(taldarimUnits, 0);
+        
+        if (target != null && sniperGhost != null) {
+            // Move Ghost into position
+            UnitMove(sniperGhost, Point(80, 80));
+            
+            // Wait for positioning
+            TriggerAddEventTimer(TriggerCreate(), 2.0, false, c_timeUnitSeconds);
+            TriggerAddAction(TriggerGetCurrent(), function() {
+                // Snipe from cloak
+                UnitAbilityTarget(sniperGhost, "Snipe", target);
+                
+                // Immediately retreat toward Golden Armada
+                UnitMove(sniperGhost, Point(40, 100));
+                
+                // Trigger aggro manipulation
+                TriggerAddEventTimer(TriggerCreate(), 1.0, false, c_timeUnitSeconds);
+                TriggerAddAction(TriggerGetCurrent(), function() {
+                    ManipulateAggro(target, sniperGhost);
+                });
+            });
+        }
+    }
+    
+    UnitGroupDestroy(ghosts);
+}
+
+// Manipulate Aggro between factions
+void ManipulateAggro(unit damagedUnit, unit attacker) {
+    // Make Tal'darim blame Golden Armada for the attack
+    unitgroup goldenUnits = UnitGroupCopy(g_goldenArmada);
+    unit nearestGolden = UnitGetNearest(damagedUnit, goldenUnits);
+    
+    if (nearestGolden != null) {
+        // Force Tal'darim to attack Golden Armada
+        UnitGroupAttackMove(g_taldarim, UnitGetPosition(nearestGolden));
+        
+        // Use EMP on Golden Armada Sentry
+        unitgroup sentries = UnitGroupFilter(g_goldenArmada, "Sentry", true);
+        if (UnitGroupCount(sentries) > 0) {
+            unit sentry = UnitGroupGetUnit(sentries, 0);
+            unit empGhost = GetGhostWithEnergy(75);
+            if (empGhost != null) {
+                UnitAbilityTarget(empGhost, "EMP", sentry);
+            }
+        }
+        UnitGroupDestroy(sentries);
+        
+        // Use Interference Matrix on Stalker
+        unitgroup stalkers = UnitGroupFilter(g_goldenArmada, "Stalker", true);
+        if (UnitGroupCount(stalkers) > 0) {
+            unit stalker = UnitGroupGetUnit(stalkers, 0);
+            unit raven = GetRaven();
+            if (raven != null) {
+                UnitAbilityTarget(raven, "InterferenceMatrix", stalker);
+            }
+        }
+        UnitGroupDestroy(stalkers);
+        
+        // Use SCV as decoy
+        unit scv = UnitGroupFilter(g_playerUnits, "SCV", true);
+        if (UnitGroupCount(scv) > 0) {
+            unit decoy = UnitGroupGetUnit(scv, 0);
+            UnitMove(decoy, Point(50, 90)); // Between factions
+            UnitGroupAdd(g_taldarim, decoy); // Temporarily add to draw aggro
+        }
+        UnitGroupDestroy(scv);
+        
+        g_conflictTriggered = true;
+    }
+    
+    UnitGroupDestroy(goldenUnits);
+}
+
+// Destroy Rock Barrier (Phase 3)
+void DestroyRockBarrier() {
+    if (!g_rocksDestroyed && g_conflictTriggered) {
+        // Find destructible rocks in the barrier area
+        unitgroup rocks = UnitGroupInArea(g_rockBarrierPoint, 20.0, "DestructibleRock", true);
+        
+        // Use Ghosts to destroy rocks
+        unitgroup ghosts = UnitGroupFilter(g_playerUnits, "Ghost", true);
+        int ghostCount = UnitGroupCount(ghosts);
+        
+        for (int i = 0; i < ghostCount; i++) {
+            unit ghost = UnitGroupGetUnit(ghosts, i);
+            if (i < UnitGroupCount(rocks)) {
+                unit rock = UnitGroupGetUnit(rocks, i);
+                UnitAttack(ghost, rock);
+            }
+        }
+        
+        g_rocksDestroyed = true;
+        
+        // Drop Auto-Turrets between factions
+        unit raven = GetRaven();
+        if (raven != null) {
+            UnitAbilityPoint(raven, "AutoTurret", Point(64, 64));
+            UnitAbilityPoint(raven, "AutoTurret", Point(60, 60));
+        }
+        
+        // EMP both sides
+        unit empGhost = GetGhostWithEnergy(75);
+        if (empGhost != null) {
+            UnitAbilityPoint(empGhost, "EMP", Point(55, 55));
+            UnitAbilityPoint(empGhost, "EMP", Point(70, 70));
+        }
+        
+        // Flank with Hellions
+        unitgroup hellions = UnitGroupFilter(g_playerUnits, "Hellion", true);
+        UnitGroupMove(hellions, Point(70, 70));
+        UnitGroupDestroy(hellions);
+        
+        UnitGroupDestroy(ghosts);
+        UnitGroupDestroy(rocks);
+    }
+}
+
+// Unit Death Monitor
+void UnitDeathMonitor() {
+    unit deadUnit = TriggerGetUnit();
+    
+    // Check if player unit died
+    if (UnitGroupContains(g_playerUnits, deadUnit)) {
+        g_playerUnitsLost++;
+        
+        if (g_playerUnitsLost > MAX_PLAYER_LOSSES) {
+            Defeat("Too many units lost. Mission failed.");
+        }
+        
+        // Remove from group
+        UnitGroupRemove(g_playerUnits, deadUnit);
+    }
+    
+    // Check Protoss deaths
+    if (UnitGroupContains(g_goldenArmada, deadUnit)) {
+        g_goldenArmadaCount--;
+        UnitGroupRemove(g_goldenArmada, deadUnit);
+        UnitGroupRemove(g_allProtoss, deadUnit);
+    }
+    else if (UnitGroupContains(g_taldarim, deadUnit)) {
+        g_taldarimCount--;
+        UnitGroupRemove(g_taldarim, deadUnit);
+        UnitGroupRemove(g_allProtoss, deadUnit);
+    }
+    
+    // Check victory conditions
+    CheckVictory();
+    
+    // Check defeat condition: one faction remains too strong
+    if ((g_goldenArmadaCount > 3 && g_taldarimCount == 0) || 
+        (g_taldarimCount > 3 && g_goldenArmadaCount == 0)) {
+        Defeat("One Protoss faction remains too powerful.");
+    }
+    
+    // Auto-destroy rocks when both factions engaged
+    if (g_conflictTriggered && !g_rocksDestroyed && 
+        g_goldenArmadaCount < 5 && g_taldarimCount < 5) {
+        DestroyRockBarrier();
+    }
+}
+
+// Check Victory Conditions
+void CheckVictory() {
+    int playerSurvivors = UnitGroupCount(g_playerUnits);
+    int totalProtoss = g_goldenArmadaCount + g_taldarimCount;
+    
+    // Victory: Both factions destroyed and player has enough survivors
+    if (totalProtoss == 0 && playerSurvivors >= VICTORY_SURVIVAL_COUNT) {
+        Victory();
+    }
+}
+
+// Helper Functions
+unit GetGhostWithEnergy(int minEnergy) {
+    unitgroup ghosts = UnitGroupFilter(g_playerUnits, "Ghost", true);
+    unit foundGhost = null;
+    
+    int count = UnitGroupCount(ghosts);
+    for (int i = 0; i < count; i++) {
+        unit ghost = UnitGroupGetUnit(ghosts, i);
+        if (UnitGetEnergy(ghost) >= minEnergy) {
+            foundGhost = ghost;
+            break;
+        }
+    }
+    
+    UnitGroupDestroy(ghosts);
+    return foundGhost;
+}
+
+unit GetRaven() {
+    unitgroup ravens = UnitGroupFilter(g_playerUnits, "Raven", true);
+    unit raven = null;
+    
+    if (UnitGroupCount(ravens) > 0) {
+        raven = UnitGroupGetUnit(ravens, 0);
+    }
+    
+    UnitGroupDestroy(ravens);
+    return raven;
+}
+
+// Victory Function
+void Victory() {
+    TransmissionCreate(Text("Command"), Text("Mission accomplished. Both Protoss factions have eliminated each other. Minimal Terran casualties. The Proxy's Gambit is complete."), 0, 10.0);
+    TriggerAddEventTimer(TriggerCreate(), 3.0, false, c_timeUnitSeconds);
+    TriggerAddAction(TriggerGetCurrent(), function() {
+        EndGame(true);
+    });
+}
+
+// Defeat Function
+void Defeat(string message) {
+    TransmissionCreate(Text("Command"), Text(message), 0, 10.0);
+    TriggerAddEventTimer(TriggerCreate(), 3.0, false, c_timeUnitSeconds);
+    TriggerAddAction(TriggerGetCurrent(), function() {
+        EndGame(false);
+    });
+}
+
+// End Game
+void EndGame(bool victory) {
+    if (victory) {
+        GameVictory();
+    } else {
+        GameDefeat();
+    }
+}
+
+// Map Initialization Trigger
+void InitTriggers() {
+    TriggerAddEventMapInit(TriggerCreate());
+    TriggerAddAction(TriggerGetCurrent(), InitMap);
+}
+
+// Main Function
+void main() {
+    InitTriggers();
+}
+```

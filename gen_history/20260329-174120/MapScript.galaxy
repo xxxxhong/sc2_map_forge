@@ -1,0 +1,471 @@
+```galaxy
+// MapScript.galaxy for "The Proxy Gambit"
+// Scenario: 借刀杀人 (Kill with a Borrowed Knife)
+
+// Include standard library
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/PlayerLib"
+include "TriggerLibs/UnitLib"
+include "TriggerLibs/AILib"
+include "TriggerLibs/DebugLib"
+
+// Global Variables
+int g_playerTerran = 1;
+int g_playerProtoss = 2;
+int g_playerNeutral = 3;
+
+unit g_ghost = null;
+unit g_scv = null;
+unit g_widowMine = null;
+
+unit g_zealot1 = null;
+unit g_zealot2 = null;
+unit g_stalker1 = null;
+unit g_stalker2 = null;
+unit g_colossus = null;
+
+point g_startPoint = null;
+point g_chokePoint = null;
+point g_acidPoolPoint = null;
+point g_protossPatrolPoint = null;
+
+bool g_phase1Complete = false;
+bool g_phase2Complete = false;
+bool g_phase3Complete = false;
+bool g_victory = false;
+bool g_defeat = false;
+
+timer g_timerLimit = null;
+timer g_phaseTimer = null;
+
+// Constants
+const int c_timeLimit = 480; // 8 minutes in seconds
+const int c_phase2Delay = 5; // seconds after phase 1
+const int c_phase3Delay = 3; // seconds after phase 2
+
+const fixed c_acidDamageRate = 10.0;
+const fixed c_acidDamageInterval = 1.0;
+
+// Ability IDs
+string ABIL_SNIPE = "Snipe";
+string ABIL_EMP = "EMP";
+string ABIL_CLOAK = "Cloak";
+string ABIL_BURROW = "Burrow";
+string ABIL_BLINK = "Blink";
+
+// Unit Type Aliases
+string ALIAS_GHOST = "Ghost";
+string ALIAS_SCV = "SCV";
+string ALIAS_WIDOWMINE = "WidowMine";
+string ALIAS_ZEALOT = "Zealot";
+string ALIAS_STALKER = "Stalker";
+string ALIAS_COLOSSUS = "Colossus";
+
+// Region Names (from terrain file)
+string REGION_START = "Region_Start";
+string REGION_CHOKE = "Region_Choke";
+string REGION_ACID = "Region_Acid";
+string REGION_PROTOSS_PATROL = "Region_ProtossPatrol";
+
+// ============================================================================
+// INITIALIZATION FUNCTIONS
+// ============================================================================
+
+void InitPoints() {
+    g_startPoint = RegionGetCenter(Region(REGION_START));
+    g_chokePoint = RegionGetCenter(Region(REGION_CHOKE));
+    g_acidPoolPoint = RegionGetCenter(Region(REGION_ACID));
+    g_protossPatrolPoint = RegionGetCenter(Region(REGION_PROTOSS_PATROL));
+}
+
+void CreatePlayerUnits() {
+    // Create Terran units
+    g_ghost = UnitCreate(1, ALIAS_GHOST, g_startPoint, 0);
+    g_scv = UnitCreate(1, ALIAS_SCV, PointWithOffsetPolar(g_startPoint, 3.0, 90.0), 0);
+    g_widowMine = UnitCreate(1, ALIAS_WIDOWMINE, PointWithOffsetPolar(g_startPoint, 5.0, 180.0), 0);
+    
+    // Create Protoss units
+    g_zealot1 = UnitCreate(2, ALIAS_ZEALOT, PointWithOffsetPolar(g_protossPatrolPoint, 2.0, 0.0), 0);
+    g_zealot2 = UnitCreate(2, ALIAS_ZEALOT, PointWithOffsetPolar(g_protossPatrolPoint, 2.0, 180.0), 0);
+    g_stalker1 = UnitCreate(2, ALIAS_STALKER, PointWithOffsetPolar(g_protossPatrolPoint, 3.0, 90.0), 0);
+    g_stalker2 = UnitCreate(2, ALIAS_STALKER, PointWithOffsetPolar(g_protossPatrolPoint, 3.0, 270.0), 0);
+    g_colossus = UnitCreate(2, ALIAS_COLOSSUS, g_protossPatrolPoint, 0);
+    
+    // Set up unit properties
+    UnitSetProperty(g_ghost, c_unitPropEnergy, 100, c_unitPropCurrent);
+    UnitSetProperty(g_ghost, c_unitPropEnergy, 200, c_unitPropMaximum);
+    
+    // Burrow the widow mine
+    UnitIssueOrder(g_widowMine, "Burrow", true);
+    
+    // Set Protoss AI behavior
+    AISetStrategy(g_playerProtoss, "Aggressive", 100);
+}
+
+void SetupVictoryDefeat() {
+    // Victory condition: All Protoss units dead
+    TriggerAddEventUnitDied(TriggerCreate("VictoryCheck"), null);
+    
+    // Defeat condition: Ghost dies
+    TriggerAddEventUnitDied(TriggerCreate("DefeatCheckGhost"), g_ghost);
+    
+    // Defeat condition: All player units dead
+    TriggerAddEventUnitDied(TriggerCreate("DefeatCheckAll"), null);
+    
+    // Time limit
+    g_timerLimit = TimerCreate(c_timeLimit, false, false);
+    TriggerAddEventTimerElapsed(TriggerCreate("TimeLimitCheck"), g_timerLimit, 0);
+    TimerStart(g_timerLimit);
+}
+
+// ============================================================================
+// PHASE 1: SETUP & BAIT
+// ============================================================================
+
+void StartPhase1() {
+    // Display objective
+    TransmissionFromUnit(g_ghost, "Phase1_Objective", "Snipe a Zealot from high ground, then retreat to choke point.", 5.0, false, true);
+    
+    // Enable snipe ability
+    UnitAbilityEnable(ABIL_SNIPE, true, g_ghost);
+    
+    // Set up trigger for when Ghost uses Snipe
+    trigger t = TriggerCreate("Phase1SnipeUsed");
+    TriggerAddEventUnitAbilityUsed(t, g_ghost, ABIL_SNIPE, c_abilCastTypeInstant);
+    TriggerAddAction(t, "Phase1Complete");
+}
+
+void Phase1Complete() {
+    g_phase1Complete = true;
+    
+    // Order Ghost to retreat to choke
+    UnitIssueOrder(g_ghost, "Move", g_chokePoint, c_orderQueueReplace);
+    
+    // Start phase 2 after delay
+    g_phaseTimer = TimerCreate(c_phase2Delay, false, false);
+    TriggerAddEventTimerElapsed(TriggerCreate("StartPhase2Trigger"), g_phaseTimer, 0);
+    TimerStart(g_phaseTimer);
+    
+    TransmissionFromUnit(g_ghost, "Phase1_Complete", "Target hit. Falling back to choke point.", 3.0, false, true);
+}
+
+// ============================================================================
+// PHASE 2: MISDIRECTION
+// ============================================================================
+
+void StartPhase2() {
+    TransmissionFromUnit(g_ghost, "Phase2_Objective", "Use EMP on Colossus and Stalkers. SCV will draw attention.", 5.0, false, true);
+    
+    // Enable EMP ability
+    UnitAbilityEnable(ABIL_EMP, true, g_ghost);
+    
+    // Enable cloak
+    UnitIssueOrder(g_ghost, "Cloak", true);
+    
+    // Position Widow Mine near acid pools
+    UnitIssueOrder(g_widowMine, "Move", PointWithOffsetPolar(g_acidPoolPoint, 2.0, 45.0), c_orderQueueReplace);
+    
+    // Set up trigger for EMP usage
+    trigger t = TriggerCreate("Phase2EMPUsed");
+    TriggerAddEventUnitAbilityUsed(t, g_ghost, ABIL_EMP, c_abilCastTypeInstant);
+    TriggerAddAction(t, "Phase2EMPExecuted");
+}
+
+void Phase2EMPExecuted() {
+    // Move SCV to choke as bait
+    UnitIssueOrder(g_scv, "Move", g_chokePoint, c_orderQueueReplace);
+    
+    // Set Protoss units to attack SCV
+    UnitIssueOrder(g_zealot1, "Attack", g_scv, c_orderQueueReplace);
+    UnitIssueOrder(g_zealot2, "Attack", g_scv, c_orderQueueReplace);
+    UnitIssueOrder(g_stalker1, "Attack", g_scv, c_orderQueueReplace);
+    UnitIssueOrder(g_stalker2, "Attack", g_scv, c_orderQueueReplace);
+    UnitIssueOrder(g_colossus, "Attack", g_scv, c_orderQueueReplace);
+    
+    // SCV retreats behind destructible rocks after brief appearance
+    g_phaseTimer = TimerCreate(2.0, false, false);
+    TriggerAddEventTimerElapsed(TriggerCreate("SCVRetreatTrigger"), g_phaseTimer, 0);
+    TimerStart(g_phaseTimer);
+    
+    g_phase2Complete = true;
+    
+    // Start phase 3 after delay
+    g_phaseTimer = TimerCreate(c_phase3Delay, false, false);
+    TriggerAddEventTimerElapsed(TriggerCreate("StartPhase3Trigger"), g_phaseTimer, 0);
+    TimerStart(g_phaseTimer);
+    
+    TransmissionFromUnit(g_scv, "Phase2_Bait", "Drawing enemy fire! Retreating!", 2.0, false, true);
+}
+
+void SCVRetreat() {
+    point retreatPoint = PointWithOffsetPolar(g_chokePoint, 8.0, 270.0);
+    UnitIssueOrder(g_scv, "Move", retreatPoint, c_orderQueueReplace);
+}
+
+// ============================================================================
+// PHASE 3: EXECUTION
+// ============================================================================
+
+void StartPhase3() {
+    TransmissionFromUnit(g_ghost, "Phase3_Objective", "Execute the Colossus at the choke. Let environment finish them.", 5.0, false, true);
+    
+    // Enable snipe again for final blow
+    UnitAbilityEnable(ABIL_SNIPE, true, g_ghost);
+    
+    // Set up acid pool damage
+    StartAcidDamage();
+    
+    // Set up trigger for Colossus death
+    trigger t = TriggerCreate("ColossusDeathTrigger");
+    TriggerAddEventUnitDied(t, g_colossus);
+    TriggerAddAction(t, "ColossusDeathEffects");
+    
+    // Set up trigger for Widow Mine activation
+    trigger t2 = TriggerCreate("WidowMineTrigger");
+    TriggerAddEventUnitEnterRegion(t2, Region(REGION_CHOKE), ALIAS_ZEALOT);
+    TriggerAddAction(t2, "WidowMineActivate");
+}
+
+void ColossusDeathEffects() {
+    // Colossus death body blocks stalkers
+    // Apply stun or slow to stalkers in area
+    unitgroup stalkers = UnitGroupGet(g_chokePoint, 4.0, c_unitFilterAlive + c_unitFilterEnemy + c_unitFilterType, ALIAS_STALKER);
+    
+    while (UnitGroupEmpty(stalkers) == false) {
+        unit u = UnitGroupPick(stalkers, 0);
+        UnitApplyBehavior(u, "Stunned", 3.0);
+        UnitGroupRemove(stalkers, u);
+    }
+    UnitGroupDestroy(stalkers);
+    
+    TransmissionFromUnit(g_ghost, "Phase3_ColossusDown", "Colossus down! Stalkers trapped in acid!", 3.0, false, true);
+}
+
+void StartAcidDamage() {
+    // Create periodic damage in acid pool region
+    trigger t = TriggerCreate("AcidDamageTrigger");
+    TriggerAddEventTimerElapsed(t, TimerCreate(c_acidDamageInterval, true, true), 0);
+    TriggerAddAction(t, "ApplyAcidDamage");
+}
+
+void ApplyAcidDamage() {
+    unitgroup unitsInAcid = UnitGroupGet(g_acidPoolPoint, 6.0, c_unitFilterAlive, null);
+    
+    while (UnitGroupEmpty(unitsInAcid) == false) {
+        unit u = UnitGroupPick(unitsInAcid, 0);
+        
+        // Don't damage player units
+        if (UnitGetOwner(u) != g_playerTerran) {
+            // Create damage actor message
+            string damageMsg = libNtve_gf_ActionDamage();
+            ActorSend(u, damageMsg, c_actorMsgSendReplace);
+            
+            // Set damage amount
+            ActorSend(u, ActorMessageSetFixed("Damage", c_acidDamageRate), c_actorMsgSendAppend);
+            
+            // Set damage type
+            ActorSend(u, ActorMessageSetInt("DamageType", c_damageTypeNormal), c_actorMsgSendAppend);
+            
+            // Send the damage
+            ActorSend(u, "DamageSend", c_actorMsgSendAppend);
+        }
+        
+        UnitGroupRemove(unitsInAcid, u);
+    }
+    UnitGroupDestroy(unitsInAcid);
+}
+
+void WidowMineActivate() {
+    // Widow mine automatically attacks when enemy enters range
+    // This is handled by game mechanics, but we can trigger effects
+    TransmissionFromUnit(g_ghost, "Phase3_MineTriggered", "Mine activated! Zealots caught in blast!", 3.0, false, true);
+}
+
+// ============================================================================
+// VICTORY/DEFEAT CONDITIONS
+// ============================================================================
+
+void VictoryCheck() {
+    // Check if all Protoss units are dead
+    if (UnitGetProperty(g_zealot1, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_zealot2, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_stalker1, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_stalker2, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_colossus, c_unitPropLife, c_unitPropCurrent) <= 0) {
+        
+        // Check at least 2 Terran units survive
+        int survivorCount = 0;
+        if (UnitGetProperty(g_ghost, c_unitPropLife, c_unitPropCurrent) > 0) survivorCount += 1;
+        if (UnitGetProperty(g_scv, c_unitPropLife, c_unitPropCurrent) > 0) survivorCount += 1;
+        if (UnitGetProperty(g_widowMine, c_unitPropLife, c_unitPropCurrent) > 0) survivorCount += 1;
+        
+        if (survivorCount >= 2) {
+            g_victory = true;
+            DeclareVictory();
+        }
+    }
+}
+
+void DefeatCheckGhost() {
+    g_defeat = true;
+    DeclareDefeat("Ghost eliminated! The operation has failed.");
+}
+
+void DefeatCheckAll() {
+    if (UnitGetProperty(g_ghost, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_scv, c_unitPropLife, c_unitPropCurrent) <= 0 &&
+        UnitGetProperty(g_widowMine, c_unitPropLife, c_unitPropCurrent) <= 0) {
+        g_defeat = true;
+        DeclareDefeat("All units lost! Mission failed.");
+    }
+}
+
+void TimeLimitCheck() {
+    if (!g_victory && !g_defeat) {
+        g_defeat = true;
+        DeclareDefeat("Time limit exceeded! Protoss reinforcements have arrived.");
+    }
+}
+
+void DeclareVictory() {
+    // Stop all timers
+    if (g_timerLimit != null) TimerDestroy(g_timerLimit);
+    if (g_phaseTimer != null) TimerDestroy(g_phaseTimer);
+    
+    // Display victory message
+    TransmissionFromUnit(g_ghost, "Victory", "借刀杀人 successful. Enemy forces eliminated through their own aggression.", 10.0, false, true);
+    
+    // Victory dialog
+    DialogCreate("VictoryDialog", "Mission Accomplished");
+    DialogSetText("VictoryDialog", "The Proxy Gambit succeeded!\n\nYou manipulated the Protoss force into destroying itself with minimal direct engagement.\n\n借刀杀人 stratagem executed perfectly.");
+    DialogAddButton("VictoryDialog", "Continue", "VictoryContinue");
+    DialogShow("VictoryDialog", g_playerTerran);
+    
+    // End game for player
+    PlayerSetState(g_playerTerran, c_playerStateVictory, true);
+}
+
+void DeclareDefeat(string message) {
+    // Stop all timers
+    if (g_timerLimit != null) TimerDestroy(g_timerLimit);
+    if (g_phaseTimer != null) TimerDestroy(g_phaseTimer);
+    
+    // Display defeat message
+    TransmissionFromUnit(g_ghost, "Defeat", message, 10.0, false, true);
+    
+    // Defeat dialog
+    DialogCreate("DefeatDialog", "Mission Failed");
+    DialogSetText("DefeatDialog", message + "\n\nRemember the stratagem: 借刀杀人 - use the enemy's strength against them.");
+    DialogAddButton("DefeatDialog", "Restart", "DefeatRestart");
+    DialogShow("DefeatDialog", g_playerTerran);
+    
+    // End game for player
+    PlayerSetState(g_playerTerran, c_playerStateDefeat, true);
+}
+
+// ============================================================================
+// DIALOG HANDLERS
+// ============================================================================
+
+void VictoryContinue() {
+    // Could transition to next mission or show score screen
+    GameSetSpeed(c_gameSpeedPaused);
+}
+
+void DefeatRestart() {
+    // Restart the scenario
+    GameRestart();
+}
+
+// ============================================================================
+// OPTIONAL CHALLENGE TRACKING
+// ============================================================================
+
+bool g_bonusNoMine = false;
+bool g_speedRun = false;
+bool g_perfectExecution = false;
+
+void CheckBonusObjectives() {
+    // Bonus: No mine trigger
+    if (UnitGetProperty(g_widowMine, c_unitPropLife, c_unitPropCurrent) > 0) {
+        // Check if mine never attacked
+        // This would require tracking mine attack events
+        g_bonusNoMine = true;
+    }
+    
+    // Speed run: Under 4 minutes
+    fixed elapsed = TimerGetElapsed(g_timerLimit);
+    if (elapsed < 240.0) { // 4 minutes
+        g_speedRun = true;
+    }
+    
+    // Perfect execution: Ghost takes no damage
+    if (UnitGetProperty(g_ghost, c_unitPropLife, c_unitPropCurrent) == 
+        UnitGetProperty(g_ghost, c_unitPropLife, c_unitPropMaximum)) {
+        g_perfectExecution = true;
+    }
+}
+
+// ============================================================================
+// MAIN INITIALIZATION
+// ============================================================================
+
+void InitMap() {
+    // Initialize points from regions
+    InitPoints();
+    
+    // Create units
+    CreatePlayerUnits();
+    
+    // Set up victory/defeat conditions
+    SetupVictoryDefeat();
+    
+    // Start phase 1
+    StartPhase1();
+    
+    // Display scenario intro
+    TransmissionFromUnit(g_ghost, "Scenario_Intro", 
+        "Operation: Proxy Gambit\n\nObjective: Eliminate Protoss patrol using 借刀杀人 stratagem.\n\nUse terrain and enemy aggression against them. Minimal direct engagement.", 
+        10.0, true, true);
+}
+
+// ============================================================================
+// TRIGGER ACTIONS (wrappers for Galaxy)
+// ============================================================================
+
+void Phase1SnipeUsed() {
+    // Wrapper for trigger action
+}
+
+void StartPhase2Trigger() {
+    StartPhase2();
+}
+
+void SCVRetreatTrigger() {
+    SCVRetreat();
+}
+
+void StartPhase3Trigger() {
+    StartPhase3();
+}
+
+void AcidDamageTrigger() {
+    ApplyAcidDamage();
+}
+
+// ============================================================================
+// MAP ENTRY POINT
+// ============================================================================
+
+void main() {
+    // Set up map
+    InitMap();
+    
+    // Set game speed
+    GameSetSpeed(c_gameSpeedNormal);
+    
+    // Set camera for player
+    CameraLookAtPoint(g_playerTerran, g_startPoint, 0.0);
+}
+```

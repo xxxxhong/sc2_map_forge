@@ -1,0 +1,102 @@
+# StarCraft II Scenario: "The Proxy Gambit"
+
+## **Scenario Concept: 借刀杀人 (Kill with a Borrowed Knife)**
+The player must manipulate a larger Protoss force into destroying itself using misdirection and environmental hazards, minimizing direct engagement.
+
+---
+
+## **Force Composition**
+
+### **Player (Terran) – 3 Units:**
+1. **Ghost** (Cloaked) – Primary operative. Equipped with:
+   - Snipe
+   - EMP Round
+   - Cloak
+2. **SCV** – Support/decoy unit. Can repair structures.
+3. **Widow Mine** (Burrowed) – Trap unit. Positioned strategically.
+
+### **Enemy (Protoss) – 5 Units:**
+1. **Zealot ×2** – Melee attackers, aggressive pursuit AI.
+2. **Stalker ×2** – Ranged attackers, will blink over terrain.
+3. **Colossus ×1** – Heavy area-damage unit, pathing restricted by cliffs.
+
+---
+
+## **Terrain Utilization Notes**
+*(Based on uploaded map file analysis)*
+
+- **Central Choke Point:** Narrow pass with destructible rocks on one side. Ideal for funneling enemies.
+- **High Ground Cliffs:** Multiple levels providing vision advantages.
+- **Neutral Creep Colonies (Xel’Naga Towers):** Two towers controlling vision over key zones.
+- **Destructible Rocks:** Can be used to block paths or redirect enemy movement.
+- **Acid Pools (Environmental Hazard):** Deals damage over time to units standing in it.
+
+---
+
+## **Positioning & Phases**
+
+### **Phase 1: Setup & Bait**
+- **Starting Position:** Player units begin on high ground near the eastern Xel’Naga tower.
+- **Enemy Position:** Protoss squad patrols near the western tower, guarding a resource node.
+- **Objective:** Use the Ghost to snipe one Zealot from maximum range, then retreat toward the central choke.
+- **Terrain Use:** High ground provides vision and attack advantage for initial snipe.
+
+### **Phase 2: Misdirection**
+- **Ghost Action:** Cloak and move to flank. Use EMP on the Colossus (removing shields) and Stalkers (removing energy).
+- **SCV Action:** Appear briefly at the choke to draw enemy attention, then retreat behind destructible rocks.
+- **Widow Mine:** Burrowed near acid pools at the choke exit.
+- **Enemy Reaction:** Protoss forces will pursue the SCV, clustering at the choke.
+
+### **Phase 3: 借刀杀人 Execution**
+- **Key Maneuver:** Ghost snipes the damaged Colossus once it reaches the choke.
+- **Environmental Kill:** Enemy units, now focused on the SCV, will path through acid pools. The Colossus’s death animation and large size will block the stalkers momentarily, causing them to take continuous acid damage.
+- **Widow Mine Trigger:** As the Zealots pursue, the mine targets the lead Zealot; splash damage hits both.
+- **Final Cleanup:** Ghost uses remaining energy to pick off remaining weakened units from high ground.
+
+---
+
+## **Victory/Defeat Conditions**
+
+### **Victory:**
+- All 5 Protoss units are destroyed.
+- At least 2 Terran units survive (SCV can be lost).
+
+### **Defeat:**
+- Ghost is killed.
+- All player units are destroyed.
+- Time limit: 8 minutes (enemy reinforcements arrive).
+
+---
+
+## **Designer Notes**
+
+1. **借刀杀人 Mechanics:**
+   - Player never directly fights the entire squad.
+   - 80% of enemy damage should come from environmental hazards and friendly fire (Colossus stepping on Zealots, acid pools, mine splash).
+   - Ghost’s role is to enable these interactions—not to deal final blows.
+
+2. **Terrain Synergy:**
+   - Acid pools are key to killing Stalkers after EMP.
+   - Destructible rocks can be used to trap the Colossus if timed correctly.
+   - High ground allows Ghost to remain undetected without detection units present.
+
+3. **Player Skill Expression:**
+   - Advanced: Use snipe to trigger Colossus death at precise moment for body-blocking.
+   - Intermediate: Lure enemies through acid while cloaked.
+   - Novice: Use mine and snipe to whittle down forces.
+
+4. **Enemy AI Tweaks:**
+   - Protoss units prioritize visible units (SCV) over cloaked Ghost.
+   - Colossus has pathing restrictions that cause it to take the choke route.
+   - Stalkers will attempt to blink up cliffs if Ghost is revealed.
+
+---
+
+## **Optional Challenge Objectives**
+- **Bonus Objective:** Kill all enemies without the Widow Mine triggering.
+- **Speed Run:** Complete in under 4 minutes.
+- **Perfect Execution:** Lose no units and take no damage with the Ghost.
+
+---
+
+This scenario emphasizes the **借刀杀人** stratagem by making the environment and enemy AI the primary weapons, with the player’s small force acting as catalysts for destruction rather than direct combatants.

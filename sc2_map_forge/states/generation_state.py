@@ -25,6 +25,9 @@ from ..services import (
 class GenerationState(rx.State):
     """地图生成页面的状态"""
 
+    # ── 配置文件 (与 ConfigState 共用，放用户目录避免热重载) ──
+    _CONFIG_FILE = str(__import__("pathlib").Path.home() / ".smac_ast" / "config.json")
+
     # ── 模式 ──
     mode: str = "macro"  # "macro" | "micro"
 
@@ -57,43 +60,115 @@ class GenerationState(rx.State):
 
     # ── 事件处理 ──
 
+    # 防抖: 避免每次输入都写文件触发 Reflex 热重载
+    _last_save_time: float = 0.0
+
+    def _save_inputs(self):
+        """将生成页面的输入保存到配置文件 (带 2 秒防抖)"""
+        import time as _t
+        now = _t.time()
+        # 距上次保存不到 2 秒就跳过，减少文件写入频率
+        if now - self._last_save_time < 2.0:
+            return
+        self._last_save_time = now
+
+        config = {}
+        if os.path.exists(self._CONFIG_FILE):
+            try:
+                with open(self._CONFIG_FILE, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+            except Exception:
+                pass
+
+        config["generation"] = {
+            "mode": self.mode,
+            "stratagem": self.stratagem,
+            "strategy_text": self.strategy_text,
+            "player_race": self.player_race,
+            "enemy_race": self.enemy_race,
+            "player_unit_count": self.player_unit_count,
+            "enemy_unit_count": self.enemy_unit_count,
+        }
+        try:
+            with open(self._CONFIG_FILE, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def _force_save_inputs(self):
+        """强制保存（不防抖，用于重要操作如选择计策、切换模式）"""
+        self._last_save_time = 0.0
+        self._save_inputs()
+
+    @rx.event
+    def on_load(self):
+        """页面加载时恢复上次的输入"""
+        if os.path.exists(self._CONFIG_FILE):
+            try:
+                with open(self._CONFIG_FILE, "r", encoding="utf-8") as f:
+                    config = json.load(f)
+                gen = config.get("generation", {})
+                self.mode = gen.get("mode", self.mode)
+                self.stratagem = gen.get("stratagem", self.stratagem)
+                self.strategy_text = gen.get("strategy_text", self.strategy_text)
+                self.player_race = gen.get("player_race", self.player_race)
+                self.enemy_race = gen.get("enemy_race", self.enemy_race)
+                self.player_unit_count = gen.get("player_unit_count", self.player_unit_count)
+                self.enemy_unit_count = gen.get("enemy_unit_count", self.enemy_unit_count)
+            except Exception:
+                pass
+
     def set_mode(self, mode: str):
         self.mode = mode
+        self._force_save_inputs()
 
     def set_stratagem(self, value: str):
         self.stratagem = value
+        self._force_save_inputs()
 
     def set_stratagem_by_label(self, label: str):
         """从下拉选择的 label 查找对应的 value"""
         for s in STRATAGEMS:
             if s["label"] == label:
                 self.stratagem = s["value"]
+                self._force_save_inputs()
                 return
         self.stratagem = ""
+        self._force_save_inputs()
 
     def set_strategy_text(self, value: str):
         self.strategy_text = value
+        self._save_inputs()
 
     def toggle_player_race(self, race: str):
         self.player_race = "" if self.player_race == race else race
+        self._force_save_inputs()
 
     def toggle_enemy_race(self, race: str):
         self.enemy_race = "" if self.enemy_race == race else race
+        self._force_save_inputs()
 
-    def set_player_count(self, value: str):
+    def set_player_count(self, value):
         try:
-            self.player_unit_count = max(1, min(100, int(value)))
-        except ValueError:
+            self.player_unit_count = max(1, min(100, int(float(value))))
+            self._save_inputs()
+        except (ValueError, TypeError):
             pass
 
-    def set_enemy_count(self, value: str):
+    def set_enemy_count(self, value):
         try:
-            self.enemy_unit_count = max(1, min(200, int(value)))
-        except ValueError:
+            self.enemy_unit_count = max(1, min(200, int(float(value))))
+            self._save_inputs()
+        except (ValueError, TypeError):
             pass
+
+    # 用户是否手动点击了某个 stage（生成期间不自动跳转）
+    _user_selected_stage: bool = False
 
     def view_stage(self, idx: int):
         self.active_stage = idx
+        if self.is_generating:
+            self._user_selected_stage = True
 
     async def handle_upload(self, files: list[rx.UploadFile]):
         """处理 .SC2Map 文件上传"""
@@ -123,27 +198,37 @@ class GenerationState(rx.State):
                 return
 
             self.is_generating = True
+            self._user_selected_stage = False
             self.stage_statuses = ["waiting", "waiting", "waiting", "waiting"]
             self.stage_outputs = ["", "", "", ""]
             self.galaxy_code = ""
             self.python_code = ""
             self.map_ready = False
 
-        # 从 ConfigState 获取提供商信息 (跨 state 读取)
+        # 从配置文件直接读取提供商信息 (不依赖 ConfigState 内存状态)
         from .config_state import ConfigState
+
+        config_data = {}
+        config_file = self._CONFIG_FILE
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, "r", encoding="utf-8") as f:
+                    config_data = json.load(f)
+            except Exception:
+                pass
+
+        provider_key = config_data.get("default_provider", "deepseek")
+        p_cfg = config_data.get("providers", {}).get(provider_key, {})
+
+        provider = ProviderConfig(
+            key=provider_key,
+            api_key=p_cfg.get("apikey", ""),
+            base_url=p_cfg.get("baseurl", ""),
+            model=p_cfg.get("model", ""),
+        )
 
         async with self:
             config_state = await self.get_state(ConfigState)
-            provider_key = config_state.default_provider or "deepseek"
-            providers = config_state.provider_configs
-            p_cfg = providers.get(provider_key, {})
-
-            provider = ProviderConfig(
-                key=provider_key,
-                api_key=p_cfg.get("apikey", ""),
-                base_url=p_cfg.get("baseurl", ""),
-                model=p_cfg.get("model", ""),
-            )
 
             gen_config = GenerationConfig(
                 mode=self.mode,
@@ -154,8 +239,8 @@ class GenerationState(rx.State):
                 player_unit_count=self.player_unit_count,
                 enemy_unit_count=self.enemy_unit_count,
                 terrain_file_path=self.uploaded_file_path,
-                temperature=config_state.temperature,
-                max_tokens=config_state.max_tokens,
+                temperature=config_data.get("temperature", 1.0),
+                max_tokens=config_data.get("max_tokens", 8096),
             )
 
         # 读取地形
@@ -188,7 +273,8 @@ class GenerationState(rx.State):
         # ── Stage 1: Planning ──
         async with self:
             self.stage_statuses = ["running", "waiting", "waiting", "waiting"]
-            self.active_stage = 0
+            if not self._user_selected_stage:
+                self.active_stage = 0
 
         try:
             plan = await asyncio.to_thread(
@@ -204,7 +290,8 @@ class GenerationState(rx.State):
         async with self:
             self.stage_statuses = ["done", "running", "waiting", "waiting"]
             self.stage_outputs[0] = plan
-            self.active_stage = 1
+            if not self._user_selected_stage:
+                self.active_stage = 1
 
         # ── Stage 2: API Query ──
         try:
@@ -223,7 +310,8 @@ class GenerationState(rx.State):
         async with self:
             self.stage_statuses = ["done", "done", "running", "waiting"]
             self.stage_outputs[1] = queries_text
-            self.active_stage = 2
+            if not self._user_selected_stage:
+                self.active_stage = 2
 
         # ── Stage 3: API Lib ──
         try:
@@ -238,7 +326,8 @@ class GenerationState(rx.State):
         async with self:
             self.stage_statuses = ["done", "done", "done", "running"]
             self.stage_outputs[2] = api_lib
-            self.active_stage = 3
+            if not self._user_selected_stage:
+                self.active_stage = 3
 
         # ── Stage 4: Codegen ──
         try:
@@ -259,16 +348,15 @@ class GenerationState(rx.State):
             self.galaxy_code = galaxy_code
             self.map_ready = True
             self.is_generating = False
+            self._user_selected_stage = False
             self.active_stage = 3
 
         # ── 保存生成结果到磁盘 ──
         import time as _time
         tag = _time.strftime("%Y%m%d-%H%M%S")
 
-        # 从 ConfigState 读取输出目录
-        async with self:
-            config_state2 = await self.get_state(ConfigState)
-            history_dir = config_state2.history_dir or "gen_history"
+        # 从配置文件读取输出目录
+        history_dir = config_data.get("paths", {}).get("history_dir", "gen_history")
 
         output_dir = os.path.join(history_dir, tag)
         os.makedirs(output_dir, exist_ok=True)
@@ -299,8 +387,11 @@ class GenerationState(rx.State):
 
     def download_galaxy(self):
         """下载 Galaxy 脚本"""
-        if self.galaxy_file_path and os.path.exists(self.galaxy_file_path):
-            return rx.download(self.galaxy_file_path, filename="MapScript.galaxy")
+        if self.galaxy_code:
+            return rx.download(
+                data=self.galaxy_code,
+                filename="MapScript.galaxy",
+            )
 
     def download_all(self):
         """下载整个输出目录（提示用户路径）"""
@@ -336,3 +427,13 @@ class GenerationState(rx.State):
     @rx.var
     def is_macro(self) -> bool:
         return self.mode == "macro"
+
+    @rx.var
+    def stratagem_label(self) -> str:
+        """将 stratagem value 转回 label 供 rx.select 回显"""
+        if not self.stratagem:
+            return ""
+        for s in STRATAGEMS:
+            if s["value"] == self.stratagem:
+                return s["label"]
+        return ""

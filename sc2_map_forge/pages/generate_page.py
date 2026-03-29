@@ -9,6 +9,7 @@ from ..components.header import header, top_tabs
 from ..components.sidebar import sidebar
 from ..components.pipeline import pipeline_bar, stage_detail_panel
 from ..components.output_panels import output_panels
+from ..states.generation_state import GenerationState
 
 
 def generate_page() -> rx.Component:
@@ -25,4 +26,5 @@ def generate_page() -> rx.Component:
             ),
             class_name="app-layout",
         ),
+        on_mount=GenerationState.on_load,
     )

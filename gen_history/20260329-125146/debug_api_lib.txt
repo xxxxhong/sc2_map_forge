@@ -1,0 +1,2132 @@
+[Galaxy API Functions - 99 loaded]
+
+
+Function: Destroy
+Identifier: libNtve_gf_Destroy
+
+Description:
+Constructs and returns a Destroy actor message.  This message destroys the actor it is sent to, removing it from the game entirely.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+(none)
+
+Prototype:
+string libNtve_gf_Destroy();
+
+Function: Query Radius
+Identifier: libNtve_gf_QueryRadius
+
+Description:
+Constructs and returns a QueryRadius actor message.  This message will search a radius equal to the Radius parameter around an actor, and send an actor message determined by the Response Actor parameter to any actors it finds in that radius.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Radius: fixed
+- Response Actor: string<gamelink::Actor>
+
+Prototype:
+string libNtve_gf_QueryRadius(fixed lp_radius,string lp_responseActor,);
+
+Function: Query Region
+Identifier: libNtve_gf_QueryRegion
+
+Description:
+Constructs and returns a QueryRegion actor message.  This message searches a region actor determined by the Region Actor parameter and sends a message determined by the Response Actor parameter to any actors found inside of the region actor.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Region Actor: string<gamelink::Actor>
+- Response Actor: string<gamelink::Actor>
+
+Prototype:
+string libNtve_gf_QueryRegion(string lp_regionActor,string lp_responseActor,);
+
+Function: Ref Destroy
+Identifier: libNtve_gf_RefDestroy
+
+Description:
+Constructs and returns a RefDestroy actor message based on the parameters.  This message destroys an existing actor reference with a name equal to the Actor Ref Name parameter.  Once it is destroyed it will no loner be accessible.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Actor Ref Name: string
+
+Prototype:
+string libNtve_gf_RefDestroy(string lp_actorRefName);
+
+Function: Remove Death Models in Region
+Identifier: libNtve_gf_RemoveDeathModelsinRegion
+
+Description:
+Destroys all of the unit death models in the specified region and calls Kill All Particles. Be careful using this action because it kills all particles across the whole map, instead of just whithin the region.
+
+Return Type:
+void
+
+Parameters:
+- Region: region
+
+Prototype:
+void libNtve_gf_RemoveDeathModelsinRegion(region lp_region,);
+
+Function: Set Target Gather Offense For Attack Waves
+Identifier: AIAttackWaveSetTargetGatherO
+
+Description:
+Sets the target of a player*“s attack waves to a town”*s offensive gather point.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Town: int
+
+Prototype:
+native void AIAttackWaveSetTargetGatherO(int player,int town,);
+
+Function: Add Attack Wave Unit Types (Swarm)
+Identifier: AIAttackWaveAddUnits3
+
+Description:
+Adds a type of unit to the next attack wave for a player; allowing you to specify a different number of units per difficulty level.
+
+Return Type:
+void
+
+Parameters:
+- Easy Count: int
+- Normal Count: int
+- Advanced Count: int
+- Type: string<gamelink::Unit>
+
+Prototype:
+void AIAttackWaveAddUnits3(int n1,int n2,int n3,string unitType,);
+
+Function: Escorts Of Unit Group
+Identifier: AIGetAllEscortsGroup
+
+Description:
+Returns a group of all of the units assigned to escort a unit group.
+
+Return Type:
+unitgroup
+
+Parameters:
+- UnitGroup: unitgroup
+
+Prototype:
+native unitgroup AIGetAllEscortsGroup(unitgroup ug);
+
+Function: Escorts Of Unit
+Identifier: AIGetAllEscorts
+
+Description:
+Returns a group of all of the units assigned to escort a unit.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native unitgroup AIGetAllEscorts(unit u);
+
+Function: Issue AI Order
+Identifier: libNtve_gf_AICast
+
+Description:
+Suggests an order to a unit.  If the computer that controls the unit has the ability to execute the order (with respect to its current APM constraint), then it will do so.  The order will eventually be dropped if the computer is unable to execute it for a few seconds after it was issued.  If you need a unit to do something immediately, use Issue Order instead.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Order: order
+
+Prototype:
+void libNtve_gf_AICast(unit lp_unit, order lp_order);
+
+Function: Set Defense Radii
+Identifier: AISetDefenseRadii
+
+Description:
+Sets the basic defense call for help radii.  The threat must attack a building or come within MaxThreateningRange to trigger a defense call for help. Defenders that are within BuildingCallForHelpRange of the building or ThreatCallForHelpRange of the threat will respond. (ie the defender must be near the building or near the threat). By default Melee is (p#, 15.0, 10.0, 12.0) and Campaign is (p#, 6.0, 7.0, 9.0)
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Max Threating Range: fixed
+- Building Call For Help Range: fixed
+- Threat Call For Help Range: fixed
+
+Prototype:
+native void AISetDefenseRadii(int player,fixed maxThreatRange,fixed buildingCallRange,fixed threatCallRange,);
+
+Function: Wave Info Attack
+Identifier: AIWaveInfoAttack
+
+Description:
+Instructs a wave to attack with the specified parameters.
+
+Return Type:
+int
+
+Parameters:
+- Wave Info: waveinfo
+- Player: int
+- From: point
+- Target: wavetarget
+- Time: int
+
+Prototype:
+native int AIWaveInfoAttack(waveinfo info,int player,point from,wavetarget target,int time,);
+
+Function: Pan Camera
+Identifier: CameraPan
+
+Description:
+Pans the camera to the center of a region or point.  If smart panning is enabled, the camera will not pan if it is already looking at the target point.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Point: point
+- Duration: fixed
+- Initial Velocity: fixed
+- Decelerate: fixed
+- Smart: bool<preset::Do_Do_Not_Option>
+
+Prototype:
+native void CameraPan(int player,point p,fixed duration,fixed velocity,fixed decelerate,bool smart,);
+
+Function: Set Camera Bounds
+Identifier: CameraSetBounds
+
+Description:
+Sets the camera bounds within a region. This will limit the specified Players from moving their camera beyond the specified Bounds. If the Minimap parameter is set to Do, the minimap will also shrink to fit the camera bounds. This is useful for hiding things off map, or having the playable area expand at some point during your map.
+
+Return Type:
+void
+
+Parameters:
+- Players: playergroup
+- Bounds: region
+- Minimap: bool<preset::Do_Do_Not_Option>
+
+Prototype:
+native void CameraSetBounds(playergroup players,region bounds,bool includeMinimap,);
+
+Function: Camera Object Target
+Identifier: CameraInfoGetTarget
+
+Description:
+Returns the camera object target.
+
+Return Type:
+point
+
+Parameters:
+- Camera Object: camerainfo
+
+Prototype:
+native point CameraInfoGetTarget(camerainfo c);
+
+Function: Catalog Reference Get
+Identifier: CatalogReferenceGet
+
+Description:
+Returns the value of a field for an entry.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the unit for the first index of a train ability, your field path string would be“InfoArray[0].Unit”.
+
+Return Type:
+string
+
+Parameters:
+- Reference: string<reference>
+- Player: int
+
+Prototype:
+native string CatalogReferenceGet(string reference,int player,);
+
+Function: Cost Of Ability
+Identifier: libNtve_gf_CostOfAbility
+
+Description:
+Returns one of the costs of an ability.  Use catalog lookup functions to retrieve a data value or other information from the game data.
+
+Return Type:
+fixed
+
+Parameters:
+- Ability: string<gamelink::Abil>
+- CostType: string<preset::CostType>
+
+Prototype:
+fixed libNtve_gf_CostOfAbility(string lp_ability,string lp_costType,);
+
+Function: Create Conversation Reply
+Identifier: ConversationReplyCreate
+
+Description:
+Creates a conversation reply.
+
+Return Type:
+int<reply>
+
+Parameters:
+- Conversation: int<conversation>
+- Reply Text: text
+
+Prototype:
+native int ConversationReplyCreate(int intId, text inText);
+
+Function: Conversation Reply Text
+Identifier: ConversationReplyGetText
+
+Description:
+Returns the text of the specified conversation reply.
+
+Return Type:
+text
+
+Parameters:
+- Conversation: int<conversation>
+- Reply: int<reply>
+
+Prototype:
+native text ConversationReplyGetText(int intId,int replyId,);
+
+Function: Active Data Conversation Sound
+Identifier: ConversationDataActiveSound
+
+Description:
+Returns the sound associated with the active line in the running data conversation
+
+Return Type:
+string<gamelink::Sound>
+
+Parameters:
+(none)
+
+Prototype:
+native string ConversationDataActiveSound();
+
+Function: Value From Data Table (Planet)
+Identifier: DataTableGetPlanet
+
+Description:
+Returns a planet value from a data table.  Data tables allow you to store and recall values using a string identifier.
+
+Return Type:
+int<planet>
+
+Parameters:
+- Scope: bool<preset::DataScope>
+- Name: string
+
+Prototype:
+native int DataTableGetPlanet(bool global, string name);
+
+Function: Value From Data Table (Transmission Source)
+Identifier: DataTableGetTransmissionSource
+
+Description:
+Returns a transmission source value from a data table.  Data tables allow you to store and recall values using a string identifier.
+
+Return Type:
+transmissionsource
+
+Parameters:
+- Scope: bool<preset::DataScope>
+- Name: string
+
+Prototype:
+native transmissionsource DataTableGetTransmissionSource(bool global,string name,);
+
+Function: Value From Data Table (Transmission)
+Identifier: DataTableGetTransmission
+
+Description:
+Returns a transmission value from a data table.  Data tables allow you to store and recall values using a string identifier.
+
+Return Type:
+int<transmission>
+
+Parameters:
+- Scope: bool<preset::DataScope>
+- Name: string
+
+Prototype:
+native int DataTableGetTransmission(bool global,string name,);
+
+Function: Unit Stats Stop
+Identifier: UnitStatsStop
+
+Description:
+Stops Unit Stats performance logging.
+
+Return Type:
+void
+
+Parameters:
+(none)
+
+Prototype:
+native void UnitStatsStop();
+
+Function: Set Dialog Item Image
+Identifier: libNtve_gf_SetDialogItemImage
+
+Description:
+Sets the image to display on a dialog item.
+
+Return Type:
+void
+
+Parameters:
+- Dialog Item: int<control>
+- Image: string<filepath>
+- Players: playergroup
+
+Prototype:
+void libNtve_gf_SetDialogItemImage(int lp_dialogItem,string lp_image,playergroup lp_players,);
+
+Function: Map Initialization
+Identifier: TriggerAddEventMapInit
+
+Description:
+This event fires when a map starts running.
+
+Return Type:
+void
+
+Parameters:
+(none)
+
+Prototype:
+native void TriggerAddEventMapInit(trigger t);
+
+Function: Destroy Objective
+Identifier: ObjectiveDestroy
+
+Description:
+Destroys an objective.
+
+Return Type:
+void
+
+Parameters:
+- Objective: int<objective>
+
+Prototype:
+native void ObjectiveDestroy(int inObjective);
+
+Function: Order Targeting Point
+Identifier: OrderTargetingPoint
+
+Description:
+Returns an order targeting a point.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Target Point: point
+
+Prototype:
+native order OrderTargetingPoint(abilcmd inAbilCmd,point inPoint,);
+
+Function: Order Targeting Unit
+Identifier: OrderTargetingUnit
+
+Description:
+Returns an order targeting a unit.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Unit: unit
+
+Prototype:
+native order OrderTargetingUnit(abilcmd inAbilCmd,unit inUnit,);
+
+Function: Order Targeting Unit Group
+Identifier: OrderTargetingUnitGroup
+
+Description:
+Returns an order targeting a unit group.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Unit Group: unitgroup
+
+Prototype:
+native order OrderTargetingUnitGroup(abilcmd inAbilCmd,unitgroup inUnitGroup,);
+
+Function: Order Targeting Valid Unit In Group
+Identifier: AIUnitGroupGetValidOrder
+
+Description:
+Returns an order targeting a unit group.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Unit Group: unitgroup
+- Order: order
+- Caster: unit
+- Forward: bool
+
+Prototype:
+native order AIUnitGroupGetValidOrder(unitgroup inGroup,order inOrder,unit caster,bool forwards,);
+
+Function: Order Set Target Point
+Identifier: OrderSetTargetPoint
+
+Description:
+Returns —void
+
+Return Type:
+void
+
+Parameters:
+- Order: order
+- Point: point
+
+Prototype:
+native void OrderSetTargetPoint(order inOrder,point inPoint,);
+
+Function: Target Position For Order
+Identifier: OrderGetTargetPosition
+
+Description:
+Returns the position of the target for an order, regardless of what type of target it is.
+
+Return Type:
+point
+
+Parameters:
+- Order: order
+
+Prototype:
+native point OrderGetTargetPosition(order inOrder);
+
+Function: Target Unit For Order
+Identifier: OrderGetTargetUnit
+
+Description:
+Returns the target for the order if the target is a unit.
+
+Return Type:
+unit
+
+Parameters:
+- Order: order
+
+Prototype:
+native unit OrderGetTargetUnit(order inOrder);
+
+Function: Ability Command
+Identifier: AbilityCommand
+
+Description:
+Constructs an ability command from an ability and an index.  An ability command is the combination of an ability and an index for a command within that ability.  Command indexes are 0 based.
+
+Return Type:
+abilcmd
+
+Parameters:
+- Ability: string<gamelink::Abil>
+- Command: int
+
+Prototype:
+native abilcmd AbilityCommand(string inAbil,int inCmdIndex,);
+
+Function: Set Ping Use Player Vision
+Identifier: PingSetUsePlayerVision
+
+Description:
+Sets whether or not the ping should use the vision of the local player at the point it exists when determining if it*“s visible or not.  This allows pings that aren”*t attached to units to easily be hidden when beneath the fog of war.
+
+Return Type:
+void
+
+Parameters:
+- Ping: int<ping>
+- Use Player Vision: bool
+
+Prototype:
+native void PingSetUsePlayerVision(int p,bool usePlayerVision,);
+
+Function: Player Leaves Game
+Identifier: TriggerAddEventPlayerLeft
+
+Description:
+This event fires when a player leaves the game with the specified victory type.  Use“Triggering Player”to get the player.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Result: int<preset::LeaveGameOption>
+
+Prototype:
+native void TriggerAddEventPlayerLeft(trigger inTrigger,int player,int inResult,);
+
+Function: Point From XY
+Identifier: Point
+
+Description:
+Returns a 2D location as a point.  This allows you to specify any location on the map grid as a viable value for a point parameter.
+
+Return Type:
+point
+
+Parameters:
+- X: fixed
+- Y: fixed
+
+Prototype:
+native point Point(fixed x, fixed y);
+
+Function: Entire Map
+Identifier: RegionEntireMap
+
+Description:
+Returns the entire map.
+
+Return Type:
+region
+
+Parameters:
+(none)
+
+Prototype:
+native region RegionEntireMap();
+
+Function: Set Playable Map Area
+Identifier: RegionPlayableMapSet
+
+Description:
+Sets the playable map area, which is the area within which units are generally confined.  The edges of the specified region will be rounded to the nearest even-numbered cell edge.  Camera bounds will be automatically adjusted to accomodate the new playable map area.  Use the“Set Camera Bounds”action to change the camera bounds.
+
+Return Type:
+void
+
+Parameters:
+- Region: region
+
+Prototype:
+native void RegionPlayableMapSet(region r);
+
+Function: Unit Attached To Region
+Identifier: RegionGetAttachUnit
+
+Description:
+Returns a unit attached to a region.
+
+Return Type:
+unit
+
+Parameters:
+- Region: region
+
+Prototype:
+native unit RegionGetAttachUnit(region r);
+
+Function: Play Sound  (Deprecated)
+Identifier: SoundPlay
+
+Description:
+Plays a sound for the specified player group.  Use the“Last Played Sound”function to refer to this sound.
+
+Return Type:
+void
+
+Parameters:
+- Sound Link: soundlink
+- Players: playergroup
+- Volume: fixed
+- Offset: fixed
+
+Prototype:
+void SoundPlay(soundlink lp_soundLink,playergroup lp_players,fixed lp_volume,fixed lp_offset,);
+
+Function: Planet Panel Death Complete
+Identifier: TriggerAddEventPlanetPanelDeathComplete
+
+Description:
+This event fires when the planet panel finishes playing its death animation.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+
+Prototype:
+native void TriggerAddEventPlanetPanelDeathComplete(trigger t,int player,);
+
+Function: Set Planet Technology Unit
+Identifier: PlanetSetTechnologyUnitLink
+
+Description:
+Sets the unit for the tech for the specified planet.
+
+Return Type:
+void
+
+Parameters:
+- Planet: int<planet>
+- Unit Link: string<gamelink::Unit>
+
+Prototype:
+native void PlanetSetTechnologyUnitLink(int inPlanetId,string inUnitLink,);
+
+Function: Mission Archives Panel Exited
+Identifier: TriggerAddEventBattleReportPanelExit
+
+Description:
+This event fires when a player closes the mission archives panel.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+
+Prototype:
+native void TriggerAddEventBattleReportPanelExit(trigger t,int inPlayer,);
+
+Function: Victory Panel Play Mission Again
+Identifier: TriggerAddEventVictoryPanelPlayMissionAgain
+
+Description:
+This event fires when a player clicks the play again button on the victory panel.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+
+Prototype:
+native void TriggerAddEventVictoryPanelPlayMissionAgain(trigger t,int player,);
+
+Function: Add Victory Panel Achievement
+Identifier: VictoryPanelAddAchievement
+
+Description:
+This will only work with Blizzard maps.
+
+Return Type:
+void
+
+Parameters:
+- Achievement: string<gamelink::Achievement>
+
+Prototype:
+native void VictoryPanelAddAchievement(string inAchievement,);
+
+Function: Time Elapsed
+Identifier: TriggerAddEventTimeElapsed
+
+Description:
+This event fires once the specified amount of time has passed in game.
+
+Return Type:
+void
+
+Parameters:
+- Duration: fixed
+- Time Type: int<preset::TimeType>
+
+Prototype:
+native void TriggerAddEventTimeElapsed(trigger inTrigger,fixed inTime,int inTimeType,);
+
+Function: Periodic Event
+Identifier: TriggerAddEventTimePeriodic
+
+Description:
+This event fires periodically whenever the time specified elapses.
+
+Return Type:
+void
+
+Parameters:
+- Duration: fixed
+- Time Type: int<preset::TimeType>
+
+Prototype:
+native void TriggerAddEventTimePeriodic(trigger inTrigger,fixed inTime,int inTimeType,);
+
+Function: Create Timer Window
+Identifier: TimerWindowCreate
+
+Description:
+Creates a new timer window for the timer.  After creation the timer window must be shown for it to appear.  Use“Show/Hide Timer Window”to show the window.
+
+Return Type:
+int<preset::TimerWindow>
+
+Parameters:
+- Timer: timer
+- Title: text
+- Visible: bool<preset::VisibleHiddenOption>
+- Elapsed: bool<preset::ElapsedRemainingOption>
+
+Prototype:
+native int TimerWindowCreate(timer inTimer,text inTitle,bool inShow,bool inShowElapsed,);
+
+Function: Last Created Timer Window
+Identifier: TimerWindowLastCreated
+
+Description:
+Returns the last timer window created using the“Create Timer Window”action.
+
+Return Type:
+int<preset::TimerWindow>
+
+Parameters:
+(none)
+
+Prototype:
+native int TimerWindowLastCreated();
+
+Function: Set Timer For Timer Window
+Identifier: TimerWindowSetTimer
+
+Description:
+Sets the timer for the specified timer window.
+
+Return Type:
+void
+
+Parameters:
+- Window: int<preset::TimerWindow>
+- Timer: timer
+
+Prototype:
+native void TimerWindowSetTimer(int inWindow,timer inTimer,);
+
+Function: Set Time Format For Timer Window
+Identifier: TimerWindowSetFormat
+
+Description:
+Sets the time format for the specified timer.
+
+Return Type:
+void
+
+Parameters:
+- Window: int<preset::TimerWindow>
+- Format: text
+
+Prototype:
+native void TimerWindowSetFormat(int inWindow,text inFormat,);
+
+Function: New Trigger
+Identifier: TriggerCreate
+
+Description:
+Returns —trigger
+
+Return Type:
+trigger
+
+Parameters:
+- Function Name: string
+
+Prototype:
+native trigger TriggerCreate(string inFunction);
+
+Function: Show/Hide Boss Bar
+Identifier: libNtve_gf_ShowHideBossBar
+
+Description:
+Shows or hides the specified boss bar.
+
+Return Type:
+void
+
+Parameters:
+- Show/Hide: bool<preset::ShowHideOption>
+- BossBarID: int
+
+Prototype:
+void libNtve_gf_ShowHideBossBar(bool lp_showHide,int lp_bossBarID,);
+
+Function: Resource Requested Amount
+Identifier: EventResourceRequestAmount
+
+Description:
+Returns —int
+
+Return Type:
+int
+
+Parameters:
+- Resource Type: int<preset::ResourceType>
+
+Prototype:
+native int EventResourceRequestAmount(int resourceIndex);
+
+Function: Get Path Display Visibility
+Identifier: PathGetVisible
+
+Description:
+Returns —bool<preset::VisibleHiddenOption>
+
+Return Type:
+bool<preset::VisibleHiddenOption>
+
+Parameters:
+- Path Display: int<path>
+- Location: int<preset::PathDisplayLocation>
+
+Prototype:
+native bool PathGetVisible(int inPathId, int inLocation);
+
+Function: Create Units With Default Facing
+Identifier: libNtve_gf_CreateUnitsWithDefaultFacing
+
+Description:
+Creates units using the default facing angle of the unit.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+void
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+
+Prototype:
+void libNtve_gf_CreateUnitsWithDefaultFacing(int lp_count,string lp_type,int lp_style,int lp_player,point lp_p,);
+
+Function: Create Units With Point Facing
+Identifier: libNtve_gf_CreateUnitsAtPoint2
+
+Description:
+Creates units using the facing angle of a point.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+void
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+
+Prototype:
+void libNtve_gf_CreateUnitsAtPoint2(int lp_count,string lp_type,int lp_flags,int lp_player,point lp_p,);
+
+Function: Last Replaced Unit
+Identifier: libNtve_gf_LastReplacedUnit
+
+Description:
+Returns the last replacement unit created via“Replace Unit”.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+unit libNtve_gf_LastReplacedUnit();
+
+Function: Create Units Facing Point
+Identifier: libNtve_gf_UnitCreateFacingPoint
+
+Description:
+Creates units facing a specified point.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+- Facing: point
+
+Prototype:
+unitgroup libNtve_gf_UnitCreateFacingPoint(int lp_count,string lp_type,int lp_flags,int lp_player,point lp_pos,point lp_facing,);
+
+Function: Old Unit Owner
+Identifier: EventUnitOwnerOld
+
+Description:
+Returns the previous owner of a unit, when used in response to“Unit Owner Changes”.
+
+Return Type:
+int
+
+Parameters:
+(none)
+
+Prototype:
+native int EventUnitOwnerOld();
+
+Function: Unit Is Alive
+Identifier: UnitIsAlive
+
+Description:
+Returns true if a unit is alive.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native bool UnitIsAlive(unit inUnit);
+
+Function: Owner Of Unit
+Identifier: UnitGetOwner
+
+Description:
+Returns the owner of a unit.
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native int UnitGetOwner(unit inUnit);
+
+Function: Sleep/WakeUp Unit
+Identifier: libNtve_gf_SleepUnit
+
+Description:
+Sleeps or wakes up the specified unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Sleep/WakeUp: bool<preset::SleepWakeUpOption>
+
+Prototype:
+void libNtve_gf_SleepUnit(unit lp_unit,bool lp_sleepWakeUp,);
+
+Function: Show/Hide Unit
+Identifier: libNtve_gf_ShowHideUnit
+
+Description:
+Shows or hides a unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Show/Hide: bool<preset::ShowHideOption>
+
+Prototype:
+void libNtve_gf_ShowHideUnit(unit lp_unit,bool lp_showHide,);
+
+Function: Unit Enters/Leaves Point
+Identifier: TriggerAddEventUnitRangePoint
+
+Description:
+This event fires when a unit enters or leaves a certain distance around a point.  Use“Triggering Unit”to get the unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Point: point
+- Distance: fixed
+- State: bool<preset::RegionEnterLeaveState>
+
+Prototype:
+native void TriggerAddEventUnitRangePoint(trigger t,unitref u,point p,fixed distance,bool state,);
+
+Function: Unit Enters/Leaves Region
+Identifier: TriggerAddEventUnitRegion
+
+Description:
+This event fires when a unit enters or leaves a region.  Use“Triggering Player”to get the player that was controlling the unit.  Use“Triggering Region”to get the region that the unit either entered or left.  Use“Triggering Unit”to get the unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Region: region
+- State: bool<preset::RegionEnterLeaveState>
+
+Prototype:
+native void TriggerAddEventUnitRegion(trigger t,unitref u,region r,bool state,);
+
+Function: Unit In Region
+Identifier: libNtve_gf_UnitInRegion
+
+Description:
+Returns true if a unit is in the specified region.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+- Region: region
+
+Prototype:
+bool libNtve_gf_UnitInRegion(unit lp_u, region lp_regioin);
+
+Function: Get Unit Damage Dealt Time
+Identifier: UnitGetDamageDealtTime
+
+Description:
+Returns time for how long it’s been since the unit has dealt damage.
+
+Return Type:
+fixed
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native fixed UnitGetDamageDealtTime(unit inUnit);
+
+Function: Triggering Unit
+Identifier: EventUnit
+
+Description:
+Returns the triggering unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+native unit EventUnit();
+
+Function: Unit Dies
+Identifier: TriggerAddEventUnitDied
+
+Description:
+This event fires when a unit dies.  Use“Damage Source Position”to get the position of the unit that dealt the killing blow.  Use“Killing Player”to get the owner of the unit that dealt the killing blow.  Use“Killing Unit”to get the unit that dealt the killing blow.  Use“Triggering Death Type Check”to get the death type.  Use“Triggering Player”to get the owner of the unit that died.  Use“Triggering Unit”to get the unit that died.  Use“Experience Level Of Unit”to get the experience level of the unit that died.  Use“Total Experience Of Unit”to get the total number of experience points the unit had before it died.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+
+Prototype:
+native void TriggerAddEventUnitDied(trigger t, unitref u);
+
+Function: Killing Unit
+Identifier: libNtve_gf_KillingUnit
+
+Description:
+Returns the killing unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+unit libNtve_gf_KillingUnit();
+
+Function: Unit Absorbs Damage
+Identifier: TriggerAddEventUnitDamageAbsorbed
+
+Description:
+This event fires when a unit absorbs damage due to a behavior damage response.  Use“Triggering Unit”to get the unit that absorbed damage.  Use“Triggering Behavior”to get the behavior that absorbed damage on the unit.  Use“Triggering Damage Absorbed”to get the amount of damage absorbed.  Use“Damaging Unit”and“Damaging Player”to get the unit and player that caused the damage.  Use“Damaging Effect”to get the effect that caused the damage.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Behavior: string<gamelink::Behavior>
+
+Prototype:
+native void TriggerAddEventUnitDamageAbsorbed(trigger inTrigger,unitref inUnit,string inBehavior,);
+
+Function: Unit Takes Damage
+Identifier: TriggerAddEventUnitDamaged
+
+Description:
+This event fires when a unit takes damage.  Use“Damage Source Position”to get the position of the damage source.  Use“Damaging Player”to get the owner of the unit that is dealing damage.  Use“Damaging Unit”to get the unit that is dealing damage.  Use“Triggering Damage Amount”to get the amount of damage being dealt.  Use“Triggering Player”to get the owner of the unit that is taking damage.  Use“Triggering Unit”to get the unit that is taking damage.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Damage Type: int<preset::DamageType>
+- Damage Fatal Option: int<preset::DamageFatalOption>
+- Damage Effect: string<gamelink::Effect>
+
+Prototype:
+native void TriggerAddEventUnitDamaged(trigger inTrigger,unitref inUnit,int inDamageType,int inDamageFatal,string inEffect,);
+
+Function: Unit Order
+Identifier: UnitOrder
+
+Description:
+Returns an order for a unit.
+
+Return Type:
+order
+
+Parameters:
+- Unit: unit
+- Index: int
+
+Prototype:
+native order UnitOrder(unit inUnit, int inIndex);
+
+Function: Issue Order
+Identifier: UnitIssueOrder
+
+Description:
+Issues an order to a unit.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+- Order: order
+- Queue: int<preset::Unit_Order_Queue_Option>
+
+Prototype:
+native bool UnitIssueOrder(unit inUnit,order inOrder,int inQueueType,);
+
+Function: Issue Order To Unit Group
+Identifier: UnitGroupIssueOrder
+
+Description:
+Issues an order to all the units in the specified unit group.
+
+Return Type:
+bool
+
+Parameters:
+- Group: unitgroup
+- Order: order
+- Queue: int<preset::Unit_Order_Queue_Option>
+
+Prototype:
+native bool UnitGroupIssueOrder(unitgroup inGroup,order inOrder,int inQueueType,);
+
+Function: Unit Type Of Unit
+Identifier: UnitGetType
+
+Description:
+Returns the unit type for the specified unit.
+
+Return Type:
+string<gamelink::Unit>
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native string UnitGetType(unit inUnit);
+
+Function: Unit Resources
+Identifier: libNtve_gf_UnitGetPropertyResources
+
+Description:
+Returns the amount of resources a unit has.
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+- Current: bool<preset::CurrentDefaultOption>
+
+Prototype:
+int libNtve_gf_UnitGetPropertyResources(unit lp_u,bool lp_current,);
+
+Function: Unit Kills
+Identifier: libNtve_gf_UnitGetPropertyKills
+
+Description:
+Returns the amount of kills a unit possesses.
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+- Current: bool<preset::CurrentDefaultOption>
+
+Prototype:
+int libNtve_gf_UnitGetPropertyKills(unit lp_u,bool lp_current,);
+
+Function: Hide Unit Status Bar
+Identifier: UnitStatusBarClearOverride
+
+Description:
+If the game setting for unit status bar display is Always, this function doesn’t work.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native void UnitStatusBarClearOverride(unit inUnit);
+
+Function: Last Created Cargo Units
+Identifier: UnitCargoLastCreatedGroup
+
+Description:
+Returns the last group of units created via the“Create Cargo Units”action.  This function ignores units created by other triggers.
+
+Return Type:
+unitgroup
+
+Parameters:
+(none)
+
+Prototype:
+native unitgroup UnitCargoLastCreatedGroup();
+
+Function: Cooldown For Unit Abilty
+Identifier: UnitAbilityGetCooldown
+
+Description:
+Returns the cooldown time for the specified ability cooldown link.
+
+Return Type:
+fixed
+
+Parameters:
+- Unit: unit
+- Ability: string<gamelink::Abil>
+- Cooldown: string<cooldown>
+
+Prototype:
+native fixed UnitAbilityGetCooldown(unit inUnit,string inAbil,string inCooldown,);
+
+Function: Remove Cooldown For Unit Ability
+Identifier: libNtve_gf_UnitAbilityRemoveCooldown
+
+Description:
+Clears the specified ability cooldown link.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Ability: string<gamelink::Abil>
+- Cooldown: string<cooldown>
+
+Prototype:
+void libNtve_gf_UnitAbilityRemoveCooldown(unit lp_inUnit,string lp_inAbil,string lp_inCooldown,);
+
+Function: Units In Region With Alliance To Player Matching Condition
+Identifier: libNtve_gf_UnitsInRegionWithAllianceToPlayerMatchingCondition
+
+Description:
+Returns a unit group containing all units within the alliance filter specified and match the specified unit filters.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type 1: string<gamelink::Unit>
+- Unit Type 2: string<gamelink::Unit>
+- Unit Type 3: string<gamelink::Unit>
+- Player: int
+- Alliance: int<preset::UnitAllianceWithSelf>
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+unitgroup libNtve_gf_UnitsInRegionWithAllianceToPlayerMatchingCondition(string lp_type,string lp_type2,string lp_type22,int lp_player,int lp_alliance,region lp_reg,unitfilter lp_unitFilter,int lp_count,);
+
+Function: Units In Region Matching Condition
+Identifier: UnitGroup
+
+Description:
+Returns a unit group containing all units that match the specified filters.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native unitgroup UnitGroup(string type,int player,region r,unitfilter filter,int maxCount,);
+
+Function: Units In Unit Group For Player
+Identifier: UnitGroupFilterPlayer
+
+Description:
+Returns a unit group by extracting units from a unit group belonging to the specified player.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Group: unitgroup
+- Player: int
+- Count: int
+
+Prototype:
+native unitgroup UnitGroupFilterPlayer(unitgroup g,int player,int maxCount,);
+
+Function: Units Near Point Matching Condition
+Identifier: UnitGroupSearch
+
+Description:
+Returns a unit group containing all units that match the specified filters within the radius of the specified point.  The player parameter determines the player used for the Unit Filter comparisons.  For example, if you specify Enemy in the Unit Filter, it will get units that are an enemy to the specified player.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Point: point
+- Radius: fixed
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native unitgroup UnitGroupSearch(string type,int player,point p,fixed radius,unitfilter filter,int maxCount,);
+
+Function: Units In Region With Alliance To Player
+Identifier: UnitGroupAlliance
+
+Description:
+Returns a unit group containing all units within the alliance filter specified.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Player: int
+- Alliance: int<preset::UnitAlliance>
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native unitgroup UnitGroupAlliance(int player,int alliance,region r,unitfilter filter,int maxCount,);
+
+Function: Add Unit To Unit Group
+Identifier: UnitGroupAdd
+
+Description:
+Adds the specified unit to the specified unit group.
+
+Return Type:
+void
+
+Parameters:
+- Unit Group: unitgroup
+- Unit: unit
+
+Prototype:
+native void UnitGroupAdd(unitgroup inGroup, unit inUnit);
+
+Function: Unit Count In Region Matching Condition
+Identifier: UnitCount
+
+Description:
+Returns a count of units that match the specified filters.
+
+Return Type:
+int
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native int UnitCount(string type,int player,region r,unitfilter filter,int maxCount,);
+
+Function: Unit Object Group Call For Help
+Identifier: UnitObjectGroupCallForHelp
+
+Description:
+Returns —void
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Attacker: unit
+
+Prototype:
+native void UnitObjectGroupCallForHelp(unit inUnit,unit attacker,);
+
+Function: Add Unit Group To Unit Group Old
+Identifier: libNtve_gf_AddUnitGroupToUnitGroup
+
+Description:
+Adds all the units in the source unit group to the target unit group.
+
+Return Type:
+void
+
+Parameters:
+- Source Unit Group: unitgroup
+- Target Unit Group: unitgroup
+
+Prototype:
+void libNtve_gf_AddUnitGroupToUnitGroup(unitgroup lp_sourceUnitGroup,unitgroup lp_targetUnitGroup,);
+
+Function: Create Unit Object Group From Unit Group
+Identifier: UnitObjectGroupFromUnitGroup
+
+Description:
+Returns —int
+
+Return Type:
+int
+
+Parameters:
+- Unit Group: unitgroup
+- Group Level: int
+
+Prototype:
+native int UnitObjectGroupFromUnitGroup(unitgroup group,int groupLevel,);
+
+Function: Number Of Units In Unit Group
+Identifier: UnitGroupCount
+
+Description:
+Returns the total number of units in the specified unit group.
+
+Return Type:
+int
+
+Parameters:
+- Unit Group: unitgroup
+- Type: int<preset::UnitCountType>
+
+Prototype:
+native int UnitGroupCount(unitgroup inGroup, int inType);
+
+Function: Closest Unit To Point Old
+Identifier: libNtve_gf_ClosestUnitToPoint
+
+Description:
+Picks the closest unit to the point specified in a unit group.
+
+Return Type:
+unit
+
+Parameters:
+- Point: point
+- Group: unitgroup
+
+Prototype:
+unit libNtve_gf_ClosestUnitToPoint(point lp_point,unitgroup lp_group,);
+
+Function: Enable/Disable Visibility
+Identifier: VisEnable
+
+Description:
+Enables/Disables the specified visibility type.
+
+Return Type:
+void
+
+Parameters:
+- Type: int<preset::VisibilityType>
+- Enable: bool<preset::Enable_Disable_Option>
+
+Prototype:
+native void VisEnable(int visType, bool enable);
+
+Function: Create Revealer
+Identifier: VisRevealerCreate
+
+Description:
+Creates a revealer that covers the region specified, for the player specified.  Use the“Last Created Revealer”function to refer to this revealer.
+
+Return Type:
+revealer
+
+Parameters:
+- Player: int
+- Area: region
+
+Prototype:
+native revealer VisRevealerCreate(int player, region area);
+
+
+[Galaxy Presets - 34 loaded]
+
+
+Preset: AI Beacon Type
+
+Base Type: int
+
+Values:
+- Beacon Defend (identifier: c_beaconDefend, code: 1)
+- Beacon Attack (identifier: c_beaconAttack, code: 2)
+- Beacon Harass (identifier: c_beaconHarass, code: 3)
+- Beacon Idle (identifier: c_beaconIdle, code: 4)
+- Beacon Auto (identifier: c_beaconAuto, code: 5)
+- Beacon Detect (identifier: c_beaconDetect, code: 6)
+- Beacon Scout (identifier: c_beaconScout, code: 7)
+- Beacon Claim (identifier: c_beaconClaim, code: 8)
+- Beacon Expand (identifier: c_beaconExpand, code: 9)
+- Beacon Rally (identifier: c_beaconRally, code: 10)
+- Beacon Custom1 (identifier: c_beaconCustom1, code: 11)
+- Beacon Custom2 (identifier: c_beaconCustom2, code: 12)
+- Beacon Custom3 (identifier: c_beaconCustom3, code: 13)
+- Beacon Custom4 (identifier: c_beaconCustom4, code: 14)
+
+Preset: AI Difficulty Index
+
+Base Type: int
+
+Values:
+- Advancing Front Line of Waves (identifier: c_diffPressForward, code: 0)
+- Enable Repairing in General (identifier: c_diffRepairDamage, code: 1)
+- Fleeing from Attackers when Low Health (identifier: c_diffFleeDamage, code: 2)
+- Optimizing Gas Harvesters (identifier: c_diffOptimizeGas, code: 3)
+- Defending with Peons (identifier: c_diffDefendWithPeons, code: 4)
+- Not Seeing Enemies without Scouting (identifier: c_diffNormalVision, code: 5)
+- Throttling APM (identifier: c_diffLimitAPM, code: 6)
+- Throttling APM only in Combat (identifier: c_diffLimitAPMCombat, code: 7)
+- Autoloading Bunkers (identifier: c_diffAutoLoadBunkers, code: 8)
+- Repair Very Early in the Game (identifier: c_diffEarlyGameRepair, code: 9)
+- General Usage of AI Danger Maps (identifier: c_diffEnableDangerMap, code: 10)
+- Wave Usage of AI Danger Maps (identifier: c_diffWaveAvoidDanger, code: 11)
+- Usege of Melee Game Target Priorities (identifier: c_diffNormalTargetPrio, code: 12)
+- Early Defense Scouting (for proxies) (identifier: c_diffEarlyDefenseScout, code: 13)
+- Spot Changelings (identifier: c_diffSpotChangelings, code: 14)
+- Use Extra Base Scouts (identifier: c_diffUseExtraScouts, code: 15)
+- Make Workers Flee Enemies (identifier: c_diffFleeWorkers, code: 16)
+- Move Away From Danger/AoE (identifier: c_diffFleeDanger, code: 17)
+- Hold Firm at Home Chokepoint (identifier: c_diffHoldAtIdleChokes, code: 18)
+- Allow Resource Requests (identifier: c_diffAllowResourceReq, code: 19)
+- Advanced Retreat Logic (identifier: c_diffAdvancedRetreatLogic, code: 20)
+- Support AI Comm Beacons (identifier: c_diffSupportsBeacons, code: 21)
+- Auto Build Prereqs (identifier: c_diffAutoBuildPrereqs, code: 22)
+- Allow Building in Danger (identifier: c_diffAllowBuildInDanger, code: 23)
+- Timeout Make Requests (identifier: c_diffTimeoutMakeRequests, code: 24)
+- Set Rally Points (identifier: c_diffSetRallyPoints, code: 25)
+- Allow Long Distance Mining (identifier: c_diffAllowLongDistanceMining, code: 26)
+- Balance Peons Across Bases (identifier: c_diffBalancePeonsAcrossBases, code: 27)
+- Wave Leashing (identifier: c_diffWaveLeashing, code: 28)
+- Target Spawners (identifier: c_diffTargetSpawners, code: 29)
+- Delay Advanced Targetting (identifier: c_diffDelayAdvTargetting, code: 30)
+- Auto Transport (identifier: c_diffAutoTransport, code: 31)
+- Split Attacking (identifier: c_diffSplitAttacking, code: 32)
+- Allow Transport Gather (identifier: c_diffAllowTransportGather, code: 33)
+- Avoid Targetting Mind Controlled (identifier: c_diffAvoidMindControlled, code: 34)
+- Allow Kiting (identifier: c_diffAllowKiting, code: 35)
+
+Preset: Camera Direction
+
+Base Type: int
+
+Values:
+- X (identifier: c_cameraDirectionX, code: 0)
+- Y (identifier: c_cameraDirectionY, code: 1)
+- Z (identifier: c_cameraDirectionZ, code: 2)
+- XY (identifier: c_cameraDirectionXY, code: 3)
+- XZ (identifier: c_cameraDirectionXZ, code: 4)
+- YZ (identifier: c_cameraDirectionYZ, code: 5)
+- XYZ (identifier: c_cameraDirectionXYZ, code: 6)
+
+Preset: Dialog Item Type
+
+Base Type: int
+
+Values:
+- Label (identifier: c_triggerControlTypeLabel, code: 1)
+- Image (identifier: c_triggerControlTypeImage, code: 2)
+- Button (identifier: c_triggerControlTypeButton, code: 3)
+- Check Box (identifier: c_triggerControlTypeCheckBox, code: 4)
+- List Box (identifier: c_triggerControlTypeListBox, code: 5)
+- Pulldown (identifier: c_triggerControlTypePulldown, code: 6)
+- Progress Bar (identifier: c_triggerControlTypeProgressBar, code: 7)
+- Slider (identifier: c_triggerControlTypeSlider, code: 8)
+- Edit Box (identifier: c_triggerControlTypeEditBox, code: 9)
+- Flash (identifier: c_triggerControlTypeFlash, code: 10)
+- Achievement (identifier: c_triggerControlTypeAchievement, code: 11)
+- Panel (identifier: c_triggerControlTypePanel, code: 12)
+- Movie (identifier: c_triggerControlTypeMovie, code: 13)
+- Tooltip (identifier: c_triggerControlTypeTooltip, code: 14)
+- Unit Status (identifier: c_triggerControlTypeUnitStatus, code: 15)
+- Portrait (identifier: c_triggerControlTypePortrait, code: 16)
+- Unit Model (identifier: c_triggerControlTypeUnitModel, code: 17)
+- Offscreen Unit (identifier: c_triggerControlTypeOffscreenUnit, code: 18)
+- Unit Target (identifier: c_triggerControlTypeUnitTarget, code: 19)
+- Unit Status Bar (identifier: c_triggerControlTypeUnitStatusBar, code: 20)
+- Unit Status Duration Bar (identifier: c_triggerControlTypeUnitStatusDurationBar, code: 21)
+- Cutscene (identifier: c_triggerControlTypeCutscene, code: 22)
+- Command Panel (identifier: c_triggerControlTypeCommandPanel, code: 23)
+- Hero Cutscene (identifier: c_triggerControlTypeHeroCutscene, code: 24)
+- Countdown Label (identifier: c_triggerControlTypeCountdownLabel, code: 25)
+- Unit Status Label (identifier: c_triggerControlTypeUnitStatusLabel, code: 26)
+- Score Value Frame (identifier: c_triggerControlTypeScoreValueFrame, code: 27)
+- Graph Frame (identifier: c_triggerControlTypeGraphFrame, code: 28)
+- Invnentory Panel (identifier: c_triggerControlTypeInvnentoryPanel, code: 32)
+- Portrait Panel (identifier: c_triggerControlTypePortraitPanel, code: 33)
+
+Preset: Dialog Observed Type
+
+Base Type: int
+
+Values:
+- Default Observed Player Id (identifier: c_triggerObservedTypeDefaultObservedPlayerId, code: 0)
+- Observed Player Id (identifier: c_triggerObservedTypeObservedPlayerId, code: 1)
+- Observed Or Selected Player Id (identifier: c_triggerObservedTypeObservedOrSelectedPlayerId, code: 2)
+- Selected Or Observed Player Id (identifier: c_triggerObservedTypeSelectedOrObservedPlayerId, code: 3)
+
+Preset: Explosion Type
+
+Base Type: int
+
+Values:
+- Terran (identifier: libNtve_ge_ExplosionType_Terran, code: 0)
+- Protoss (identifier: libNtve_ge_ExplosionType_Protoss, code: 1)
+- Zerg (identifier: libNtve_ge_ExplosionType_Zerg, code: 2)
+
+Preset: Game Over Type
+
+Base Type: int
+
+Values:
+- Victory (identifier: c_gameOverVictory, code: 0)
+- Defeat (identifier: c_gameOverDefeat, code: 1)
+- Tie (identifier: c_gameOverTie, code: 2)
+
+Preset: Resource Type
+
+Base Type: int
+
+Values:
+- Minerals (identifier: c_resourceTypeMinerals, code: 0)
+- Vespene (identifier: c_resourceTypeVespene, code: 1)
+- Terrazine (identifier: c_resourceTypeTerrazine, code: 2)
+- Custom Resource (identifier: c_resourceTypeCustom, code: 3)
+
+Preset: Map Type
+
+Base Type: int
+
+Values:
+- Mission (identifier: c_mapKindMission, code: 0)
+- Story (identifier: c_mapKindStory, code: 1)
+- Upgrade (identifier: c_mapKindUpgrade, code: 2)
+
+Preset: Order Flag
+
+Base Type: int
+
+Values:
+- Was issued by the AI (identifier: c_cmdAI, code: 11)
+- AI Heroes (for internal use) (identifier: c_cmdAIHeroes, code: 23)
+- AI Ignore on Finish (for internal use) (identifier: c_cmdAIIgnoreOnFinish, code: 12)
+- Alternate (identifier: c_cmdAlternate, code: 0)
+- Was automatically queued (identifier: c_cmdAutoQueued, code: 22)
+- Instant building placement at the unit’s own position (identifier: c_cmdBuildOnSelf, code: 24)
+- Repeats until canceled (identifier: c_cmdContinuous, code: 20)
+- DataA (for internal use) (identifier: c_cmdDataA, code: 9)
+- DataB (for internal use) (identifier: c_cmdDataB, code: 10)
+- Was issued to the other unit (identifier: c_cmdDispatchToOtherUnit, code: 18)
+- Was issued to a group of uninterruptible units (identifier: c_cmdHomogenousInterruption, code: 15)
+- Is Order (for internal use) (identifier: c_cmdIsOrder, code: 13)
+- Was issued using quick cast (identifier: c_cmdQuickCast, code: 21)
+- Was issued using a repeated keypress (identifier: c_cmdRepeat, code: 17)
+- Was issued by triggers (identifier: c_cmdScript, code: 14)
+- Minimap (Was issued using the minimap) (identifier: c_cmdMinimap, code: 16)
+- Will target the caster (identifier: c_cmdTargetSelf, code: 19)
+- Was directly issued by the user (identifier: c_cmdUser, code: 8)
+- Preempt Existing Orders (identifier: c_cmdPreempt, code: 2)
+- Queue After Existing Orders (identifier: c_cmdQueued, code: 1)
+- Set Auto Cast State (identifier: c_cmdSetAutoCast, code: 6)
+- Auto Cast State (identifier: c_cmdSetAutoCastOn, code: 7)
+- Smart Click (identifier: c_cmdSmartClick, code: 3)
+- Smart Rally (identifier: c_cmdSmartRally, code: 4)
+- Subgroup (identifier: c_cmdSubgroup, code: 5)
+
+Preset: Order Target Type
+
+Base Type: int
+
+Values:
+- None (identifier: c_orderTargetNone, code: 0)
+- Point (identifier: c_orderTargetPoint, code: 1)
+- Unit (identifier: c_orderTargetUnit, code: 2)
+- Item (identifier: c_orderTargetItem, code: 3)
+
+Preset: Any Region
+
+Base Type: region
+
+Values:
+- Any Region (identifier: null, code: —)
+
+Preset: Global Sound
+
+Base Type: int
+
+Values:
+- Global Sound (identifier: c_maxPlayers, code: 16)
+
+Preset: Purchase Group
+
+Base Type: int
+
+Values:
+- Any Purchase Group (identifier: c_invalidPurchaseGroupId, code: 0)
+- No Purchase Group (identifier: c_invalidPurchaseGroupId, code: 0)
+
+Preset: Purchase Group State
+
+Base Type: int
+
+Values:
+- Enabled (identifier: c_purchaseGroupStateEnabled, code: 0)
+- Disabled (identifier: c_purchaseGroupStateDisabled, code: 1)
+- Hidden (identifier: c_purchaseGroupStateHidden, code: 2)
+- New (identifier: c_purchaseGroupStateNew, code: 3)
+
+Preset: Timer Window Component
+
+Base Type: int
+
+Values:
+- Title (identifier: c_timerWindowColorTitle, code: 0)
+- Time (identifier: c_timerWindowColorTime, code: 1)
+- Background (identifier: c_timerWindowColorBackground, code: 2)
+
+Preset: No Transmission
+
+Base Type: transmission
+
+Values:
+- No Transmission (identifier: c_invalidTransmissionId, code: 0)
+
+Preset: Any Trigger
+
+Base Type: trigger
+
+Values:
+- Any Trigger (identifier: null, code: —)
+
+Preset: GameUIStoreIndex
+
+Base Type: int
+
+Values:
+- GameUI (identifier: libNtve_ge_GameUIStoreIndex_GameUI, code: 0)
+- CinematicMode (identifier: libNtve_ge_GameUIStoreIndex_CinematicMode, code: 1)
+- StoryMode (identifier: libNtve_ge_GameUIStoreIndex_StoryMode, code: 2)
+
+Preset: Custom Dialog Type
+
+Base Type: int
+
+Values:
+- Message (identifier: libNtve_ge_CustomDialogType_c_customDialogTypeMessage, code: 0)
+- Query (identifier: libNtve_ge_CustomDialogType_c_customDialogTypeQuery, code: 1)
+
+Preset: Path Display Location
+
+Base Type: int
+
+Values:
+- All (identifier: c_pathLocationAll, code: -1)
+- World (identifier: c_pathLocationWorld, code: 0)
+- Minimap (identifier: c_pathLocationMinimap, code: 1)
+
+Preset: Status Bar Display
+
+Base Type: int
+
+Values:
+- Owner (identifier: c_unitStatusGroupOwner, code: 0)
+- Allied (identifier: c_unitStatusGroupAllied, code: 1)
+- Enemy (identifier: c_unitStatusGroupEnemy, code: 2)
+- All (identifier: c_unitStatusGroupAll, code: 3)
+- None (identifier: **, code: —)
+
+Preset: Ability Charge Type
+
+Base Type: int
+
+Values:
+- Max Count (identifier: c_unitAbilChargeCountMax, code: 0)
+- Use Count (identifier: c_unitAbilChargeCountUse, code: 1)
+- Remaining Count (identifier: c_unitAbilChargeCountLeft, code: 2)
+- Max Regen Time (identifier: c_unitAbilChargeRegenMax, code: 3)
+- Remaining Regen Time (identifier: c_unitAbilChargeRegenLeft, code: 4)
+
+Preset: Damage Type
+
+Base Type: int
+
+Values:
+- Any (identifier: c_unitDamageTypeAny, code: -1)
+- Spell (identifier: c_unitDamageTypeSpell, code: 0)
+- Melee (identifier: c_unitDamageTypeMelee, code: 1)
+- Ranged (identifier: c_unitDamageTypeRanged, code: 2)
+- Splash (identifier: c_unitDamageTypeSplash, code: 3)
+
+Preset: Unit Damage Take/Deal
+
+Base Type: int
+
+Values:
+- Take (identifier: libNtve_ge_UnitDamageTakenDealt_Damage_Take, code: 0)
+- Deal (identifier: libNtve_ge_UnitDamageTakenDealt_Damage_Deal, code: 1)
+
+Preset: Unit Cost Type
+
+Base Type: int
+
+Values:
+- Minerals (identifier: c_unitCostMinerals, code: 0)
+- Vespene (identifier: c_unitCostVespene, code: 1)
+- Terrazine (identifier: c_unitCostTerrazine, code: 2)
+- Custom Resource (identifier: c_unitCostCustomResource, code: 3)
+- Sum - Minerals, Vespene (identifier: c_unitCostSumMineralsVespene, code: 4)
+
+Preset: Unit Filter Type
+
+Base Type: int
+
+Values:
+- Air (identifier: c_targetFilterAir, code: 5)
+- Ally (identifier: c_targetFilterAlly, code: 2)
+- Armored (identifier: c_targetFilterArmored, code: 8)
+- Benign (identifier: c_targetFilterBenign, code: 41)
+- Biological (identifier: c_targetFilterBiological, code: 9)
+- Buried (identifier: c_targetFilterBuried, code: 29)
+- Can Have Energy (identifier: c_targetFilterCanHaveEnergy, code: 25)
+- Can Have Shields (identifier: c_targetFilterCanHaveShields, code: 26)
+- Cloaked (identifier: c_targetFilterCloaked, code: 30)
+- Dazed (identifier: c_targetFilterDazed, code: 51)
+- Dead (identifier: c_targetFilterDead, code: 34)
+- Destructible (identifier: c_targetFilterDestructible, code: 22)
+- Detector (identifier: c_targetFilterDetector, code: 43)
+- Enemy (identifier: c_targetFilterEnemy, code: 4)
+- Ground (identifier: c_targetFilterGround, code: 6)
+- Hallucination (identifier: c_targetFilterHallucination, code: 37)
+- Harvestable Resource (identifier: c_targetFilterHarvestableResource, code: 20)
+- Has Energy (identifier: c_targetFilterHasEnergy, code: 39)
+- Has Shields (identifier: c_targetFilterHasShields, code: 40)
+- Heroic (identifier: c_targetFilterHeroic, code: 16)
+- Hidden (identifier: c_targetFilterHidden, code: 36)
+- Hover (identifier: c_targetFilterHover, code: 15)
+- Invulnerable (identifier: c_targetFilterInvulnerable, code: 38)
+- Item (identifier: c_targetFilterItem, code: 23)
+- Light (identifier: c_targetFilterLight, code: 7)
+- Map Boss (identifier: c_targetFilterMapBoss, code: 52)
+- Massive (identifier: c_targetFilterMassive, code: 13)
+- Mechanical (identifier: c_targetFilterMechanical, code: 11)
+- Missile (identifier: c_targetFilterMissile, code: 21)
+- Neutral (identifier: c_targetFilterNeutral, code: 3)
+- Outer (identifier: c_targetFilterOuter, code: 48)
+- Passive (identifier: c_targetFilterPassive, code: 42)
+- Player (identifier: c_targetFilterPlayer, code: 1)
+- Prevent Defeat (identifier: c_targetFilterPreventDefeat, code: 27)
+- Prevent Reveal (identifier: c_targetFilterPreventReveal, code: 28)
+- Psionic (identifier: c_targetFilterPsionic, code: 12)
+- Radar (identifier: c_targetFilterRadar, code: 44)
+- Raw Resource (identifier: c_targetFilterRawResource, code: 19)
+- Resistant (identifier: c_targetFilterResistant, code: 49)
+- Revivable (identifier: c_targetFilterRevivable, code: 35)
+- Robotic (identifier: c_targetFilterRobotic, code: 10)
+- Self (identifier: c_targetFilterSelf, code: 0)
+- Silenced (identifier: c_targetFilterSilenced, code: 50)
+- Stasis (identifier: c_targetFilterStasis, code: 32)
+- Structure (identifier: c_targetFilterStructure, code: 14)
+- Stunned (identifier: c_targetFilterStunned, code: 45)
+- Summoned (identifier: c_targetFilterSummoned, code: 46)
+- Map Object (identifier: c_targetFilterUser1, code: 17)
+- Uncommandable (identifier: c_targetFilterUncommandable, code: 24)
+- Under Construction (identifier: c_targetFilterUnderConstruction, code: 33)
+- Unstoppable (identifier: c_targetFilterUnstoppable, code: 47)
+- Visible (identifier: c_targetFilterVisible, code: 31)
+- Worker (identifier: c_targetFilterWorker, code: 18)
+
+Preset: Unit Order Queue Option
+
+Base Type: int
+
+Values:
+- Replace Existing Orders (identifier: c_orderQueueReplace, code: 0)
+- After Existing Orders (identifier: c_orderQueueAddToEnd, code: 1)
+- Before Existing Orders (identifier: c_orderQueueAddToFront, code: 2)
+
+Preset: Unit Vital Type
+
+Base Type: int
+
+Values:
+- Life (identifier: c_unitVitalLife, code: 0)
+- Shield (identifier: c_unitVitalShields, code: 1)
+- Energy (identifier: c_unitVitalEnergy, code: 2)
+- Any (identifier: c_unitVitalAny, code: -1)
+
+Preset: Unit Property (Set)
+
+Base Type: int
+
+Values:
+- Life (identifier: c_unitPropLife, code: 0)
+- Life (Percent) (identifier: c_unitPropLifePercent, code: 1)
+- Life Regeneration Rate (identifier: c_unitPropLifeRegen, code: 3)
+- Expected Life (identifier: c_unitPropLifeExpected, code: 38)
+- Maximum Life (identifier: c_unitPropLifeMax, code: 2)
+- Energy (identifier: c_unitPropEnergy, code: 4)
+- Energy (Percent) (identifier: c_unitPropEnergyPercent, code: 5)
+- Energy Regeneration Rate (identifier: c_unitPropEnergyRegen, code: 7)
+- Expected Energy (identifier: c_unitPropEnergyExpected, code: 39)
+- Maximum Energy (identifier: c_unitPropEnergyMax, code: 6)
+- Shields (identifier: c_unitPropShields, code: 8)
+- Shields (Percent) (identifier: c_unitPropShieldsPercent, code: 9)
+- Shields Regeneration Rate (identifier: c_unitPropShieldsRegen, code: 11)
+- Expected Shields (identifier: c_unitPropShieldsExpected, code: 40)
+- Maximum Shields (identifier: c_unitPropShieldsMax, code: 10)
+- Kills (identifier: c_unitPropKills, code: 14)
+- Height (identifier: c_unitPropHeight, code: 19)
+- Movement Speed Max (identifier: c_unitPropMovementSpeed, code: 20)
+- Resources (identifier: c_unitPropResources, code: 22)
+- Experience (identifier: c_unitPropXP, code: 24)
+- Level (identifier: c_unitPropLevel, code: 25)
+- Bounty (Minerals) (identifier: c_unitPropBountyMinerals, code: 26)
+- Bounty (Vespene) (identifier: c_unitPropBountyVespene, code: 27)
+- Bounty (Terrazine) (identifier: c_unitPropBountyTerrazine, code: 28)
+- Bounty (Custom) (identifier: c_unitPropBountyCustom, code: 29)
+- Bounty (XP) (identifier: c_unitPropKillXP, code: 30)
+- Carried Minerals (identifier: c_unitPropCarriedMinerals, code: 31)
+- Carried Vespene (identifier: c_unitPropCarriedVespene, code: 32)
+- Carried Terrazine (identifier: c_unitPropCarriedTerrazine, code: 33)
+- Carried Custom Resource (identifier: c_unitPropCarriedCustom, code: 34)
+- Base Movement Speed (identifier: c_unitPropBaseMovementSpeed, code: 41)
+
+Preset: Unit State (Get)
+
+Base Type: int
+
+Values:
+- Attack Suppressed (identifier: c_unitStateAttackSuppressed, code: 5)
+- Buried (identifier: c_unitStateBuried, code: 0)
+- Cloaked (identifier: c_unitStateCloaked, code: 1)
+- Cursor (identifier: c_unitStateCursorable, code: 21)
+- Dead (identifier: c_unitStateIsDead, code: 22)
+- Detectable (identifier: c_unitStateDetectable, code: 29)
+- Detector (identifier: c_unitStateDetector, code: 2)
+- Fidget (identifier: c_unitStateFidget, code: 16)
+- Hallucination (identifier: c_unitStateHallucination, code: 7)
+- Hidden (identifier: c_unitStateHidden, code: 10)
+- Highlightable (identifier: c_unitStateHighlightable, code: 11)
+- Highlighted (identifier: c_unitStateHighlighted, code: 26)
+- Idle (identifier: c_unitStateIdle, code: 15)
+- Ignore Terrain Height (identifier: c_unitStateIgnoreTerrainZ, code: 12)
+- Inside Transport (identifier: c_unitStateInsideTransport, code: 14)
+- Invulnerable (identifier: c_unitStateInvulnerable, code: 8)
+- Moving Suppressed (identifier: c_unitStateMoveSuppressed, code: 24)
+- Paused (identifier: c_unitStatePaused, code: 9)
+- Stunned (identifier: c_unitStateStunned, code: 31)
+- Radar (identifier: c_unitStateRadar, code: 3)
+- Revivable (identifier: c_unitStateRevivable, code: 28)
+- Stasis (identifier: c_unitStateInStasis, code: 6)
+- Transport (identifier: c_unitStateIsTransport, code: 23)
+- Under Construction (identifier: c_unitStateUnderConstruction, code: 13)
+- Vision Suppressed (identifier: c_unitStateVisionSuppressed, code: 4)
+- Selectable (identifier: c_unitStateSelectable, code: 17)
+- Stoppable (identifier: c_unitStateStoppable, code: 32)
+- Targetable (identifier: c_unitStateTargetable, code: 18)
+- Tooltips (identifier: c_unitStateTooltipable, code: 20)
+- Turning Suppressed (identifier: c_unitStateTurnSuppressed, code: 25)
+- Uses Supply (identifier: c_unitStateUsingSupply, code: 27)
+- Visible to Radar (identifier: c_unitStateRadarable, code: 30)
+- Silenced (identifier: c_unitStateSilenced, code: 34)
+- Inside Unit Transport (identifier: c_unitStateInsideUnitTransport, code: 36)
+- Inside Player Transport (identifier: c_unitStateInsidePlayerTransport, code: 37)
+- Is Changeling (identifier: c_unitStateIsChangeling, code: 38)
+- Sleeping (identifier: c_unitStateSleeping, code: 39)
+
+Preset: Unit Alliance
+
+Base Type: int
+
+Values:
+- Any (identifier: c_unitAllianceAny, code: 0)
+- Ally (identifier: c_unitAllianceAlly, code: 1)
+- Enemy (identifier: c_unitAllianceEnemy, code: 2)
+- Ally Exclude Self (identifier: c_unitAllianceAllyExcludeSelf, code: 3)
+- Any Exclude Self (identifier: c_unitAllianceAnyExcludeSelf, code: 4)
+
+Preset: Unit Count Type
+
+Base Type: int
+
+Values:
+- Any (identifier: c_unitCountAll, code: 0)
+- Living (identifier: c_unitCountAlive, code: 1)
+- Dead (identifier: c_unitCountDead, code: 2)
+
+Preset: No Unit Group
+
+Base Type: unitgroup
+
+Values:
+- No Unit Group (identifier: null, code: —)

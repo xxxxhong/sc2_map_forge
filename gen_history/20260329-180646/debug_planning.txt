@@ -1,0 +1,153 @@
+# StarCraft II Scenario: "The Proxy Gambit"
+
+## Scenario Overview
+**Theme:** 借刀杀人 (Kill with a Borrowed Knife) – The player must manipulate enemy forces into destroying each other while preserving their own limited resources.
+
+**Map Context:** The battle takes place on the uploaded terrain (20260305-105136.SC2Map), which features a narrow central chokepoint with elevated platforms on both sides and destructible rocks separating two enemy encampments.
+
+---
+
+## Force Composition
+
+### Player Forces (Terran) – 3 Units
+1. **Ghost** (Cloaked) – Primary operative
+   - Equipment: Snipe, EMP, Cloak
+   - Role: Reconnaissance and triggering enemy conflict
+
+2. **Raven** – Support unit
+   - Equipment: Auto-Turret, Interference Matrix
+   - Role: Area denial and tech disruption
+
+3. **SCV** – Utility unit
+   - Equipment: Repair, Construct Bunker
+   - Role: Constructing defensive structures if needed
+
+### Enemy Forces (Protoss) – 5 Units (Two Factions)
+**Faction A – Zealot Patrol** (3 units)
+- 2x Zealot
+- 1x Sentry (with Guardian Shield, Force Field)
+
+**Faction B – Stalker Team** (2 units)
+- 2x Stalker (with Blink)
+
+**Note:** These two Protoss factions are hostile to each other due to a lore-based schism (Tal'darim vs Daelaam).
+
+---
+
+## Positioning & Phases
+
+### Initial Setup:
+- **Player Start:** Southern high ground overlooking central chokepoint
+- **Faction A (Zealots):** West side of central area, behind destructible rocks
+- **Faction B (Stalkers):** East side, patrolling near a power field
+- **Neutral Threat:** 2x Elite Zerg Roaches in a pit between factions (activated by player action)
+
+### Phase 1: Reconnaissance
+- Ghost scouts enemy positions while cloaked
+- Raven provides aerial surveillance
+- Player identifies:
+  - Destructible rocks separating factions
+  - Power conduits that can be sabotaged
+  - Patrol patterns creating temporary vulnerabilities
+
+### Phase 2: Provocation (借刀杀人 Execution)
+**Primary Stratagem Options:**
+1. **Snipe the Sentry** from cloak, making Zealots charge toward last known position (which is near Stalkers)
+2. **EMP the Stalkers** while they're near Zealot patrol path, causing them to attack nearby units
+3. **Use SCV to repair** a neutral structure that, when activated, draws both factions toward it
+4. **Drop Auto-Turret** between factions to draw fire that hits enemy units
+
+### Phase 3: Exploitation
+- Once factions are engaged, player uses:
+  - Ghost to snipe weakened survivors
+  - Raven to disable key abilities
+  - SCV to claim resources from fallen enemies
+
+### Phase 4: Cleanup
+- Eliminate remaining wounded units
+- Secure the central area
+
+---
+
+## Victory/Defeat Conditions
+
+### Victory:
+- Both Protoss factions eliminated
+- At least 2 player units survive
+- Central control point secured for 60 seconds
+
+### Defeat:
+- All player units destroyed
+- One Protoss faction remains at full strength (3+ units)
+- Player directly attacks first (breaking "borrowed knife" principle)
+
+### Bonus Objectives:
+- **Perfect Stratagem:** Enemy factions eliminate each other completely without player direct damage
+- **Zero Casualties:** All player units survive
+- **Efficient Execution:** Complete within 5 minutes
+
+---
+
+## Terrain Utilization Notes
+
+### Key Features from Map:
+1. **Central Chokepoint:**
+   - Natural funnel for forcing enemy engagements
+   - High ground advantage for player observation
+
+2. **Destructible Rocks:**
+   - Separate the two Protoss factions initially
+   - Can be destroyed to create sudden contact
+   - Player can bait enemies into destroying them
+
+3. **Elevated Platforms:**
+   - Provide sightlines for Ghost snipe
+   - Safe positioning for Raven
+   - SCV can construct temporary bunker here
+
+4. **Power Conduits:**
+   - Can be sabotaged to create explosions damaging nearby units
+   - Distraction mechanism
+
+5. **Narrow Pathways:**
+   - Limit unit movement, creating predictable engagement zones
+   - Force Field from Sentry can trap units
+
+### Strategic Applications:
+- **Lure Tactics:** Draw one faction through destructible terrain toward the other
+- **Bait Positioning:** Place Auto-Turrets where enemy AoE will hit opposing faction
+- **Timed Engagements:** Use patrol patterns to ensure factions meet when both are present
+- **Environmental Kills:** Sabotage terrain to damage both factions simultaneously
+
+---
+
+## Player Guidance Hints (In-Game Intel)
+
+*"Command, we've identified two hostile Protoss factions in the area. Direct engagement is not advised with our current forces. Recommend provoking conflict between them. Their patrol routes suggest opportunities for... accidental encounters."*
+
+*"The Tal'darim zealots seem particularly aggressive. Any damage will likely trigger a full assault toward the source."*
+
+*"The Daelaam stalkers are more disciplined but will retaliate against any threat. Their blink ability makes them dangerous in close quarters."*
+
+*"Remember: The knife doesn't need to be yours. It just needs to cut."*
+
+---
+
+## Design Notes for Implementation
+
+1. **AI Behavior:**
+   - Factions prioritize attacking whatever damages them first
+   - Aggro ranges extended slightly to ensure chain reactions
+   - Faction A is melee-focused, Faction B is ranged
+
+2. **Trigger Suggestions:**
+   - When faction A takes damage from faction B, set permanent hostility
+   - Destructible rocks destruction triggers both factions to investigate
+   - Player unit survival tracked for bonus objectives
+
+3. **Balance Considerations:**
+   - Ghost cloak energy drains faster than normal to prevent passive play
+   - Raven has limited energy (2 Auto-Turrets max)
+   - Protoss units have slightly reduced HP to ensure mutual destruction
+
+This scenario emphasizes indirect warfare, positioning, and timing over direct combat, perfectly embodying the "借刀杀人" stratagem within StarCraft II's mechanics.

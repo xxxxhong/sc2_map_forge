@@ -1,0 +1,97 @@
+# StarCraft II Scenario: "The Proxy's Gambit"
+
+## Scenario Overview
+**Stratagem:** 借刀杀人 (Kill with a Borrowed Knife)  
+**Theme:** Manipulate the Protoss forces into destroying each other while preserving your limited Terran forces.
+
+## Force Composition
+
+### Player (Terran) - 10 Units:
+- **4x Ghost** (Cloaked, with EMP and Snipe)
+- **2x Raven** (Auto-Turrets, Interference Matrix)
+- **3x Hellion** (Scout/Harass capability)
+- **1x SCV** (For emergency repairs/decoy)
+
+### Enemy (Protoss) - 10 Units (Two Hostile Factions):
+**Golden Armada Loyalists (5 units):**
+- 2x Zealot
+- 1x Stalker
+- 1x Sentry
+- 1x High Templar
+
+**Tal'darim Renegades (5 units):**
+- 2x Adept
+- 1x Immortal
+- 1x Disruptor
+- 1x Dark Templar (Cloaked)
+
+## Terrain Utilization Notes
+Based on the uploaded map file analysis:
+1. **Central Choke Point:** Narrow pass with high ground on both sides - ideal for ambushes
+2. **Two Enemy Bases:** Separated by a destructible rock barrier (key terrain feature)
+3. **Vision Towers:** One overlooking each Protoss encampment
+4. **Mineral Line:** Between the two Protoss factions - a contested resource
+5. **Cliff Edges:** Multiple elevation changes for tactical positioning
+
+## Positioning & Phases
+
+### Initial Setup:
+- **Player Forces:** Start on high ground overlooking the central choke point
+- **Golden Armada:** Positioned west of the choke, guarding their mineral line
+- **Tal'darim:** Positioned east of the choke, separated by destructible rocks
+- **Destructible Rocks:** Currently block direct engagement between Protoss factions
+
+### Phase 1: Intelligence Gathering (0-2 minutes)
+- Use Hellions to scout both Protoss positions
+- Ravens deploy Auto-Turrets near vision towers to gain map control
+- Ghosts remain cloaked, observing enemy patrol patterns
+
+### Phase 2: Provocation (2-5 minutes)
+**Key Stratagem Execution:**
+1. Ghosts use Snipe to damage Tal'darim units from cloak
+2. Immediately retreat toward Golden Armada position
+3. Use EMP on Golden Armada Sentry to drain energy (preventing Guardian Shield)
+4. Raven uses Interference Matrix on Golden Armada Stalker
+5. SCV acts as decoy, drawing Tal'darim pursuit toward Golden Armada
+
+### Phase 3: The Borrowed Knife (5-8 minutes)
+**Critical Actions:**
+1. Ghosts destroy the destructible rocks separating the two Protoss factions
+2. Raven drops Auto-Turrets between the now-engaged Protoss forces
+3. Ghosts EMP both sides' shields equally
+4. Hellions flank to clean up weakened survivors
+
+### Phase 4: Mop-up (8-10 minutes)
+- Use remaining Ghosts to Snipe any high-value survivors
+- Ravens disable remaining dangerous units (Disruptor/High Templar)
+- Hellions chase down fleeing units
+
+## Victory/Defeat Conditions
+
+### Victory:
+- Both Protoss factions eliminate each other
+- Player retains at least 6 original units
+- No Protoss units remain by 10-minute mark
+
+### Defeat:
+- Player loses more than 5 units
+- Either Protoss faction retains more than 3 units after engagement
+- Player fails to provoke conflict within 6 minutes
+
+## Special Mechanics & Triggers
+
+1. **Aggro Manipulation:** Damaging a unit while cloaked near their enemy will cause them to blame the nearest visible faction
+2. **Destructible Rocks:** Can only be destroyed after both factions have been provoked
+3. **Vision Control:** Controlling both vision towers reveals entire engagement area
+4. **Energy Management:** Ghosts have limited energy - must choose between EMP and Cloak strategically
+
+## Player Tips
+1. **Timing is Critical:** Provoke both factions simultaneously to ensure mutual aggression
+2. **Positioning:** Keep Ravens behind Ghosts for detection and support
+3. **Resource Denial:** Use Hellions to harass mineral lines, increasing enemy desperation
+4. **The Decoy:** The SCV is expendable but most effective when sacrificed at the perfect moment to trigger full-scale conflict
+
+## Narrative Context
+*"Command, this is Spectre Team. We've identified two hostile Protoss factions in the area. The Tal'darim renegades and Golden Armada loyalists are unaware of each other's presence. Our orders: make sure they become intimately acquainted. Let their zealotry do our work for us."*
+
+This scenario emphasizes the 借刀杀人 stratagem by forcing players to manipulate enemies rather than engage directly, using terrain features and unit abilities to orchestrate conflict between superior forces.

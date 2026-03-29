@@ -1,0 +1,473 @@
+```galaxy
+// MapScript.galaxy for "The Proxy Gambit"
+// Generated for StarCraft II scenario implementing "借刀杀人" stratagem
+
+// Include necessary libraries
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/UnitLib"
+
+// Global Variables
+int g_PlayerFactionEliminated = 0;
+int g_PlayerUnitsAlive = 3;
+int g_Phase = 0;
+int g_CentralControlTimer = 0;
+bool g_PlayerAttackedFirst = false;
+bool g_BonusPerfectStratagem = true;
+bool g_BonusZeroCasualties = true;
+bool g_ScenarioStarted = false;
+region g_CentralControlRegion;
+timer g_VictoryCheckTimer;
+timer g_PhaseTimer;
+unit g_PlayerGhost;
+unit g_PlayerRaven;
+unit g_PlayerSCV;
+unitgroup g_FactionA;
+unitgroup g_FactionB;
+unitgroup g_NeutralZerg;
+point g_FactionAStart;
+point g_FactionBStart;
+point g_PlayerStart;
+point g_CentralPoint;
+
+// Custom Text Constants
+string c_IntelRecon = "\"Command, we've identified two hostile Protoss factions in the area. Direct engagement is not advised with our current forces. Recommend provoking conflict between them. Their patrol routes suggest opportunities for... accidental encounters.\"";
+string c_IntelZealots = "\"The Tal'darim zealots seem particularly aggressive. Any damage will likely trigger a full assault toward the source.\"";
+string c_IntelStalkers = "\"The Daelaam stalkers are more disciplined but will retaliate against any threat. Their blink ability makes them dangerous in close quarters.\"";
+string c_IntelPrinciple = "\"Remember: The knife doesn't need to be yours. It just needs to cut.\"";
+string c_ObjectiveMain = "Provoke the two Protoss factions into destroying each other";
+string c_ObjectiveBonus1 = "Perfect Stratagem: Enemies eliminate each other without your direct damage";
+string c_ObjectiveBonus2 = "Zero Casualties: All your units survive";
+string c_ObjectiveBonus3 = "Efficient Execution: Complete within 5 minutes";
+
+// Function Declarations
+void InitScenario();
+void SetupUnits();
+void SetupTriggers();
+void StartPhase1();
+void StartPhase2();
+void CheckVictoryConditions();
+void CheckDefeatConditions();
+void UpdatePlayerUnitsAlive();
+void HandleFactionEngagement(unit attacker, unit victim);
+void HandleRockDestruction();
+void HandlePowerConduitSabotage();
+void ShowIntelMessage(string message);
+void StartControlTimer();
+void StopControlTimer();
+
+// Main Initialization Function
+void InitScenario() {
+    // Set up map constants
+    g_PlayerStart = Point(64, 48); // Southern high ground
+    g_FactionAStart = Point(48, 64); // West side
+    g_FactionBStart = Point(80, 64); // East side
+    g_CentralPoint = Point(64, 64); // Central chokepoint
+    
+    // Create central control region
+    g_CentralControlRegion = RegionCreateCircle(g_CentralPoint, 10.0);
+    
+    // Setup player units
+    SetupUnits();
+    
+    // Setup triggers
+    SetupTriggers();
+    
+    // Initialize timers
+    g_VictoryCheckTimer = TimerCreate();
+    g_PhaseTimer = TimerCreate();
+    
+    // Start scenario
+    g_ScenarioStarted = true;
+    TriggerAddEventTimer(g_VictoryCheckTimer, 1.0, c_timePeriodic);
+    StartPhase1();
+}
+
+void SetupUnits() {
+    // Create Player Units (Terran)
+    g_PlayerGhost = UnitCreate(1, "Ghost", g_PlayerStart, 270);
+    UnitSetProperty(g_PlayerGhost, c_unitPropEnergy, 75); // Reduced energy for cloak
+    UnitSetBehavior(g_PlayerGhost, c_unitBehaviorNormal, false);
+    
+    g_PlayerRaven = UnitCreate(1, "Raven", Point(g_PlayerStart.x + 2, g_PlayerStart.y), 270);
+    UnitSetProperty(g_PlayerRaven, c_unitPropEnergy, 100); // Limited energy
+    UnitSetBehavior(g_PlayerRaven, c_unitBehaviorNormal, false);
+    
+    g_PlayerSCV = UnitCreate(1, "SCV", Point(g_PlayerStart.x - 2, g_PlayerStart.y), 270);
+    UnitSetBehavior(g_PlayerSCV, c_unitBehaviorNormal, false);
+    
+    // Create Faction A (Zealot Patrol - Tal'darim)
+    g_FactionA = UnitGroupCreate();
+    unit zealot1 = UnitCreate(2, "Zealot", Point(g_FactionAStart.x - 3, g_FactionAStart.y), 90);
+    unit zealot2 = UnitCreate(2, "Zealot", Point(g_FactionAStart.x + 3, g_FactionAStart.y), 90);
+    unit sentry = UnitCreate(2, "Sentry", g_FactionAStart, 90);
+    UnitGroupAdd(g_FactionA, zealot1);
+    UnitGroupAdd(g_FactionA, zealot2);
+    UnitGroupAdd(g_FactionA, sentry);
+    
+    // Reduce HP for balance
+    UnitSetProperty(zealot1, c_unitPropLife, 80);
+    UnitSetProperty(zealot2, c_unitPropLife, 80);
+    UnitSetProperty(sentry, c_unitPropLife, 60);
+    
+    // Create Faction B (Stalker Team - Daelaam)
+    g_FactionB = UnitGroupCreate();
+    unit stalker1 = UnitCreate(3, "Stalker", Point(g_FactionBStart.x - 2, g_FactionBStart.y), 270);
+    unit stalker2 = UnitCreate(3, "Stalker", Point(g_FactionBStart.x + 2, g_FactionBStart.y), 270);
+    UnitGroupAdd(g_FactionB, stalker1);
+    UnitGroupAdd(g_FactionB, stalker2);
+    
+    // Reduce HP for balance
+    UnitSetProperty(stalker1, c_unitPropLife, 60);
+    UnitSetProperty(stalker2, c_unitPropLife, 60);
+    
+    // Set factions hostile to each other
+    PlayerSetAlliance(2, 3, c_allianceEnemy);
+    PlayerSetAlliance(3, 2, c_allianceEnemy);
+    
+    // Set both factions hostile to player
+    PlayerSetAlliance(2, 1, c_allianceEnemy);
+    PlayerSetAlliance(3, 1, c_allianceEnemy);
+    
+    // Create neutral Zerg Roaches
+    g_NeutralZerg = UnitGroupCreate();
+    unit roach1 = UnitCreate(4, "Roach", Point(64, 56), 0);
+    unit roach2 = UnitCreate(4, "Roach", Point(64, 52), 0);
+    UnitGroupAdd(g_NeutralZerg, roach1);
+    UnitGroupAdd(g_NeutralZerg, roach2);
+    UnitSetProperty(roach1, c_unitPropLife, 100);
+    UnitSetProperty(roach2, c_unitPropLife, 100);
+    PlayerSetAlliance(4, 1, c_allianceEnemy);
+    PlayerSetAlliance(4, 2, c_allianceEnemy);
+    PlayerSetAlliance(4, 3, c_allianceEnemy);
+    
+    // Set player units to neutral with Zerg initially
+    PlayerSetAlliance(1, 4, c_allianceNeutral);
+    
+    // Setup patrol behaviors
+    UnitIssueOrder(zealot1, "Patrol", Point(g_FactionAStart.x - 5, g_FactionAStart.y));
+    UnitIssueOrder(zealot2, "Patrol", Point(g_FactionAStart.x + 5, g_FactionAStart.y));
+    UnitIssueOrder(sentry, "Patrol", g_FactionAStart);
+    UnitIssueOrder(stalker1, "Patrol", Point(g_FactionBStart.x - 4, g_FactionBStart.y));
+    UnitIssueOrder(stalker2, "Patrol", Point(g_FactionBStart.x + 4, g_FactionBStart.y));
+}
+
+void SetupTriggers() {
+    // Trigger: Player unit death
+    trigger tPlayerUnitDeath = TriggerCreate("PlayerUnitDeath");
+    TriggerAddEventUnitDied(tPlayerUnitDeath, null);
+    TriggerAddCondition(tPlayerUnitDeath, ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 1));
+    TriggerAddAction(tPlayerUnitDeath, "UpdatePlayerUnitsAlive");
+    
+    // Trigger: Faction unit death
+    trigger tFactionUnitDeath = TriggerCreate("FactionUnitDeath");
+    TriggerAddEventUnitDied(tFactionUnitDeath, null);
+    TriggerAddCondition(tFactionUnitDeath, 
+        ConditionOr(
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 2),
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 3)
+        )
+    );
+    TriggerAddAction(tFactionUnitDeath, "CheckVictoryConditions");
+    
+    // Trigger: Player attacks first (defeat condition)
+    trigger tPlayerAttacksFirst = TriggerCreate("PlayerAttacksFirst");
+    TriggerAddEventUnitDamaged(tPlayerAttacksFirst, null);
+    TriggerAddCondition(tPlayerAttacksFirst, 
+        ConditionAnd(
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareAtLeast, 2),
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareAtMost, 3),
+            ConditionCompare(UnitGetOwner(EventDamageSource()), c_compareEqual, 1)
+        )
+    );
+    TriggerAddAction(tPlayerAttacksFirst, "g_PlayerAttackedFirst = true; CheckDefeatConditions");
+    
+    // Trigger: Faction A attacks Faction B
+    trigger tFactionAAttacksB = TriggerCreate("FactionAAttacksB");
+    TriggerAddEventUnitDamaged(tFactionAAttacksB, null);
+    TriggerAddCondition(tFactionAAttacksB,
+        ConditionAnd(
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 3),
+            ConditionCompare(UnitGetOwner(EventDamageSource()), c_compareEqual, 2)
+        )
+    );
+    TriggerAddAction(tFactionAAttacksB, "HandleFactionEngagement(EventDamageSource(), EventUnit())");
+    
+    // Trigger: Faction B attacks Faction A
+    trigger tFactionBAttacksA = TriggerCreate("FactionBAttacksA");
+    TriggerAddEventUnitDamaged(tFactionBAttacksB, null);
+    TriggerAddCondition(tFactionBAttacksB,
+        ConditionAnd(
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 2),
+            ConditionCompare(UnitGetOwner(EventDamageSource()), c_compareEqual, 3)
+        )
+    );
+    TriggerAddAction(tFactionBAttacksB, "HandleFactionEngagement(EventDamageSource(), EventUnit())");
+    
+    // Trigger: Player damages enemy (breaks perfect stratagem)
+    trigger tPlayerDamagesEnemy = TriggerCreate("PlayerDamagesEnemy");
+    TriggerAddEventUnitDamaged(tPlayerDamagesEnemy, null);
+    TriggerAddCondition(tPlayerDamagesEnemy,
+        ConditionAnd(
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareAtLeast, 2),
+            ConditionCompare(UnitGetOwner(EventUnit()), c_compareAtMost, 3),
+            ConditionCompare(UnitGetOwner(EventDamageSource()), c_compareEqual, 1),
+            ConditionCompare(UnitGetProperty(EventUnit(), c_unitPropLife), c_compareLessThan, 100)
+        )
+    );
+    TriggerAddAction(tPlayerDamagesEnemy, "g_BonusPerfectStratagem = false");
+    
+    // Trigger: Central control region entered
+    trigger tCentralRegionEnter = TriggerCreate("CentralRegionEnter");
+    TriggerAddEventRegionEnter(tCentralRegionEnter, g_CentralControlRegion);
+    TriggerAddCondition(tCentralRegionEnter,
+        ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 1)
+    );
+    TriggerAddAction(tCentralRegionEnter, "StartControlTimer");
+    
+    // Trigger: Central control region left
+    trigger tCentralRegionLeave = TriggerCreate("CentralRegionLeave");
+    TriggerAddEventRegionLeave(tCentralRegionLeave, g_CentralControlRegion);
+    TriggerAddCondition(tCentralRegionLeave,
+        ConditionCompare(UnitGetOwner(EventUnit()), c_compareEqual, 1)
+    );
+    TriggerAddAction(tCentralRegionLeave, "StopControlTimer");
+    
+    // Trigger: Destructible rock destruction
+    trigger tRockDestroyed = TriggerCreate("RockDestroyed");
+    TriggerAddEventUnitDied(tRockDestroyed, null);
+    TriggerAddCondition(tRockDestroyed,
+        ConditionCompare(UnitGetType(EventUnit()), c_compareEqual, "DestructibleRock")
+    );
+    TriggerAddAction(tRockDestroyed, "HandleRockDestruction");
+    
+    // Trigger: Phase 2 auto-start after 60 seconds
+    trigger tPhase2AutoStart = TriggerCreate("Phase2AutoStart");
+    TriggerAddEventTimerElapsed(tPhase2AutoStart, g_PhaseTimer, 60.0);
+    TriggerAddCondition(tPhase2AutoStart,
+        ConditionCompare(g_Phase, c_compareEqual, 1)
+    );
+    TriggerAddAction(tPhase2AutoStart, "StartPhase2");
+}
+
+void StartPhase1() {
+    g_Phase = 1;
+    TimerStart(g_PhaseTimer, 60.0, false);
+    
+    // Show intelligence messages
+    ShowIntelMessage(c_IntelRecon);
+    Wait(3.0);
+    ShowIntelMessage(c_IntelZealots);
+    Wait(3.0);
+    ShowIntelMessage(c_IntelStalkers);
+    Wait(3.0);
+    ShowIntelMessage(c_IntelPrinciple);
+    
+    // Display objectives
+    TransmissionFromUnit(g_PlayerGhost, c_IntelRecon, "Command", 5.0);
+    ObjectiveAdd(1, c_ObjectiveMain, 0);
+    ObjectiveAdd(2, c_ObjectiveBonus1, 1);
+    ObjectiveAdd(3, c_ObjectiveBonus2, 1);
+    ObjectiveAdd(4, c_ObjectiveBonus3, 1);
+}
+
+void StartPhase2() {
+    g_Phase = 2;
+    TimerStop(g_PhaseTimer);
+    
+    // Enable player abilities
+    UnitSetAbilityCooldown(g_PlayerGhost, "Snipe", 0);
+    UnitSetAbilityCooldown(g_PlayerGhost, "EMP", 0);
+    UnitSetAbilityCooldown(g_PlayerRaven, "AutoTurret", 0);
+    UnitSetAbilityCooldown(g_PlayerRaven, "InterferenceMatrix", 0);
+    
+    // Start 5-minute timer for bonus objective
+    timer bonusTimer = TimerCreate();
+    TriggerAddEventTimerElapsed(TriggerCreate("BonusTimeExpired"), bonusTimer, 300.0);
+    TriggerAddAction(TriggerGetCurrent(), "ObjectiveSetState(4, 2)"); // Failed
+    TimerStart(bonusTimer, 300.0, false);
+}
+
+void CheckVictoryConditions() {
+    // Check if both factions are eliminated
+    bool factionADestroyed = UnitGroupCount(g_FactionA, c_unitCountAll) == 0;
+    bool factionBDestroyed = UnitGroupCount(g_FactionB, c_unitCountAll) == 0;
+    
+    if (factionADestroyed && factionBDestroyed) {
+        g_PlayerFactionEliminated = 1;
+    }
+    
+    // Check all victory conditions
+    if (g_PlayerFactionEliminated && 
+        g_PlayerUnitsAlive >= 2 && 
+        g_CentralControlTimer >= 60) {
+        
+        // Set bonus objectives
+        if (g_BonusPerfectStratagem) {
+            ObjectiveSetState(2, 1); // Completed
+        }
+        if (g_BonusZeroCasualties && g_PlayerUnitsAlive == 3) {
+            ObjectiveSetState(3, 1); // Completed
+        }
+        
+        // Check efficient execution
+        if (TimerGetElapsed(g_PhaseTimer) <= 300.0) {
+            ObjectiveSetState(4, 1); // Completed
+        }
+        
+        // Victory
+        VictoryPanelShow(1, "Stratagem Successful", "You have successfully manipulated the Protoss factions into destroying each other.");
+        Wait(5.0);
+        EndGame();
+    }
+}
+
+void CheckDefeatConditions() {
+    // Check if player attacked first
+    if (g_PlayerAttackedFirst) {
+        DefeatPanelShow(1, "Stratagem Broken", "You attacked directly, violating the 'borrowed knife' principle.");
+        Wait(5.0);
+        EndGame();
+        return;
+    }
+    
+    // Check if all player units destroyed
+    if (g_PlayerUnitsAlive == 0) {
+        DefeatPanelShow(1, "Operatives Lost", "All your units have been destroyed.");
+        Wait(5.0);
+        EndGame();
+        return;
+    }
+    
+    // Check if one faction remains at full strength
+    int factionACount = UnitGroupCount(g_FactionA, c_unitCountAll);
+    int factionBCount = UnitGroupCount(g_FactionB, c_unitCountAll);
+    
+    if ((factionACount >= 3 && factionBCount == 0) || 
+        (factionBCount >= 2 && factionACount == 0)) {
+        DefeatPanelShow(1, "Faction Dominance", "One Protoss faction remains at full strength.");
+        Wait(5.0);
+        EndGame();
+    }
+}
+
+void UpdatePlayerUnitsAlive() {
+    g_PlayerUnitsAlive = 0;
+    
+    if (UnitGetProperty(g_PlayerGhost, c_unitPropLife) > 0) {
+        g_PlayerUnitsAlive += 1;
+    }
+    if (UnitGetProperty(g_PlayerRaven, c_unitPropLife) > 0) {
+        g_PlayerUnitsAlive += 1;
+    }
+    if (UnitGetProperty(g_PlayerSCV, c_unitPropLife) > 0) {
+        g_PlayerUnitsAlive += 1;
+    }
+    
+    if (g_PlayerUnitsAlive < 3) {
+        g_BonusZeroCasualties = false;
+        ObjectiveSetState(3, 2); // Failed
+    }
+    
+    CheckDefeatConditions();
+}
+
+void HandleFactionEngagement(unit attacker, unit victim) {
+    // Make factions permanently hostile if not already
+    int attackerOwner = UnitGetOwner(attacker);
+    int victimOwner = UnitGetOwner(victim);
+    
+    if (attackerOwner == 2 && victimOwner == 3) {
+        // Faction A attacks B - increase aggression
+        unitgroup enemies = UnitGroupFromUnit(victim);
+        UnitGroupOrder(enemies, "Attack", attacker);
+        
+        // Make nearby units join the fight
+        unitgroup nearbyA = UnitGroupGetInRange(attacker, 15.0);
+        UnitGroupFilterPlayer(nearbyA, 2);
+        UnitGroupOrder(nearbyA, "Attack", victim);
+        
+        unitgroup nearbyB = UnitGroupGetInRange(victim, 15.0);
+        UnitGroupFilterPlayer(nearbyB, 3);
+        UnitGroupOrder(nearbyB, "Attack", attacker);
+    }
+}
+
+void HandleRockDestruction() {
+    // When rocks are destroyed, alert both factions
+    point rockPos = UnitGetPosition(EventUnit());
+    
+    // Faction A investigates
+    unitgroup factionAUnits = UnitGroupGetInRange(rockPos, 20.0);
+    UnitGroupFilterPlayer(factionAUnits, 2);
+    UnitGroupOrder(factionAUnits, "Move", rockPos);
+    
+    // Faction B investigates
+    unitgroup factionBUnits = UnitGroupGetInRange(rockPos, 20.0);
+    UnitGroupFilterPlayer(factionBUnits, 3);
+    UnitGroupOrder(factionBUnits, "Move", rockPos);
+    
+    // Activate neutral Zerg after delay
+    Wait(2.0);
+    PlayerSetAlliance(4, 1, c_allianceEnemy);
+    PlayerSetAlliance(4, 2, c_allianceEnemy);
+    PlayerSetAlliance(4, 3, c_allianceEnemy);
+    
+    unitgroup zergUnits = UnitGroupGetInRange(rockPos, 15.0);
+    UnitGroupFilterPlayer(zergUnits, 4);
+    UnitGroupOrder(zergUnits, "Attack", rockPos);
+}
+
+void HandlePowerConduitSabotage() {
+    // When SCV repairs a conduit (simulated by attacking it)
+    point conduitPos = UnitGetPosition(EventUnit());
+    
+    // Create explosion effect
+    ActorCreate("ExplosionLarge", conduitPos);
+    
+    // Damage nearby units
+    unitgroup nearbyUnits = UnitGroupGetInRange(conduitPos, 8.0);
+    UnitGroupFilterPlayers(nearbyUnits, 2, 3); // Only Protoss factions
+    
+    unit currentUnit = UnitGroupGetFirst(nearbyUnits);
+    while (currentUnit != null) {
+        UnitDamage(currentUnit, 30, false);
+        currentUnit = UnitGroupGetNext(nearbyUnits);
+    }
+}
+
+void ShowIntelMessage(string message) {
+    TransmissionFromUnit(g_PlayerGhost, message, "Command", 4.0);
+}
+
+void StartControlTimer() {
+    trigger tControlTimer = TriggerCreate("ControlTimer");
+    TriggerAddEventTimer(tControlTimer, 1.0, c_timePeriodic);
+    TriggerAddAction(tControlTimer, "g_CentralControlTimer += 1; CheckVictoryConditions");
+}
+
+void StopControlTimer() {
+    // Find and destroy the control timer trigger
+    trigger tControlTimer = TriggerGet("ControlTimer");
+    if (tControlTimer != null) {
+        TriggerDestroy(tControlTimer);
+    }
+}
+
+// Map Initialization
+void InitMap() {
+    // Set game speed
+    GameSetSpeed(c_gameSpeedFaster);
+    
+    // Set camera
+    CameraLookAtPoint(g_PlayerStart, 0.0);
+    
+    // Initialize scenario
+    InitScenario();
+}
+
+// Main function
+void main() {
+    InitMap();
+}
+```

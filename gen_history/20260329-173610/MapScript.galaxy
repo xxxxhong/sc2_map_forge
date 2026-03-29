@@ -1,0 +1,554 @@
+```galaxy
+// MapScript.galaxy for "The Proxy Gambit"
+// Generated based on scenario plan and terrain
+
+// Include necessary libraries
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/UnitLib"
+include "TriggerLibs/AILib"
+include "TriggerLibs/DebugLib"
+
+// Global Variables
+int g_playerId = 1;
+int g_protossForceId = 2;
+int g_neutralHostileId = 3;
+int g_zergInfestationId = 4;
+
+unit g_ghost = null;
+unit g_reaper1 = null;
+unit g_reaper2 = null;
+unit g_highTemplar = null;
+unit g_warpPrism = null;
+unit g_aberration = null;
+unit g_broodlingNest = null;
+
+unit g_stalker1 = null;
+unit g_stalker2 = null;
+unit g_zealot1 = null;
+unit g_zealot2 = null;
+unit g_zealotReserve1 = null;
+unit g_zealotReserve2 = null;
+
+point g_zergNestLocation = point(64.0, 64.0);
+point g_warpPrismLocation = point(96.0, 32.0);
+point g_bridgeLocation = point(48.0, 48.0);
+point g_protossOutpost = point(80.0, 64.0);
+
+bool g_phase1Complete = false;
+bool g_phase2Complete = false;
+bool g_phase3Complete = false;
+bool g_phase4Complete = false;
+
+int g_playerDirectKills = 0;
+int g_protossFriendlyKills = 0;
+bool g_warpPrismDestroyed = false;
+bool g_zergTriggered = false;
+timer g_phaseTimer = null;
+timer g_warpPrismTimer = null;
+
+// Custom Ability IDs
+int ABILITY_DISTRACTION_PULSE = 211111; // Custom ability for Ghost
+int ABILITY_NEURAL_PARASITE_DEBUFF = 211112; // Custom debuff
+int ABILITY_CREEP_SLOW = 211113; // Creep slow effect
+
+// Unit Type Constants
+int c_unitTypeGhost = 50;
+int c_unitTypeReaper = 48;
+int c_unitTypeStalker = 74;
+int c_unitTypeHighTemplar = 75;
+int c_unitTypeZealot = 73;
+int c_unitTypeWarpPrism = 81;
+int c_unitTypeAberration = 289;
+int c_unitTypeBroodling = 289;
+int c_unitTypeBroodlingNest = 828;
+
+// Region Constants
+region r_playerStart = null;
+region r_bridge = null;
+region r_zergInfestation = null;
+region r_protossOutpost = null;
+region r_cliffEdge = null;
+
+// Sound Constants
+sound s_protossFriendlyFire = "Protoss_Unit_Attack";
+sound s_zergTrigger = "Zerg_Creep";
+sound s_objectiveComplete = "ObjectiveComplete";
+
+// Text Constants
+text t_phase1 = "Phase 1: Infiltration - Eliminate the Aberration guarding the Zerg nest";
+text t_phase2 = "Phase 2: Provocation - Use Distraction Pulse on the Zerg nest";
+text t_phase3 = "Phase 3: Escalation - Snipe the High Templar during Psionic Storm";
+text t_phase4 = "Phase 4: Cleanup - Eliminate remaining Protoss forces";
+text t_victoryCondition = "Victory: Eliminate all Protoss forces, destroy Warp Prism, ensure at least 2 Protoss units are killed by friendly fire";
+text t_defeatCondition = "Defeat: Ghost dies, both Reapers die before Phase 4, too many direct kills, or Warp Prism escapes";
+
+// ============================================
+// Initialization Functions
+// ============================================
+
+void InitMap() {
+    // Create regions based on terrain
+    r_playerStart = RegionCreateCircle(point(32.0, 32.0), 10.0);
+    r_bridge = RegionCreateCircle(g_bridgeLocation, 8.0);
+    r_zergInfestation = RegionCreateCircle(g_zergNestLocation, 12.0);
+    r_protossOutpost = RegionCreateCircle(g_protossOutpost, 15.0);
+    r_cliffEdge = RegionCreateCircle(point(90.0, 30.0), 6.0);
+    
+    // Setup initial units
+    CreateInitialForces();
+    SetupVictoryConditions();
+    SetupTriggers();
+    
+    // Start phase timer
+    g_phaseTimer = TimerLaunch(0.0, c_timeGame, true, TimerPhaseCheck);
+    
+    // Start Warp Prism escape timer (8 minutes)
+    g_warpPrismTimer = TimerLaunch(480.0, c_timeGame, false, TimerWarpPrismEscape);
+    
+    // Display initial objectives
+    DisplayTextToPlayer(g_playerId, c_timeGame, t_phase1);
+    DisplayTextToPlayer(g_playerId, c_timeGame, t_victoryCondition);
+}
+
+void CreateInitialForces() {
+    // Create Player Units
+    g_ghost = UnitCreate(1, c_unitTypeGhost, point(30.0, 30.0), 0.0);
+    UnitSetProperty(g_ghost, c_unitPropLife, 100, c_unitPropCurrent);
+    UnitSetProperty(g_ghost, c_unitPropEnergy, 75, c_unitPropCurrent);
+    UnitAbilityCommand(g_ghost, c_abilCmdCloak, true, point(0.0, 0.0));
+    
+    g_reaper1 = UnitCreate(1, c_unitTypeReaper, point(28.0, 32.0), 0.0);
+    g_reaper2 = UnitCreate(1, c_unitTypeReaper, point(32.0, 28.0), 0.0);
+    
+    // Create Neutral Zerg
+    g_aberration = UnitCreate(g_neutralHostileId, c_unitTypeAberration, point(60.0, 60.0), 0.0);
+    g_broodlingNest = UnitCreate(g_zergInfestationId, c_unitTypeBroodlingNest, g_zergNestLocation, 0.0);
+    UnitSetProperty(g_broodlingNest, c_unitPropLife, 500, c_unitPropCurrent);
+    UnitSetInvulnerable(g_broodlingNest, true);
+    
+    // Create Protoss Forces
+    g_stalker1 = UnitCreate(g_protossForceId, c_unitTypeStalker, point(70.0, 70.0), 0.0);
+    g_stalker2 = UnitCreate(g_protossForceId, c_unitTypeStalker, point(74.0, 66.0), 0.0);
+    g_highTemplar = UnitCreate(g_protossForceId, c_unitTypeHighTemplar, point(78.0, 62.0), 0.0);
+    g_zealot1 = UnitCreate(g_protossForceId, c_unitTypeZealot, point(82.0, 58.0), 0.0);
+    g_zealot2 = UnitCreate(g_protossForceId, c_unitTypeZealot, point(86.0, 54.0), 0.0);
+    g_warpPrism = UnitCreate(g_protossForceId, c_unitTypeWarpPrism, g_warpPrismLocation, 0.0);
+    
+    // Create reserve Zealots inside Warp Prism
+    g_zealotReserve1 = UnitCreate(g_protossForceId, c_unitTypeZealot, g_warpPrismLocation, 0.0);
+    g_zealotReserve2 = UnitCreate(g_protossForceId, c_unitTypeZealot, g_warpPrismLocation, 0.0);
+    UnitSetProperty(g_zealotReserve1, c_unitPropLife, 0, c_unitPropCurrent);
+    UnitSetProperty(g_zealotReserve2, c_unitPropLife, 0, c_unitPropCurrent);
+    
+    // Setup patrols
+    SetupProtossPatrols();
+    
+    // Add custom ability to Ghost
+    UnitAddAbility(g_ghost, ABILITY_DISTRACTION_PULSE);
+}
+
+void SetupProtossPatrols() {
+    // Create patrol waypoints
+    point patrolPoint1 = point(70.0, 70.0);
+    point patrolPoint2 = point(90.0, 50.0);
+    point patrolPoint3 = point(50.0, 90.0);
+    
+    // Setup patrol for Zealots
+    IssueOrder(g_zealot1, c_orderPatrol, patrolPoint1, patrolPoint2);
+    IssueOrder(g_zealot2, c_orderPatrol, patrolPoint2, patrolPoint3);
+    
+    // Stalkers guard positions
+    IssueOrder(g_stalker1, c_orderHold, point(70.0, 70.0));
+    IssueOrder(g_stalker2, c_orderHold, point(74.0, 66.0));
+    
+    // High Templar stationary
+    IssueOrder(g_highTemplar, c_orderHold, point(78.0, 62.0));
+}
+
+// ============================================
+// Trigger Setup
+// ============================================
+
+void SetupTriggers() {
+    // Phase 1: Aberration death
+    trigger t_aberrationDeath = TriggerCreate("AberrationDeath");
+    TriggerAddEventUnitDied(t_aberrationDeath, g_aberration);
+    TriggerAddCondition(t_aberrationDeath, ConditionCompareUnit(EventUnit(), g_aberration, c_unitCompareEqual));
+    TriggerAddAction(t_aberrationDeath, ActionAberrationDeath);
+    
+    // Phase 2: Distraction Pulse used
+    trigger t_distractionPulse = TriggerCreate("DistractionPulse");
+    TriggerAddEventUnitAbility(t_distractionPulse, ABILITY_DISTRACTION_PULSE, g_ghost, c_abilCmdUseOnPoint);
+    TriggerAddCondition(t_distractionPulse, ConditionComparePoint(EventTargetPoint(), g_zergNestLocation, 15.0));
+    TriggerAddAction(t_distractionPulse, ActionDistractionPulse);
+    
+    // Phase 3: High Templar damaged
+    trigger t_highTemplarDamaged = TriggerCreate("HighTemplarDamaged");
+    TriggerAddEventUnitDamaged(t_highTemplarDamaged, g_highTemplar);
+    TriggerAddCondition(t_highTemplarDamaged, ConditionCompareUnit(EventUnit(), g_highTemplar, c_unitCompareEqual));
+    TriggerAddAction(t_highTemplarDamaged, ActionHighTemplarDamaged);
+    
+    // Phase 3: Psionic Storm cast
+    trigger t_psionicStorm = TriggerCreate("PsionicStorm");
+    TriggerAddEventUnitAbility(t_psionicStorm, 112, g_highTemplar, c_abilCmdUseOnPoint); // Psionic Storm ability
+    TriggerAddAction(t_psionicStorm, ActionPsionicStorm);
+    
+    // Phase 4: Warp Prism destroyed
+    trigger t_warpPrismDeath = TriggerCreate("WarpPrismDeath");
+    TriggerAddEventUnitDied(t_warpPrismDeath, g_warpPrism);
+    TriggerAddAction(t_warpPrismDeath, ActionWarpPrismDeath);
+    
+    // Player unit death tracking
+    trigger t_ghostDeath = TriggerCreate("GhostDeath");
+    TriggerAddEventUnitDied(t_ghostDeath, g_ghost);
+    TriggerAddAction(t_ghostDeath, ActionGhostDeath);
+    
+    trigger t_reaperDeath = TriggerCreate("ReaperDeath");
+    TriggerAddEventUnitDied(t_reaperDeath, null);
+    TriggerAddCondition(t_reaperDeath, ConditionOr(ConditionCompareUnit(EventUnit(), g_reaper1, c_unitCompareEqual), ConditionCompareUnit(EventUnit(), g_reaper2, c_unitCompareEqual)));
+    TriggerAddAction(t_reaperDeath, ActionReaperDeath);
+    
+    // Protoss unit death tracking
+    trigger t_protossDeath = TriggerCreate("ProtossDeath");
+    TriggerAddEventUnitDied(t_protossDeath, null);
+    TriggerAddCondition(t_protossDeath, ConditionCompareUnitPlayer(EventUnit(), g_protossForceId, c_unitCompareEqual));
+    TriggerAddAction(t_protossDeath, ActionProtossDeath);
+    
+    // Player direct kill tracking
+    trigger t_playerDamage = TriggerCreate("PlayerDamage");
+    TriggerAddEventUnitDamaged(t_playerDamage, null);
+    TriggerAddCondition(t_playerDamage, ConditionAnd(
+        ConditionCompareUnitPlayer(EventUnit(), g_protossForceId, c_unitCompareEqual),
+        ConditionCompareUnitPlayer(EventDamageSource(), g_playerId, c_unitCompareEqual)
+    ));
+    TriggerAddAction(t_playerDamage, ActionPlayerDamage);
+    
+    // Protoss friendly fire tracking
+    trigger t_protossFriendlyFire = TriggerCreate("ProtossFriendlyFire");
+    TriggerAddEventUnitDamaged(t_protossFriendlyFire, null);
+    TriggerAddCondition(t_protossFriendlyFire, ConditionAnd(
+        ConditionCompareUnitPlayer(EventUnit(), g_protossForceId, c_unitCompareEqual),
+        ConditionCompareUnitPlayer(EventDamageSource(), g_protossForceId, c_unitCompareEqual)
+    ));
+    TriggerAddAction(t_protossFriendlyFire, ActionProtossFriendlyFire);
+    
+    // Zerg unit creation (when nest is triggered)
+    trigger t_zergUnitCreated = TriggerCreate("ZergUnitCreated");
+    TriggerAddEventUnitCreated(t_zergUnitCreated, null);
+    TriggerAddCondition(t_zergUnitCreated, ConditionCompareUnitPlayer(EventUnit(), g_zergInfestationId, c_unitCompareEqual));
+    TriggerAddAction(t_zergUnitCreated, ActionZergUnitCreated);
+}
+
+// ============================================
+// Trigger Actions
+// ============================================
+
+void ActionAberrationDeath() {
+    g_phase1Complete = true;
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Aberration eliminated. Zerg nest is now vulnerable.");
+    DisplayTextToPlayer(g_playerId, c_timeGame, t_phase2);
+    
+    // Make broodling nest vulnerable
+    UnitSetInvulnerable(g_broodlingNest, false);
+    
+    // Give Ghost energy for Distraction Pulse
+    UnitSetProperty(g_ghost, c_unitPropEnergy, 100, c_unitPropCurrent);
+}
+
+void ActionDistractionPulse() {
+    if (!g_phase1Complete) return;
+    
+    g_phase2Complete = true;
+    g_zergTriggered = true;
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Distraction Pulse activated! Zerg are swarming toward Protoss energy signatures.");
+    
+    // Trigger Zerg swarm
+    TriggerZergSwarm();
+    
+    // Display next objective
+    DisplayTextToPlayer(g_playerId, c_timeGame, t_phase3);
+}
+
+void ActionHighTemplarDamaged() {
+    if (!g_phase2Complete || g_phase3Complete) return;
+    
+    // Check if High Templar is below 50% health
+    int currentLife = UnitGetProperty(g_highTemplar, c_unitPropLife, c_unitPropCurrent);
+    int maxLife = UnitGetProperty(g_highTemplar, c_unitPropLife, c_unitPropMaximum);
+    
+    if (currentLife <= maxLife / 2) {
+        // Opportunity to snipe
+        DisplayTextToPlayer(g_playerId, c_timeGame, "High Templar is vulnerable! Snipe it during Psionic Storm animation.");
+    }
+}
+
+void ActionPsionicStorm() {
+    if (!g_phase2Complete || g_phase3Complete) return;
+    
+    // Check if Ghost snipes during storm animation
+    trigger t_snipeDuringStorm = TriggerCreate("SnipeDuringStorm");
+    TriggerAddEventUnitAbility(t_snipeDuringStorm, 112, g_ghost, c_abilCmdUseOnTarget); // Snipe ability
+    TriggerAddCondition(t_snipeDuringStorm, ConditionCompareUnit(EventTargetUnit(), g_highTemplar, c_unitCompareEqual));
+    TriggerAddAction(t_snipeDuringStorm, ActionSnipeDuringStorm);
+    
+    // Timer to check if storm completed without snipe
+    TimerLaunch(3.0, c_timeGame, false, TimerPsionicStormComplete);
+}
+
+void ActionSnipeDuringStorm() {
+    g_phase3Complete = true;
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Perfect timing! High Templar eliminated during Psionic Storm.");
+    DisplayTextToPlayer(g_playerId, c_timeGame, t_phase4);
+    
+    // Apply Neural Parasite debuff to remaining Protoss
+    ApplyNeuralParasite();
+    
+    // Deploy reserve Zealots from Warp Prism
+    DeployReserveZealots();
+}
+
+void ActionWarpPrismDeath() {
+    g_warpPrismDestroyed = true;
+    CheckVictoryConditions();
+}
+
+void ActionGhostDeath() {
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Ghost has been eliminated. Mission Failed.");
+    Defeat();
+}
+
+void ActionReaperDeath() {
+    static int reaperDeaths = 0;
+    reaperDeaths++;
+    
+    if (reaperDeaths >= 2 && !g_phase4Complete) {
+        DisplayTextToPlayer(g_playerId, c_timeGame, "Both Reapers lost before cleanup phase. Mission Failed.");
+        Defeat();
+    }
+}
+
+void ActionProtossDeath() {
+    CheckVictoryConditions();
+}
+
+void ActionPlayerDamage() {
+    // Track if this damage results in a kill
+    trigger t_killCheck = TriggerCreate("KillCheck");
+    TriggerAddEventUnitDied(t_killCheck, EventUnit());
+    TriggerAddCondition(t_killCheck, ConditionCompareUnit(EventUnit(), TriggerGetTriggeringUnit(), c_unitCompareEqual));
+    TriggerAddAction(t_killCheck, ActionPlayerKill);
+}
+
+void ActionPlayerKill() {
+    if (!g_phase4Complete) {
+        g_playerDirectKills++;
+        
+        if (g_playerDirectKills > 3) {
+            DisplayTextToPlayer(g_playerId, c_timeGame, "Too many direct kills before Phase 4. Mission Failed.");
+            Defeat();
+        }
+    }
+}
+
+void ActionProtossFriendlyFire() {
+    // Play sound cue
+    SoundPlayForPlayer(g_playerId, s_protossFriendlyFire);
+    
+    // Check if this results in a kill
+    trigger t_ffKillCheck = TriggerCreate("FFKillCheck");
+    TriggerAddEventUnitDied(t_ffKillCheck, EventUnit());
+    TriggerAddCondition(t_ffKillCheck, ConditionCompareUnit(EventUnit(), TriggerGetTriggeringUnit(), c_unitCompareEqual));
+    TriggerAddAction(t_ffKillCheck, ActionProtossFriendlyKill);
+}
+
+void ActionProtossFriendlyKill() {
+    g_protossFriendlyKills++;
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Protoss unit eliminated by friendly fire: " + IntToString(g_protossFriendlyKills) + "/2 required");
+}
+
+void ActionZergUnitCreated() {
+    unit zergUnit = EventUnit();
+    
+    // Order Zerg to attack nearest Protoss energy source
+    unit nearestProtoss = UnitGetNearest(zergUnit, g_protossForceId, true);
+    if (nearestProtoss != null) {
+        IssueOrder(zergUnit, c_orderAttack, nearestProtoss);
+    }
+}
+
+// ============================================
+// Timer Actions
+// ============================================
+
+void TimerPhaseCheck() {
+    // Check phase progression
+    if (!g_phase1Complete) {
+        // Check if aberration is dead
+        if (UnitGetProperty(g_aberration, c_unitPropLife, c_unitPropCurrent) <= 0) {
+            ActionAberrationDeath();
+        }
+    }
+    
+    if (g_phase3Complete && !g_phase4Complete) {
+        // Check if cleanup should begin
+        int protossCount = UnitGroupCount(UnitGroupGet(g_protossForceId));
+        if (protossCount <= 3) {
+            g_phase4Complete = true;
+            DisplayTextToPlayer(g_playerId, c_timeGame, "Begin cleanup operations. Eliminate remaining Protoss forces.");
+        }
+    }
+}
+
+void TimerWarpPrismEscape() {
+    if (!g_warpPrismDestroyed) {
+        DisplayTextToPlayer(g_playerId, c_timeGame, "Warp Prism has escaped. Mission Failed.");
+        Defeat();
+    }
+}
+
+void TimerPsionicStormComplete() {
+    if (!g_phase3Complete) {
+        DisplayTextToPlayer(g_playerId, c_timeGame, "Missed opportunity! High Templar survived the storm.");
+    }
+}
+
+// ============================================
+// Game Logic Functions
+// ============================================
+
+void TriggerZergSwarm() {
+    // Create broodlings
+    for (int i = 0; i < 8; i++) {
+        point spawnPoint = PointWithOffsetPolar(g_zergNestLocation, RandomFixed(0.0, 5.0), RandomFixed(0.0, 360.0));
+        unit broodling = UnitCreate(g_zergInfestationId, c_unitTypeBroodling, spawnPoint, 0.0);
+        
+        // Order to attack nearest Protoss
+        unit target = UnitGetNearest(broodling, g_protossForceId, true);
+        if (target != null) {
+            IssueOrder(broodling, c_orderAttack, target);
+        }
+    }
+    
+    // Play sound
+    SoundPlayForPlayer(g_playerId, s_zergTrigger);
+}
+
+void ApplyNeuralParasite() {
+    // Apply debuff to all Protoss units
+    unitgroup protossGroup = UnitGroupGet(g_protossForceId);
+    unit currentUnit = UnitGroupFirst(protossGroup);
+    
+    while (currentUnit != null) {
+        UnitApplyBehavior(currentUnit, ABILITY_NEURAL_PARASITE_DEBUFF, true);
+        
+        // Make units attack nearest enemy (including other Protoss)
+        unit nearestEnemy = UnitGetNearest(currentUnit, 0, true);
+        if (nearestEnemy != null && nearestEnemy != currentUnit) {
+            IssueOrder(currentUnit, c_orderAttack, nearestEnemy);
+        }
+        
+        currentUnit = UnitGroupNext(protossGroup);
+    }
+    
+    UnitGroupClear(protossGroup);
+}
+
+void DeployReserveZealots() {
+    // Revive reserve Zealots
+    UnitSetProperty(g_zealotReserve1, c_unitPropLife, 100, c_unitPropCurrent);
+    UnitSetProperty(g_zealotReserve2, c_unitPropLife, 100, c_unitPropCurrent);
+    
+    // Move them near Warp Prism
+    UnitSetPosition(g_zealotReserve1, PointWithOffsetPolar(g_warpPrismLocation, 2.0, 0.0), true);
+    UnitSetPosition(g_zealotReserve2, PointWithOffsetPolar(g_warpPrismLocation, 2.0, 180.0), true);
+    
+    // Order to attack nearest Zerg or player unit
+    unit target1 = UnitGetNearest(g_zealotReserve1, g_zergInfestationId, true);
+    if (target1 == null) target1 = UnitGetNearest(g_zealotReserve1, g_playerId, true);
+    
+    unit target2 = UnitGetNearest(g_zealotReserve2, g_zergInfestationId, true);
+    if (target2 == null) target2 = UnitGetNearest(g_zealotReserve2, g_playerId, true);
+    
+    if (target1 != null) IssueOrder(g_zealotReserve1, c_orderAttack, target1);
+    if (target2 != null) IssueOrder(g_zealotReserve2, c_orderAttack, target2);
+}
+
+void ApplyCreepSlow(unit target) {
+    // Check if unit is on creep (in Zerg infestation region)
+    if (RegionContainsPoint(r_zergInfestation, UnitGetPosition(target))) {
+        UnitApplyBehavior(target, ABILITY_CREEP_SLOW, true);
+    }
+}
+
+// ============================================
+// Victory/Defeat Conditions
+// ============================================
+
+void SetupVictoryConditions() {
+    // Set player alliance
+    PlayerSetAlliance(g_playerId, g_protossForceId, c_allianceEnemy);
+    PlayerSetAlliance(g_protossForceId, g_playerId, c_allianceEnemy);
+    PlayerSetAlliance(g_zergInfestationId, g_playerId, c_allianceEnemy);
+    PlayerSetAlliance(g_zergInfestationId, g_protossForceId, c_allianceEnemy);
+    PlayerSetAlliance(g_protossForceId, g_zergInfestationId, c_allianceEnemy);
+}
+
+void CheckVictoryConditions() {
+    // Check if all Protoss forces are eliminated
+    unitgroup protossGroup = UnitGroupGet(g_protossForceId);
+    int protossCount = UnitGroupCount(protossGroup);
+    UnitGroupClear(protossGroup);
+    
+    // Check Warp Prism
+    bool warpPrismAlive = (UnitGetProperty(g_warpPrism, c_unitPropLife, c_unitPropCurrent) > 0);
+    
+    // Check Ghost survival
+    bool ghostAlive = (UnitGetProperty(g_ghost, c_unitPropLife, c_unitPropCurrent) > 0);
+    
+    // Check victory conditions
+    if (protossCount == 0 && g_warpPrismDestroyed && ghostAlive && g_protossFriendlyKills >= 2) {
+        Victory();
+    }
+}
+
+void Victory() {
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Mission Accomplished! The Proxy Gambit succeeded.");
+    SoundPlayForPlayer(g_playerId, s_objectiveComplete);
+    
+    // Check for Master Tactician achievement
+    if (g_playerDirectKills == 0 && UnitGetProperty(g_reaper1, c_unitPropLife, c_unitPropCurrent) > 0 && 
+        UnitGetProperty(g_reaper2, c_unitPropLife, c_unitPropCurrent) > 0) {
+        DisplayTextToPlayer(g_playerId, c_timeGame, "Achievement Unlocked: Master Tactician!");
+    }
+    
+    // End game
+    TimerStop(g_phaseTimer);
+    TimerStop(g_warpPrismTimer);
+    GameVictory(g_playerId);
+}
+
+void Defeat() {
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Mission Failed. The Proxy Gambit has been exposed.");
+    
+    // End game
+    TimerStop(g_phaseTimer);
+    TimerStop(g_warpPrismTimer);
+    GameDefeat(g_playerId);
+}
+
+// ============================================
+// Main Function
+// ============================================
+
+void main() {
+    // Initialize the map
+    InitMap();
+    
+    // Display scenario briefing
+    DisplayTextToPlayer(g_playerId, c_timeGame, "=== THE PROXY GAMBIT ===");
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Strategy: 借刀杀人 (Kill with a Borrowed Knife)");
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Manipulate Protoss and Zerg forces to eliminate each other.");
+    DisplayTextToPlayer(g_playerId, c_timeGame, "Minimize direct engagement until cleanup phase.");
+}
+```

@@ -1,0 +1,111 @@
+# StarCraft II Scenario: "The Proxy Gambit"
+
+## Scenario Overview
+**Theme:** 借刀杀人 (Kill with a Borrowed Knife) – The player must manipulate enemy forces into destroying each other rather than engaging directly.
+
+**Map Context:** The battle takes place in a narrow mining canyon with a central neutral Zerg infestation separating Terran and Protoss forward positions.
+
+---
+
+## Force Composition
+
+### Player (Terran)
+- 1x **Ghost** (with Cloak and Snipe researched)
+- 2x **Reapers** (with KD-8 Charge researched)
+- **Hidden asset:** 1x **Neutral Broodling nest** (triggered by terrain interaction)
+
+### Enemy (Protoss)
+- 2x **Stalkers** (with Blink)
+- 1x **High Templar** (with Psionic Storm)
+- 2x **Zealots** (with Charge)
+- **Hidden threat:** 1x **Warp Prism** (stationary, containing 2 additional Zealots in reserve)
+
+---
+
+## Positioning & Phases
+
+### Initial Setup:
+```
+[Terran Start]━━━━[Narrow Bridge]━━━━[Zerg Infestation]━━━━[Protoss Outpost]━━(Cliff)
+       ↑                    ↑                  ↑                    ↑
+    Ghost +           Reaper #1          Broodling           Stalker x2
+    Reaper #2                             Nest              High Templar
+                                                           Zealot x2 (patrolling)
+                                                           Warp Prism (hidden)
+```
+
+### Phase 1: Infiltration
+- Player starts at southwest base entrance.
+- Ghost must snipe a **Zerg Aberration** (neutral) guarding the broodling nest without alerting Protoss patrols.
+- Reapers scout flanks, identifying:
+  - Protoss patrol routes (30-second cycles)
+  - Warp Prism location (cliff edge)
+  - High Templar's stationary position near infestation
+
+### Phase 2: Provocation
+- Ghost uses **"Distraction Pulse"** (special ability for this scenario) on the Zerg nest.
+- This triggers broodlings to swarm toward the *nearest energy source* – the Protoss Warp Prism.
+- Protoss forces automatically engage the Zerg, pulling all units from their positions.
+
+### Phase 3: Escalation
+- As Protoss cleans up the Zerg, the High Templar uses Psionic Storm, damaging nearby Stalkers.
+- Player's Ghost must **snipe the High Templar at 50% health** – making it appear the Zerg killed it.
+- Remaining Protoss forces (now damaged) turn on each other due to **"Neural Parasite"** (special debuff from Zerg nest).
+
+### Phase 4: Cleanup
+- Player uses Reapers to:
+  - KD-8 Charge the weakened Stalkers
+  - Kite remaining Zealots into residual Zerg creep (slows movement)
+- Ghost finishes final unit with snipe.
+
+---
+
+## Victory/Defeat Conditions
+
+### Victory:
+- All Protoss forces eliminated
+- Warp Prism destroyed
+- **At least 2 Protoss units must be killed by other Protoss or neutral forces**
+- Ghost survives
+
+### Defeat:
+- Ghost dies
+- Reapers both die before Phase 4
+- Player directly kills more than 3 Protoss units before Phase 4
+- Warp Prism escapes (if not destroyed in 8 minutes)
+
+---
+
+## Terrain Utilization Notes
+
+### Key Map Features (from uploaded terrain):
+1. **Central Zerg Infestation**
+   - Neutral units attack nearest energy signature
+   - Creep slows non-Zerg units by 30%
+   - Use to split Protoss forces
+
+2. **Narrow Bridge**
+   - Choke point for Reaper hit-and-run
+   - Line-of-sight break for Ghost cloak
+
+3. **Cliff Edge near Warp Prism**
+   - Elevated position allows overlooking infestation
+   - Reapers can use cliff jumps to bypass melee Zealots
+
+4. **Destroyable Rock Formations**
+   - Two rocks seal alternate paths
+   - Can be blown to redirect Zerg swarm or trap Protoss
+
+### Advanced Tactics:
+- **Snipe Timing:** Ghost must snipe the High Templar *during* Psionic Storm animation to hide kill credit.
+- **Reaper Mining Drill:** Use KD-8 Charge on mineral patches near Protoss to create debris that blocks Zealot charges.
+- **Warp Prisor:** If player destroys Warp Prism too early, reinforcements won't arrive to fight Zerg – must wait until Zealots deploy.
+
+---
+
+## Designer Notes
+- **借刀杀人 Execution:** Player's damage contribution must be <40% of total damage to Protoss forces.
+- **Audio Cues:** Provide distinct sound when Protoss units damage each other (feedback for stratagem working).
+- **Optional Objective:** If player completes scenario without losing units and with 0 direct kills, unlock "Master Tactician" achievement.
+
+**Balance Tip:** Adjust Zerg swarm size based on difficulty – more Zerg means easier proxy battle but more cleanup required afterward.
