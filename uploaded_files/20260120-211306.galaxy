@@ -1,0 +1,137 @@
+//==================================================================================================
+include "TriggerLibs/NativeLib"
+
+// Library Initialization
+void InitLibs () {
+    libNtve_InitLib();
+}
+
+// Global Variables
+bool gv_IsMainNexusUnderAttack;
+
+void InitGlobals () {
+}
+
+// Global Function Declarations
+void gf_Spawn ();
+void gf_EnemyProtectNexus ();
+void gf_EnemyBack ();
+
+// Trigger Variables
+trigger gt_Visibility;
+trigger gt_Allunitsdied;
+trigger gt_protect_main_nexus;
+trigger gt_protect_nexus2;
+
+// Global Functions
+void gf_Spawn () {
+    libNtve_gf_CreateUnitsWithDefaultFacing(14, "Marine", 0, 1, Point(25.96,38.5798));
+    libNtve_gf_CreateUnitsWithDefaultFacing(2, "Medivac", 0, 1, Point(25.96,38.5798));
+    libNtve_gf_CreateUnitsWithDefaultFacing(2, "Medivac", 0, 1, Point(63.1098,22.47));
+    libNtve_gf_CreateUnitsWithDefaultFacing(1, "Assimilator", 0, 2, Point(62.0297,47.2897));
+    libNtve_gf_CreateUnitsWithDefaultFacing(1, "Assimilator", 0, 2, Point(46.7597,54.38));
+    libNtve_gf_CreateUnitsWithDefaultFacing(1, "Nexus", 0, 2, Point(54.99,47.18));
+    libNtve_gf_CreateUnitsWithDefaultFacing(1, "Nexus", 0, 2, Point(24.3198,47.8598));
+    libNtve_gf_CreateUnitsWithDefaultFacing(1, "Pylon", 0, 2, Point(61.89,38.23));
+    libNtve_gf_CreateUnitsWithDefaultFacing(3, "Colossus", 0, 2, Point(36.7597,49.73));
+    libNtve_gf_CreateUnitsWithDefaultFacing(4, "Stalker", 0, 2, Point(36.7597,49.73));
+    libNtve_gf_CreateUnitsWithDefaultFacing(5, "Zealot", 0, 2, Point(36.7597,49.73));
+}
+
+void gf_EnemyProtectNexus () {
+    UnitGroupIssueOrder(UnitGroup(null, 2, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), OrderTargetingPoint(AbilityCommand("attack", 0), Point(24.3198,47.8598)), c_orderQueueReplace);
+}
+
+void gf_EnemyBack () {
+    UnitGroupIssueOrder(UnitGroup(null, 2, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), OrderTargetingPoint(AbilityCommand("move", 0), Point(54.99,47.18)), c_orderQueueReplace);
+}
+
+// Trigger: Initial Setup
+bool gt_Visibility_Func (bool testConds, bool runActions) {
+    if (!runActions) {
+        return true;
+    }
+    gv_IsMainNexusUnderAttack = false;
+    VisEnable(c_visTypeFog, false);
+    VisEnable(c_visTypeMask, false);
+    gf_Spawn();
+    return true;
+}
+
+void gt_Visibility_Init () {
+    gt_Visibility = TriggerCreate("gt_Visibility_Func");
+    TriggerAddEventMapInit(gt_Visibility);
+}
+
+// Trigger: All Units Died
+bool gt_Allunitsdied_Func (bool testConds, bool runActions) {
+    if (testConds) {
+        if (!(((UnitGroupCount(UnitGroup(null, 1, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), c_unitCountAlive) == 0) && (UnitGroupCount(UnitGroup(null, 2, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), c_unitCountAlive) == 0)))) {
+            return false;
+        }
+    }
+    if (!runActions) {
+        return true;
+    }
+    gv_IsMainNexusUnderAttack = false;
+    gf_Spawn();
+    return true;
+}
+
+void gt_Allunitsdied_Init () {
+    gt_Allunitsdied = TriggerCreate("gt_Allunitsdied_Func");
+    TriggerAddEventUnitDied(gt_Allunitsdied, null);
+}
+
+// Trigger: Protect Main Nexus
+bool gt_protect_main_nexus_Func (bool testConds, bool runActions) {
+    if (testConds) {
+        if (!((UnitGetType(EventUnit()) == "Medivac"))) {
+            return false;
+        }
+    }
+    if (!runActions) {
+        return true;
+    }
+    gv_IsMainNexusUnderAttack = true;
+    gf_EnemyBack();
+    return true;
+}
+
+void gt_protect_main_nexus_Init () {
+    gt_protect_main_nexus = TriggerCreate("gt_protect_main_nexus_Func");
+    TriggerAddEventUnitRangePoint(gt_protect_main_nexus, null, Point(54.99,47.18), 8.0, true);
+}
+
+// Trigger: Protect Nexus 2
+bool gt_protect_nexus2_Func (bool testConds, bool runActions) {
+    if (testConds) {
+        if (!((gv_IsMainNexusUnderAttack == false))) {
+            return false;
+        }
+    }
+    if (!runActions) {
+        return true;
+    }
+    gf_EnemyProtectNexus();
+    return true;
+}
+
+void gt_protect_nexus2_Init () {
+    gt_protect_nexus2 = TriggerCreate("gt_protect_nexus2_Func");
+    TriggerAddEventUnitRangePoint(gt_protect_nexus2, null, Point(24.3198,47.8598), 8.0, true);
+}
+
+// Trigger Initialization
+void InitTriggers () {
+    gt_Visibility_Init();
+    gt_Allunitsdied_Init();
+    gt_protect_main_nexus_Init();
+    gt_protect_nexus2_Init();
+}
+
+// Map Initialization
+void InitMap () {
+    InitLibs();
+    InitGlobals();
+    InitTr

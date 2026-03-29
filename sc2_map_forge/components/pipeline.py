@@ -29,6 +29,7 @@ def stage_node(stage: dict, index: int) -> rx.Component:
         rx.el.div(
             rx.el.div(stage["label"], class_name="stage-label"),
             rx.el.div(status, class_name="stage-status"),
+            class_name="stage-info",
         ),
         on_click=GenerationState.view_stage(index),
         class_name=node_cls,

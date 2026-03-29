@@ -15,6 +15,9 @@ from ..constants import API_PROVIDERS
 
 CONFIG_FILE = "smac_ast_config.json"
 
+# Provider keys — used to generate computed vars
+_PROVIDER_KEYS = [p["key"] for p in API_PROVIDERS]
+
 
 class ConfigState(rx.State):
     """API 和路径配置状态"""
@@ -47,6 +50,87 @@ class ConfigState(rx.State):
                     "model": p["default_model"],
                 }
             self.provider_configs = configs
+
+    def _get_field(self, provider_key: str, field: str) -> str:
+        """安全地从 provider_configs 获取字段值"""
+        return self.provider_configs.get(provider_key, {}).get(field, "")
+
+    # ── Computed vars: 每个 provider 的每个字段 ──
+    # 用于 UI input 的 value 绑定 (刷新后能正确回显)
+
+    @rx.var
+    def deepseek_apikey(self) -> str:
+        return self._get_field("deepseek", "apikey")
+
+    @rx.var
+    def deepseek_baseurl(self) -> str:
+        return self._get_field("deepseek", "baseurl")
+
+    @rx.var
+    def deepseek_model(self) -> str:
+        return self._get_field("deepseek", "model")
+
+    @rx.var
+    def openai_apikey(self) -> str:
+        return self._get_field("openai", "apikey")
+
+    @rx.var
+    def openai_baseurl(self) -> str:
+        return self._get_field("openai", "baseurl")
+
+    @rx.var
+    def openai_model(self) -> str:
+        return self._get_field("openai", "model")
+
+    @rx.var
+    def anthropic_apikey(self) -> str:
+        return self._get_field("anthropic", "apikey")
+
+    @rx.var
+    def anthropic_baseurl(self) -> str:
+        return self._get_field("anthropic", "baseurl")
+
+    @rx.var
+    def anthropic_model(self) -> str:
+        return self._get_field("anthropic", "model")
+
+    @rx.var
+    def glm_apikey(self) -> str:
+        return self._get_field("glm", "apikey")
+
+    @rx.var
+    def glm_baseurl(self) -> str:
+        return self._get_field("glm", "baseurl")
+
+    @rx.var
+    def glm_model(self) -> str:
+        return self._get_field("glm", "model")
+
+    @rx.var
+    def qwen_apikey(self) -> str:
+        return self._get_field("qwen", "apikey")
+
+    @rx.var
+    def qwen_baseurl(self) -> str:
+        return self._get_field("qwen", "baseurl")
+
+    @rx.var
+    def qwen_model(self) -> str:
+        return self._get_field("qwen", "model")
+
+    @rx.var
+    def minimax_apikey(self) -> str:
+        return self._get_field("minimax", "apikey")
+
+    @rx.var
+    def minimax_baseurl(self) -> str:
+        return self._get_field("minimax", "baseurl")
+
+    @rx.var
+    def minimax_model(self) -> str:
+        return self._get_field("minimax", "model")
+
+    # ── 页面加载 ──
 
     @rx.event
     def on_load(self):
@@ -90,12 +174,6 @@ class ConfigState(rx.State):
         except ValueError:
             pass
 
-    def update_provider_field(self, provider_key: str, field: str, value: str):
-        """更新指定提供商的字段"""
-        self._init_providers()
-        if provider_key in self.provider_configs:
-            self.provider_configs[provider_key][field] = value
-
     def update_provider_apikey(self, provider_key: str, value: str):
         self._init_providers()
         if provider_key in self.provider_configs:
@@ -121,8 +199,17 @@ class ConfigState(rx.State):
         if value:
             self.max_tokens = max(512, min(16384, int(value[0])))
 
+    def reset_temperature(self):
+        """重置 Temperature 到默认值"""
+        self.temperature = 1.0
+
+    def reset_max_tokens(self):
+        """重置 Max Tokens 到默认值"""
+        self.max_tokens = 8096
+
     def save_api_config(self):
         """保存 API 配置到文件"""
+        self._init_providers()
         config = {
             "default_provider": self.default_provider,
             "temperature": self.temperature,
@@ -155,7 +242,6 @@ class ConfigState(rx.State):
 
     def save_path_config(self):
         """保存路径配置"""
-        # 读取已有的配置合并
         config = {}
         if os.path.exists(CONFIG_FILE):
             try:

@@ -1,0 +1,108 @@
+include "TriggerLibs/NativeLib"
+
+void InitLibs () {
+    libNtve_InitLib();
+}
+
+bool gv_AllyWin;
+bool gv_EnemyWin;
+int gv_TimeLimit;
+int gv_TimeElapsed;
+
+void InitGlobals () {
+    gv_AllyWin = false;
+    gv_EnemyWin = false;
+    gv_TimeLimit = 400;
+    gv_TimeElapsed = 0;
+}
+
+void gf_SpawnAlly () {
+    libNtve_gf_CreateUnitsWithDefaultFacing(3, "Marine", 0, 1, Point(20.0, 40.0));
+}
+
+void gf_SpawnEnemy () {
+    libNtve_gf_CreateUnitsWithDefaultFacing(3, "Marine", 0, 2, Point(60.0, 40.0));
+}
+
+void gf_OrderAttackMove () {
+    UnitGroupIssueOrder(UnitGroup(null, 1, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), OrderTargetingPoint(AbilityCommand("attack", 0), Point(60.0, 40.0)), c_orderQueueReplace);
+    UnitGroupIssueOrder(UnitGroup(null, 2, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), OrderTargetingPoint(AbilityCommand("attack", 0), Point(20.0, 40.0)), c_orderQueueReplace);
+}
+
+void gf_CheckVictory () {
+    int allyCount = UnitGroupCount(UnitGroup(null, 1, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), c_unitCountAlive);
+    int enemyCount = UnitGroupCount(UnitGroup(null, 2, RegionEntireMap(), UnitFilter(0, 0, (1 << c_targetFilterMissile), (1 << (c_targetFilterDead - 32)) | (1 << (c_targetFilterHidden - 32))), 0), c_unitCountAlive);
+    if (allyCount == 0) {
+        gv_EnemyWin = true;
+    }
+    if (enemyCount == 0) {
+        gv_AllyWin = true;
+    }
+}
+
+void gf_CheckTime () {
+    gv_TimeElapsed = gv_TimeElapsed + 1;
+    if (gv_TimeElapsed >= gv_TimeLimit) {
+        gv_AllyWin = false;
+        gv_EnemyWin = true;
+    }
+}
+
+trigger gt_MapInit;
+trigger gt_UnitDeath;
+trigger gt_Timer;
+
+bool gt_MapInit_Func (bool testConds, bool runActions) {
+    if (!runActions) {
+        return true;
+    }
+    VisEnable(c_visTypeFog, false);
+    VisEnable(c_visTypeMask, false);
+    gf_SpawnAlly();
+    gf_SpawnEnemy();
+    gf_OrderAttackMove();
+    return true;
+}
+
+void gt_MapInit_Init () {
+    gt_MapInit = TriggerCreate("gt_MapInit_Func");
+    TriggerAddEventMapInit(gt_MapInit);
+}
+
+bool gt_UnitDeath_Func (bool testConds, bool runActions) {
+    if (!runActions) {
+        return true;
+    }
+    gf_CheckVictory();
+    return true;
+}
+
+void gt_UnitDeath_Init () {
+    gt_UnitDeath = TriggerCreate("gt_UnitDeath_Func");
+    TriggerAddEventUnitDied(gt_UnitDeath, null);
+}
+
+bool gt_Timer_Func (bool testConds, bool runActions) {
+    if (!runActions) {
+        return true;
+    }
+    gf_CheckTime();
+    return true;
+}
+
+void gt_Timer_Init () {
+    gt_Timer = TriggerCreate("gt_Timer_Func");
+    TriggerAddEventTimer(gt_Timer, 1.0, true);
+}
+
+void InitTriggers () {
+    gt_MapInit_Init();
+    gt_UnitDeath_Init();
+    gt_Timer_Init();
+}
+
+void InitMap () {
+    InitLibs();
+    InitGlobals();
+    InitTriggers();
+}

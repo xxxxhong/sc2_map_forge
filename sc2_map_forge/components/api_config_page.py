@@ -9,17 +9,6 @@ from ..components.header import header, top_tabs
 from ..constants import API_PROVIDERS
 from ..states.config_state import ConfigState
 
-# Mapping: provider key → (apikey_var, baseurl_var, model_var)
-# These are the @rx.var computed properties on ConfigState
-_PROVIDER_VARS = {
-    "deepseek": (ConfigState.deepseek_apikey, ConfigState.deepseek_baseurl, ConfigState.deepseek_model),
-    "openai": (ConfigState.openai_apikey, ConfigState.openai_baseurl, ConfigState.openai_model),
-    "anthropic": (ConfigState.anthropic_apikey, ConfigState.anthropic_baseurl, ConfigState.anthropic_model),
-    "glm": (ConfigState.glm_apikey, ConfigState.glm_baseurl, ConfigState.glm_model),
-    "qwen": (ConfigState.qwen_apikey, ConfigState.qwen_baseurl, ConfigState.qwen_model),
-    "minimax": (ConfigState.minimax_apikey, ConfigState.minimax_baseurl, ConfigState.minimax_model),
-}
-
 
 def _provider_radio(provider: dict) -> rx.Component:
     """单个 provider radio 选项"""
@@ -42,8 +31,6 @@ def _provider_card(provider: dict) -> rx.Component:
     color = provider["color"]
     is_active = ConfigState.default_provider == key
 
-    apikey_var, baseurl_var, model_var = _PROVIDER_VARS[key]
-
     return rx.el.div(
         # Header
         rx.el.div(
@@ -65,7 +52,6 @@ def _provider_card(provider: dict) -> rx.Component:
                 rx.el.input(
                     type="password",
                     placeholder="sk-...",
-                    value=apikey_var,
                     on_change=ConfigState.update_provider_apikey(key),
                     class_name="form-input",
                 ),
@@ -73,7 +59,7 @@ def _provider_card(provider: dict) -> rx.Component:
             rx.el.div(
                 rx.el.label("BASE URL", class_name="form-label"),
                 rx.el.input(
-                    value=baseurl_var,
+                    default_value=provider["default_base_url"],
                     on_change=ConfigState.update_provider_baseurl(key),
                     class_name="form-input",
                 ),
@@ -81,7 +67,7 @@ def _provider_card(provider: dict) -> rx.Component:
             rx.el.div(
                 rx.el.label("模型名", class_name="form-label"),
                 rx.el.input(
-                    value=model_var,
+                    default_value=provider["default_model"],
                     on_change=ConfigState.update_provider_model(key),
                     class_name="form-input",
                 ),
