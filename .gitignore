@@ -1,7 +1,4 @@
-.web
-.states
 __pycache__/
-assets/external/
 *.py[cod]
 *.db
 smac_ast_config.json
