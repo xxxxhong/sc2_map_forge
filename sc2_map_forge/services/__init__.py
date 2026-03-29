@@ -61,6 +61,10 @@ class GenerationResult:
 
 # ── LLM 客户端工厂 ──
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def create_llm_client(provider: ProviderConfig):
     """
@@ -72,6 +76,7 @@ def create_llm_client(provider: ProviderConfig):
         return OpenAI(
             api_key=provider.api_key,
             base_url=provider.base_url,
+            timeout=180,  # 3 分钟超时，避免无限等待
         )
     except ImportError:
         raise RuntimeError("请先安装 openai: pip install openai")
@@ -87,14 +92,21 @@ def call_llm(
     """
     通用 LLM 调用，返回纯文本响应。
     """
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=temperature,
-        max_tokens=max_tokens,
-        stream=False,
-    )
-    return response.choices[0].message.content
+    logger.info(f"[LLM] 调用 model={model}, prompt长度={len(prompt)}, max_tokens={max_tokens}")
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            stream=False,
+        )
+        content = response.choices[0].message.content
+        logger.info(f"[LLM] 返回 {len(content)} 字符")
+        return content
+    except Exception as e:
+        logger.error(f"[LLM] 调用失败: {e}")
+        raise
 
 
 # ── 生成流程 (对应原 generate.py 的四个阶段) ──

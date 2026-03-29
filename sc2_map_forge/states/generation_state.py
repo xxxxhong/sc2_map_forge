@@ -191,7 +191,9 @@ class GenerationState(rx.State):
             self.active_stage = 0
 
         try:
-            plan = run_stage_planning(client, provider.model, gen_config, terrain_xml)
+            plan = await asyncio.to_thread(
+                run_stage_planning, client, provider.model, gen_config, terrain_xml
+            )
         except Exception as e:
             async with self:
                 self.is_generating = False
@@ -207,7 +209,9 @@ class GenerationState(rx.State):
         # ── Stage 2: API Query ──
         try:
             import json as _json
-            queries = run_stage_api_query(client, provider.model, plan, gen_config)
+            queries = await asyncio.to_thread(
+                run_stage_api_query, client, provider.model, plan, gen_config
+            )
             queries_text = _json.dumps(queries, ensure_ascii=False, indent=2)
         except Exception as e:
             async with self:
@@ -223,7 +227,7 @@ class GenerationState(rx.State):
 
         # ── Stage 3: API Lib ──
         try:
-            api_lib = run_stage_api_lib(queries)
+            api_lib = await asyncio.to_thread(run_stage_api_lib, queries)
         except Exception as e:
             async with self:
                 self.is_generating = False
@@ -238,7 +242,8 @@ class GenerationState(rx.State):
 
         # ── Stage 4: Codegen ──
         try:
-            galaxy_code = run_stage_codegen(
+            galaxy_code = await asyncio.to_thread(
+                run_stage_codegen,
                 client, provider.model, plan, terrain_xml, api_lib, gen_config
             )
         except Exception as e:
