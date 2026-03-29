@@ -185,15 +185,17 @@ Return ONLY a JSON array of strings, e.g.:
 def run_stage_api_lib(queries: list[str]) -> str:
     """
     阶段 3: API 库构建
-    对接原始 build_api_lib() — 需要 ChromaDB 和嵌入模型
-    如果环境中没有这些依赖，返回占位文本
+    从 ChromaDB 向量库检索 Galaxy API 函数和预设值
+    如果向量库未就绪，返回占位文本
     """
     try:
         import chromadb
         from chromadb.config import Settings
-        from sentence_transformers import SentenceTransformer
 
         DB_DIR = "chroma_db"
+        if not os.path.exists(DB_DIR):
+            raise FileNotFoundError(f"ChromaDB 目录 {DB_DIR} 不存在")
+
         chroma = chromadb.Client(
             Settings(
                 persist_directory=DB_DIR,
@@ -201,10 +203,39 @@ def run_stage_api_lib(queries: list[str]) -> str:
                 is_persistent=True,
             )
         )
-        collection_func = chroma.get_collection("galaxy_functions")
 
-        # 必选函数
-        required_ids = [
+        # 检查 galaxy_functions
+        try:
+            col_func = chroma.get_collection("galaxy_functions")
+        except Exception:
+            raise RuntimeError("galaxy_functions collection 不存在，请先运行: python scripts/build_vector_db.py")
+
+        if col_func.count() == 0:
+            raise RuntimeError("galaxy_functions 为空，请先运行: python scripts/build_vector_db.py")
+
+        # 检查 galaxy_presets (可选)
+        col_preset = None
+        try:
+            _col = chroma.get_collection("galaxy_presets")
+            if _col.count() > 0:
+                col_preset = _col
+        except Exception:
+            pass
+
+        logger.info(
+            f"[Stage 3] 向量库就绪: functions={col_func.count()}, "
+            f"presets={col_preset.count() if col_preset else 0}"
+        )
+
+        # 加载 embedding 模型
+        from sentence_transformers import SentenceTransformer
+        logger.info("[Stage 3] 加载 embedding 模型...")
+        embedding_model = SentenceTransformer(
+            "BAAI/bge-base-en-v1.5", cache_folder="models"
+        )
+
+        # 必选核心函数
+        required_func_ids = [
             "libNtve_InitLib", "VisEnable", "Point",
             "libNtve_gf_CreateUnitsWithDefaultFacing",
             "UnitGroup", "UnitGroupCount", "UnitGroupIssueOrder",
@@ -214,31 +245,60 @@ def run_stage_api_lib(queries: list[str]) -> str:
             "RegionEntireMap", "UnitFilter", "EventUnit",
         ]
 
-        embedding_model = SentenceTransformer(
-            "BAAI/bge-base-en-v1.5", cache_folder="models"
-        )
-
+        # 向量检索: 函数
         for q in queries:
             query_emb = embedding_model.encode(
                 f"Represent this query for retrieving relevant Galaxy API functions: {q}"
             ).tolist()
-            results = collection_func.query(
-                query_embeddings=[query_emb], n_results=1
-            )
-            if results["ids"][0]:
-                fid = results["ids"][0][0]
-                if fid not in required_ids:
-                    required_ids.append(fid)
+            results = col_func.query(query_embeddings=[query_emb], n_results=2)
+            if results["ids"] and results["ids"][0]:
+                for fid in results["ids"][0]:
+                    if fid not in required_func_ids:
+                        required_func_ids.append(fid)
 
-        docs = collection_func.get(ids=required_ids)["documents"]
-        return "\n\n".join(docs)
+        # 过滤不存在的 ID
+        existing_func_ids = set(col_func.get()["ids"])
+        valid_func_ids = [fid for fid in required_func_ids if fid in existing_func_ids]
+        func_docs = col_func.get(ids=valid_func_ids)["documents"] if valid_func_ids else []
+        logger.info(f"[Stage 3] 检索到 {len(func_docs)} 个 API 函数")
 
-    except Exception:
-        # 无 ChromaDB 时的占位
+        # 向量检索: 预设
+        preset_docs = []
+        if col_preset:
+            preset_ids = set()
+            for q in queries:
+                query_emb = embedding_model.encode(
+                    f"Represent this query for retrieving relevant Galaxy preset types: {q}"
+                ).tolist()
+                results = col_preset.query(query_embeddings=[query_emb], n_results=1)
+                if results["ids"] and results["ids"][0]:
+                    for pid in results["ids"][0]:
+                        preset_ids.add(pid)
+            if preset_ids:
+                existing_preset_ids = set(col_preset.get()["ids"])
+                valid_preset_ids = [pid for pid in preset_ids if pid in existing_preset_ids]
+                if valid_preset_ids:
+                    preset_docs = col_preset.get(ids=valid_preset_ids)["documents"]
+            logger.info(f"[Stage 3] 检索到 {len(preset_docs)} 个预设类型")
+
+        # 组装输出
+        parts = []
+        if func_docs:
+            parts.append(f"[Galaxy API Functions - {len(func_docs)} loaded]\n")
+            parts.extend(func_docs)
+        if preset_docs:
+            parts.append(f"\n[Galaxy Presets - {len(preset_docs)} loaded]\n")
+            parts.extend(preset_docs)
+
+        return "\n\n".join(parts) if parts else "(未检索到任何 API 数据)"
+
+    except Exception as e:
+        logger.warning(f"[Stage 3] 向量库不可用，使用占位输出: {e}")
         lines = [f"[API Library - {len(queries)} queries matched]", ""]
         for i, q in enumerate(queries, 1):
             lines.append(f"  {i}. {q}")
-        lines.append("\n(ChromaDB 未配置，显示查询摘要)")
+        lines.append(f"\n(向量库不可用: {e})")
+        lines.append("请运行: python scripts/build_vector_db.py")
         return "\n".join(lines)
 
 
