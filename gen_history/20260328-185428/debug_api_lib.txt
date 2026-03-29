@@ -1,0 +1,20 @@
+[API Library - 16 queries matched]
+
+  1. spawn units with initial positions
+  2. set facing direction for units
+  3. issue move order to specific location
+  4. conduct scouting with Reaper unit
+  5. trigger diversionary attack sequence
+  6. deploy unit groups at specific coordinates
+  7. use terrain for strategic advantage
+  8. execute area bombardment with Siege Tanks
+  9. initiate Medivac healing on unit
+  10. simulate enemy unit reaction to feint
+  11. coordinate simultaneous multi-front assault
+  12. manage unit visibility and stealth mechanics
+  13. manipulate unit engagement priority
+  14. control unit mobility via terrain paths
+  15. implement timeline-based mission objectives
+  16. monitor victory or defeat event triggers
+
+(ChromaDB 未配置，显示查询摘要)

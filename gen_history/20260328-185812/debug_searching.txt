@@ -1,0 +1,16 @@
+[
+  "create units with specific composition",
+  "set unit initial position",
+  "issue move order to unit group",
+  "hide units in terrain",
+  "detect unit visibility by enemy",
+  "activate Infestor's Neural Parasite ability",
+  "issue attack order to unit group",
+  "check unit survival count",
+  "track time elapsed for event",
+  "set victory conditions",
+  "set defeat conditions",
+  "use map natural chokepoints for strategic advantage",
+  "trigger phase timing and transitions",
+  "utilize terrain for stealth positioning"
+]

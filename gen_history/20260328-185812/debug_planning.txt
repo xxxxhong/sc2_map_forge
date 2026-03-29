@@ -1,0 +1,71 @@
+### Scenario Plan: "声东击西 - The Art of Deception"
+
+#### Strategic Context
+- **Stratagem**: 声东击西 (Make noise in the east, then strike in the west). This classic strategy involves creating a diversion to mislead the enemy, allowing for an attack where they least expect it.
+
+#### Scenario Overview
+- **Player Race**: Zerg
+- **Enemy Race**: Terran
+- **Map Filename**: uploaded_files\20260127-131733.galaxy
+
+#### Force Composition
+
+**Zerg Forces (Player)**
+1. **Main Force** (Diversionary Attack):
+   - 1x Ultralisk
+   - 3x Hydralisks
+   - 1x Roach
+2. **Flanking Force** (Main Attack):
+   - 2x Zerglings
+   - 2x Banelings
+   - 1x Infestor (for mind control and support)
+
+**Terran Forces (Enemy)**
+1. **Frontline Defense**:
+   - 2x Siege Tanks
+   - 2x Marines
+2. **Rear Guard**:
+   - 2x Marauders
+   - 3x Reapers
+   - 1x Raven (for detection and support)
+
+#### Positioning and Phases
+
+**Initial Positioning**
+- Zerg Main Force positioned to the east, visible from key Terran observation points.
+- Zerg Flanking Force hidden in dense terrain/behind obstacles to the west.
+
+**Phases**
+
+1. **Phase 1: Diversion**
+   - The Zerg Main Force advances towards the eastern Terran defenses, drawing their attention and causing them to reposition Shield Tanks and Marines to brace for an assault.
+   - This serves to lure out the enemy firepower and divert focus from the western flank.
+
+2. **Phase 2: Approach**
+   - As the Terran forces are engaged on the eastern flank, the Zerg Flanking Force, aided by cloaking and the Infestor's abilities, maneuver stealthily through terrain to the western perimeter of the Terran base.
+
+3. **Phase 3: Flank and Destroy**
+   - Once positioned, the Zerg Flanking Force engages, with Banelings targeting Reapers and Marauders, and the Infestor using Neural Parasite to momentarily control critical units.
+   - The Zerglings quickly overwhelm the back-line, while the Roach provides support where needed.
+
+4. **Phase 4: Consolidate and Overcome**
+   - With Terran forces split and weakened, coordinate a unified assault with any surviving units of both Zerg sides to eliminate remaining resistance.
+
+#### Victory/Defeat Conditions
+
+**Victory Conditions:**
+- All Terran units are destroyed.
+- At least 2 Zerg units from any composition survive the skirmish.
+
+**Defeat Conditions:**
+- All Zerg units are destroyed.
+- The Terran forces hold their defensive positions for a set time (e.g., 15 minutes), successfully signaling reinforcements.
+
+#### Terrain Utilization Notes
+
+- **Uploaded Terrain File**: Leverage the natural chokepoints and high ground areas in the eastern and western sections.
+- **Dense Cover**: Utilize vegetation and terrain elevation to hide the Flanking Force's initial positioning.
+- **Pathways**: The map’s narrow pathways favor Zerg agility and can be used to funnel Terran units into vulnerable positions favorable for Zerg ambushes.
+- **Observation Points**: The terrain offers certain elevated observation points that are strategically aligned with the eastern approaches, perfect for the initial diversion setup.
+
+This battle scenario exemplifies the deceptive art of the stratagem "声东击西", requiring players to think strategically about unit placement, timing, and terrain advantages. The objective is not merely destruction, but clever misdirection and tactical exploitation of the enemy’s perceived weaknesses.

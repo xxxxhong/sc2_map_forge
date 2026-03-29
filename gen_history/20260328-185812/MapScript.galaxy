@@ -1,0 +1,87 @@
+```galaxy
+/******************************************************************
+ * MapScript.galaxy - "声东击西 - The Art of Deception"
+ ******************************************************************/
+
+const float PHASE_DURATION = 180.0; // 3 minutes per phase
+
+function InitZergForces() {
+    // Initialize Zerg Main Force - Diversionary Attack
+    createUnit("Zerg Ultralisk", 1, Point(100, 50), 1);
+    createUnit("Zerg Hydralisk", 3, Point(100, 52), 1);
+    createUnit("Zerg Roach", 1, Point(100, 54), 1);
+
+    // Initialize Zerg Flanking Force - Main Attack
+    createUnit("Zerg Zergling", 2, Point(10, 200), 1);
+    createUnit("Zerg Baneling", 2, Point(12, 200), 1);
+    createUnit("Zerg Infestor", 1, Point(14, 200), 1);
+    hideUnitsInTerrain(Group("Zerg Zergling"), true);
+    hideUnitsInTerrain(Group("Zerg Baneling"), true);
+    hideUnitsInTerrain(Group("Zerg Infestor"), true);
+}
+
+function InitTerranForces() {
+    // Initialize Terran Frontline Defense
+    createUnit("Terran Siege Tank", 2, Point(300, 60), 2);
+    createUnit("Terran Marine", 2, Point(300, 62), 2);
+
+    // Initialize Terran Rear Guard
+    createUnit("Terran Marauder", 2, Point(310, 180), 2);
+    createUnit("Terran Reaper", 3, Point(312, 182), 2);
+    createUnit("Terran Raven", 1, Point(314, 184), 2);
+}
+
+function Phase1_Diversion() {
+    UnitGroup orderGroup = Group("Zerg Ultralisk", "Zerg Hydralisk", "Zerg Roach");
+    issueMoveOrder(orderGroup, Point(300, 60));
+    useMapNaturalChokepoints(orderGroup, true);
+}
+
+function Phase2_Approach() {
+    if (detectUnitVisibilityByEnemy(Group("Zerg Ultralisk")) > 0) {
+        // If main force is visible, start flank move
+        UnitGroup flankingGroup = Group("Zerg Zergling", "Zerg Baneling", "Zerg Infestor");
+        issueMoveOrder(flankingGroup, Point(310, 180));
+        useMapNaturalChokepoints(flankingGroup, false);
+    }
+}
+
+function Phase3_FlankAndDestroy() {
+    // Attack orders and use of Infestor abilities
+    UnitGroup flankingGroup = Group("Zerg Zergling", "Zerg Baneling", "Zerg Infestor");
+    issueAttackOrder(flankingGroup, Point(310, 180));
+    activateInfestorNeuralParasite("Zerg Infestor", "Terran Reaper", true);
+}
+
+function Phase4_ConsolidateAndOvercome() {
+    UnitGroup allSurvivingUnits = Group("Zerg Ultralisk", "Zerg Hydralisk", "Zerg Roach", "Zerg Zergling", "Zerg Baneling", "Zerg Infestor");
+    issueAttackOrder(allSurvivingUnits, Point(300, 60));
+}
+
+function CheckVictoryConditions() {
+    if (checkUnitSurvivalCount(Group("Zerg Ultralisk", "Zerg Hydralisk", "Zerg Roach", "Zerg Zergling", "Zerg Baneling", "Zerg Infestor")) >= 2 
+        && !checkUnitSurvivalCount(Group("Terran Siege Tank", "Terran Marine", "Terran Marauder", "Terran Reaper", "Terran Raven")) > 0) {
+        setVictoryConditions(true);
+    }
+}
+
+function CheckDefeatConditions() {
+    if (checkUnitSurvivalCount(Group("Zerg Ultralisk", "Zerg Hydralisk", "Zerg Roach", "Zerg Zergling", "Zerg Baneling", "Zerg Infestor")) <= 0 
+        || trackTimeElapsedForEvent() >= 900.0) {
+        setDefeatConditions(true);
+    }
+}
+
+function main() {
+    InitZergForces();
+    InitTerranForces();
+
+    triggerPhaseTimingAndTransitions(PHASE_DURATION, Phase1_Diversion, Phase2_Approach, Phase3_FlankAndDestroy, Phase4_ConsolidateAndOvercome);
+
+    while (true) {
+        CheckVictoryConditions();
+        CheckDefeatConditions();
+        wait(1); // Check every second
+    }
+}
+```

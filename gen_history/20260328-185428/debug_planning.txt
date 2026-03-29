@@ -1,0 +1,59 @@
+### Battle Scenario: "Echoes of Deception"
+
+#### Strategy: 声东击西 (Feint to the East, Attack to the West)
+
+This battle scenario is designed to implement the Chinese military stratagem 声东击西, which involves creating a diversion to mislead the enemy and striking at a target they did not anticipate. In this Terran vs. Zerg match-up, you will utilize a feint to draw Zerg forces to one flank while your main force strikes at a critical point.
+
+---
+
+#### Force Composition
+
+**Terran (Player)**
+- 4 Marines: Main offensive unit, high mobility for versatile engagement.
+- 2 Marauders: Provide heavy fire support against armored Zerg units.
+- 2 Siege Tanks: Offer long-range bombardment capabilities.
+- 1 Medivac: Ensure unit longevity through on-field healing.
+- 1 Reaper: Acts as a scout and secondary feint unit due to its high mobility.
+
+**Zerg (Enemy)**
+- 5 Zerglings: Quick response and harassment units.
+- 2 Roaches: Provide tankiness and pressure against Terran infantry.
+- 2 Hydralisks: Offer ranged attack to challenge Terran's aerial capabilities.
+- 1 Mutalisk: Adds air threat to Terran ground units.
+
+---
+
+#### Positioning and Phases
+
+**Phase 1: Initial Deployment**
+- **Terran**: Position Marines and Marauders near the eastern edge of the map to simulate a forthcoming assault. Deploy the Reaper for rapid scouting and feint execution near the eastern frontlines.
+- **Zerg**: Scatter Zerglings on key choke points, with Roaches in support positions and Hydralisks covering flanks. Hold Mutalisk in reserve near the main base for flexibility.
+
+**Phase 2: Execute Feint (Voice)**
+- Use the Reaper to launch initial harassment and reconnaissance on the eastern front, creating noise (“声”) and drawing Zerg units toward defending this perceived main attack.
+- Initiate bombardment with Siege Tanks concealed behind cover near the central region, suggesting long-range support for the eastern assault.
+
+**Phase 3: Main Assault (West Strike)**
+- Deploy the bulk of Terran forces, including Medivac-supported Marines and Marauders, to strike at an exposed western Zerg structure or high-value resource point, executing the actual attack (“击西”).
+- Utilize terrain cover as listed in XML to approach undetected, ensuring maximum surprise.
+
+**Terrain Utilization Notes:**
+- Leverage cliffs and high ground as described in the XML to provide Siege Tanks an advantageous firing position.
+- Utilize valleys and narrow passages to funnel and control Zergling mobility.
+- Use Medivac to allow flexible unit repositioning across uneven terrain, bypassing obstacles described in the terrain file.
+
+---
+
+#### Victory/Defeat Conditions
+
+**Victory Conditions:**
+- Destroy the Zerg’s vital structure or resource cache located on the western flank.
+- Complete mission objectives within 10 minutes after the main strike to demonstrate swift execution of the stratagem.
+
+**Defeat Conditions:**
+- Loss of all Siege Tanks before the main assault.
+- Complete annihilation of the main western attack force.
+
+---
+
+This scenario allows players to master the art of deception and surprise, leveraging terrain and strategic unit composition to create a dramatic and fulfilling gameplay experience.

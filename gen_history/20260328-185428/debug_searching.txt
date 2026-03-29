@@ -1,0 +1,18 @@
+[
+  "spawn units with initial positions",
+  "set facing direction for units",
+  "issue move order to specific location",
+  "conduct scouting with Reaper unit",
+  "trigger diversionary attack sequence",
+  "deploy unit groups at specific coordinates",
+  "use terrain for strategic advantage",
+  "execute area bombardment with Siege Tanks",
+  "initiate Medivac healing on unit",
+  "simulate enemy unit reaction to feint",
+  "coordinate simultaneous multi-front assault",
+  "manage unit visibility and stealth mechanics",
+  "manipulate unit engagement priority",
+  "control unit mobility via terrain paths",
+  "implement timeline-based mission objectives",
+  "monitor victory or defeat event triggers"
+]

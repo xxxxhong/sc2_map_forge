@@ -1,0 +1,18 @@
+[API Library - 14 queries matched]
+
+  1. create units with specific composition
+  2. set unit initial position
+  3. issue move order to unit group
+  4. hide units in terrain
+  5. detect unit visibility by enemy
+  6. activate Infestor's Neural Parasite ability
+  7. issue attack order to unit group
+  8. check unit survival count
+  9. track time elapsed for event
+  10. set victory conditions
+  11. set defeat conditions
+  12. use map natural chokepoints for strategic advantage
+  13. trigger phase timing and transitions
+  14. utilize terrain for stealth positioning
+
+(ChromaDB 未配置，显示查询摘要)

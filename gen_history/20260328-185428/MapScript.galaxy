@@ -1,0 +1,48 @@
+```galaxy
+// MapScript.galaxy for "Echoes of Deception" scenario
+
+void InitMap()
+{
+    // Initial Deployment Phase
+    spawnUnits(PlayerTerran, Marines, 4, GetStartingLocation(PlayerTerran, 0), FacingEast);
+    spawnUnits(PlayerTerran, Marauders, 2, GetStartingLocation(PlayerTerran, 0), FacingEast);
+    spawnUnits(PlayerTerran, SiegeTanks, 2, GetStartingLocation(PlayerTerran, 0), FacingEast);
+    spawnUnits(PlayerTerran, Medivac, 1, GetStartingLocation(PlayerTerran, 0), FacingEast);
+    spawnUnits(PlayerTerran, Reaper, 1, GetStartingLocation(PlayerTerran, 0), FacingEast);
+
+    spawnUnits(PlayerZerg, Zerglings, 5, GetStartingLocation(PlayerZerg, 1), FacingWest);
+    spawnUnits(PlayerZerg, Roaches, 2, GetStartingLocation(PlayerZerg, 1), FacingWest);
+    spawnUnits(PlayerZerg, Hydralisks, 2, GetStartingLocation(PlayerZerg, 1), FacingWest);
+    spawnUnits(PlayerZerg, Mutalisk, 1, GetStartingLocation(PlayerZerg, 1), FacingWest);
+
+    // Phase 2: Execute Feint
+    conductScouting(Reaper, GetLocationByTag("EasternFrontline"), FacingEast);
+    triggerDiversionaryAttackSequence(Reaper, GetLocationByTag("EasternFrontline"));
+    executeAreaBombardment(SiegeTanks, GetLocationByTag("CentralRegion"));
+
+    // Phase 3: Main Assault
+    deployUnitGroups(PlayerTerran, Marines, GetLocationByTag("WesternAssaultPoint"));
+    deployUnitGroups(PlayerTerran, Marauders, GetLocationByTag("WesternAssaultPoint"));
+    initiateMedivacHealing(PlayerTerran, GetLocationByTag("WesternAssaultPoint"));
+    coordinateSimultaneousMultiFrontAssault(PlayerTerran);
+
+    // Victory & Defeat Conditions
+    monitorVictoryEventTrigger(PlayerTerran, "DestroyZergVitalStructure", 10 * 60);
+    monitorDefeatEventTrigger(SiegeTanks, "LossOfAll", MainAssaultForce, "CompleteAnnihilation");
+}
+
+void ExecuteScenario()
+{
+    InitMap();
+
+    while (true) 
+    {
+        simulateEnemyUnitReactionToFeint(PlayerZerg, Reaper);
+        manageUnitVisibilityAndStealthMechanics(PlayerTerran);
+        controlUnitMobilityViaTerrainPaths(PlayerZerg, "ZerglingMobilityControl");
+        manipulateUnitEngagementPriority();
+        useTerrainForStrategicAdvantage();
+        delayExecution(1.0); // Allow time for script cycle loop
+    }
+}
+```
