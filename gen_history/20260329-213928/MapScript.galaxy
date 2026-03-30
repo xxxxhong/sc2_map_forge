@@ -1,0 +1,464 @@
+```galaxy
+// MapScript.galaxy for "The Distant Roar"
+// Generated based on scenario plan and terrain sota.SC2Map
+
+// Include necessary libraries
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/UnitLib"
+
+// Global Variables
+int g_phase = 0;
+int g_strikeTimer = 0;
+int g_strikeStarted = 0;
+int g_playerUnitsLost = 0;
+int g_strikeUnitsLost = 0;
+int g_lureUnitsLost = 0;
+unitgroup g_playerLureForce = null;
+unitgroup g_playerStrikeForce = null;
+unitgroup g_enemyPrimaryDefense = null;
+unitgroup g_enemyObjectiveGuard = null;
+unitgroup g_allEnemyUnits = null;
+region g_centralChokeRegion = null;
+region g_objectiveZoneRegion = null;
+region g_ravineRegion = null;
+region g_plateauRegion = null;
+point g_lureStart = point(0,0);
+point g_strikeStart = point(0,0);
+point g_objectiveCenter = point(0,0);
+timer g_strikeCountdownTimer = null;
+timer g_phaseTimer = null;
+
+// Constants
+const int PHASE_LURE = 1;
+const int PHASE_CHASE = 2;
+const int PHASE_STRIKE = 3;
+const int STRIKE_TIME_LIMIT = 60; // seconds
+const float LURE_DISTANCE_THRESHOLD = 20.0; // Distance for strike trigger
+const int MAX_TOTAL_LOSSES = 5;
+const int MAX_STRIKE_LOSSES = 3;
+
+// Unit Type Constants
+const int PROTOSS_STALKER = 74;
+const int PROTOSS_ADEPT = 311;
+const int PROTOSS_SENTRY = 77;
+const int PROTOSS_ORACLE = 495;
+const int PROTOSS_ZEALOT = 73;
+const int PROTOSS_DARK_TEMPLAR = 76;
+const int PROTOSS_HIGH_TEMPLAR = 75;
+const int ZERG_ROACH = 110;
+const int ZERG_HYDRALISK = 107;
+const int ZERG_QUEEN = 126;
+const int ZERG_RAVAGER = 688;
+const int ZERG_ZERGLING = 105;
+const int ZERG_BANELING = 9;
+const int ZERG_SPORE_CRAWLER = 89;
+
+// Ability Constants
+const string ABIL_BLINK = "Blink";
+const string ABIL_SHADE = "AdeptPhaseShift";
+const string ABIL_FORCE_FIELD = "ForceField";
+const string ABIL_GUARDIAN_SHIELD = "GuardianShield";
+const string ABIL_REVELATION = "Revelation";
+const string ABIL_CHARGE = "Charge";
+const string ABIL_PSI_STORM = "PsiStorm";
+const string ABIL_TRANSFUSION = "Transfusion";
+const string ABIL_CORROSIVE_BILE = "CorrosiveBile";
+
+// Player and Force Definitions
+int g_player = 1;
+int g_enemy = 2;
+
+// ========== INITIALIZATION ==========
+void InitMap() {
+    // Setup regions based on sota.SC2Map terrain
+    g_centralChokeRegion = RegionCreate("CentralChoke");
+    g_objectiveZoneRegion = RegionCreate("ObjectiveZone");
+    g_ravineRegion = RegionCreate("WesternRavine");
+    g_plateauRegion = RegionCreate("EasternPlateau");
+    
+    // Define region boundaries (adjust based on actual map coordinates)
+    RegionAddRect(g_centralChokeRegion, rect(-20, -10, 20, 10));
+    RegionAddRect(g_objectiveZoneRegion, rect(30, -5, 50, 15));
+    RegionAddRect(g_ravineRegion, rect(-40, -20, -25, 5));
+    RegionAddRect(g_plateauRegion, rect(15, 15, 35, 30));
+    
+    // Define key points
+    g_lureStart = point(-15, 0);    // Western edge of central choke
+    g_strikeStart = point(-35, -10); // Hidden in ravine
+    g_objectiveCenter = point(40, 5); // Objective zone center
+    
+    // Create units
+    CreatePlayerForces();
+    CreateEnemyForces();
+    
+    // Setup victory/defeat conditions
+    TriggerAddEventUnitDied(TriggerCreate("OnPlayerUnitDied"), null, c_playerAny, false);
+    TriggerAddEventUnitDied(TriggerCreate("OnEnemyUnitDied"), null, c_playerAny, false);
+    
+    // Setup phase timer
+    g_phaseTimer = TimerCreate();
+    TimerStart(g_phaseTimer, 90, false, "AdvanceToPhase2"); // 1:30 for Phase 1
+    
+    // Setup strike countdown timer (initially inactive)
+    g_strikeCountdownTimer = TimerCreate();
+    
+    // Start Phase 1
+    g_phase = PHASE_LURE;
+    UIDisplayText(g_player, "Phase 1: The Lure\nUse Oracle to scout, then engage and retreat through choke point.");
+    
+    // Setup persistent query for objective zone
+    ActorSend(g_objectiveZoneRegion, libNtve_gf_QueryPersistent("OnEnterObjectiveZone", "OnLeaveObjectiveZone"));
+}
+
+void CreatePlayerForces() {
+    // Create Lure Force (6 units)
+    g_playerLureForce = UnitGroupCreate();
+    
+    // 2 Stalkers
+    unit stalker1 = UnitCreate(g_player, PROTOSS_STALKER, g_lureStart, 0);
+    unit stalker2 = UnitCreate(g_player, PROTOSS_STALKER, point(g_lureStart.x + 2, g_lureStart.y), 0);
+    UnitGroupAdd(g_playerLureForce, stalker1);
+    UnitGroupAdd(g_playerLureForce, stalker2);
+    
+    // 2 Adepts
+    unit adept1 = UnitCreate(g_player, PROTOSS_ADEPT, point(g_lureStart.x, g_lureStart.y + 2), 0);
+    unit adept2 = UnitCreate(g_player, PROTOSS_ADEPT, point(g_lureStart.x + 2, g_lureStart.y + 2), 0);
+    UnitGroupAdd(g_playerLureForce, adept1);
+    UnitGroupAdd(g_playerLureForce, adept2);
+    
+    // 1 Sentry
+    unit sentry = UnitCreate(g_player, PROTOSS_SENTRY, point(g_lureStart.x - 2, g_lureStart.y), 0);
+    UnitGroupAdd(g_playerLureForce, sentry);
+    
+    // 1 Oracle
+    unit oracle = UnitCreate(g_player, PROTOSS_ORACLE, point(g_lureStart.x - 2, g_lureStart.y + 2), 0);
+    UnitGroupAdd(g_playerLureForce, oracle);
+    
+    // Create Strike Force (4 units) - hidden in ravine
+    g_playerStrikeForce = UnitGroupCreate();
+    
+    // 2 Zealots
+    unit zealot1 = UnitCreate(g_player, PROTOSS_ZEALOT, g_strikeStart, 0);
+    unit zealot2 = UnitCreate(g_player, PROTOSS_ZEALOT, point(g_strikeStart.x, g_strikeStart.y + 2), 0);
+    UnitGroupAdd(g_playerStrikeForce, zealot1);
+    UnitGroupAdd(g_playerStrikeForce, zealot2);
+    
+    // 1 Dark Templar
+    unit darkTemplar = UnitCreate(g_player, PROTOSS_DARK_TEMPLAR, point(g_strikeStart.x + 2, g_strikeStart.y), 0);
+    UnitGroupAdd(g_playerStrikeForce, darkTemplar);
+    
+    // 1 High Templar
+    unit highTemplar = UnitCreate(g_player, PROTOSS_HIGH_TEMPLAR, point(g_strikeStart.x + 2, g_strikeStart.y + 2), 0);
+    UnitGroupAdd(g_playerStrikeForce, highTemplar);
+    
+    // Disable strike force initially (hidden)
+    UnitGroupSetState(g_playerStrikeForce, c_unitStateUnselectable, true);
+    UnitGroupSetState(g_playerStrikeForce, c_unitStateInvulnerable, true);
+    
+    // Set up ability hotkeys/availability
+    SetupPlayerAbilities();
+}
+
+void CreateEnemyForces() {
+    // Create Primary Defense (6 units) - patrolling central area
+    g_enemyPrimaryDefense = UnitGroupCreate();
+    
+    // 2 Roaches
+    unit roach1 = UnitCreate(g_enemy, ZERG_ROACH, point(0, 5), 0);
+    unit roach2 = UnitCreate(g_enemy, ZERG_ROACH, point(0, -5), 0);
+    UnitGroupAdd(g_enemyPrimaryDefense, roach1);
+    UnitGroupAdd(g_enemyPrimaryDefense, roach2);
+    
+    // 2 Hydralisks
+    unit hydra1 = UnitCreate(g_enemy, ZERG_HYDRALISK, point(5, 5), 0);
+    unit hydra2 = UnitCreate(g_enemy, ZERG_HYDRALISK, point(5, -5), 0);
+    UnitGroupAdd(g_enemyPrimaryDefense, hydra1);
+    UnitGroupAdd(g_enemyPrimaryDefense, hydra2);
+    
+    // 1 Queen
+    unit queen = UnitCreate(g_enemy, ZERG_QUEEN, point(2, 0), 0);
+    UnitGroupAdd(g_enemyPrimaryDefense, queen);
+    
+    // 1 Ravager
+    unit ravager = UnitCreate(g_enemy, ZERG_RAVAGER, point(-2, 0), 0);
+    UnitGroupAdd(g_enemyPrimaryDefense, ravager);
+    
+    // Create Objective Guard (4 units) - stationed at objective
+    g_enemyObjectiveGuard = UnitGroupCreate();
+    
+    // 2 Zerglings
+    unit zergling1 = UnitCreate(g_enemy, ZERG_ZERGLING, point(g_objectiveCenter.x - 3, g_objectiveCenter.y), 0);
+    unit zergling2 = UnitCreate(g_enemy, ZERG_ZERGLING, point(g_objectiveCenter.x + 3, g_objectiveCenter.y), 0);
+    UnitGroupAdd(g_enemyObjectiveGuard, zergling1);
+    UnitGroupAdd(g_enemyObjectiveGuard, zergling2);
+    
+    // 1 Baneling
+    unit baneling = UnitCreate(g_enemy, ZERG_BANELING, point(g_objectiveCenter.x, g_objectiveCenter.y - 3), 0);
+    UnitGroupAdd(g_enemyObjectiveGuard, baneling);
+    
+    // 1 Spore Crawler
+    unit spore = UnitCreate(g_enemy, ZERG_SPORE_CRAWLER, point(g_objectiveCenter.x, g_objectiveCenter.y + 3), 0);
+    UnitGroupAdd(g_enemyObjectiveGuard, spore);
+    
+    // Combine all enemy units
+    g_allEnemyUnits = UnitGroupCreate();
+    UnitGroupAddGroup(g_allEnemyUnits, g_enemyPrimaryDefense);
+    UnitGroupAddGroup(g_allEnemyUnits, g_enemyObjectiveGuard);
+    
+    // Increase Zerg health by 15%
+    UnitGroupModifyProperty(g_allEnemyUnits, c_unitPropLife, 1.15, c_modifierMax);
+    
+    // Set up enemy AI behavior
+    SetupEnemyAI();
+}
+
+void SetupPlayerAbilities() {
+    // Enable all abilities by default
+    // Galaxy handles ability availability through unit types
+}
+
+void SetupEnemyAI() {
+    // Primary defense patrols central area
+    UnitGroupOrder(g_enemyPrimaryDefense, c_orderPatrol, point(-10, 5), point(10, -5));
+    
+    // Objective guard stays in place
+    UnitGroupOrder(g_enemyObjectiveGuard, c_orderHoldPosition, g_objectiveCenter, c_orderQueueOverwrite);
+    
+    // Setup AI triggers for enemy responses
+    TriggerAddEventUnitDamaged(TriggerCreate("OnEnemyDamaged"), null, c_playerAny, false);
+}
+
+// ========== PHASE MANAGEMENT ==========
+void AdvanceToPhase2() {
+    if (g_phase != PHASE_LURE) return;
+    
+    g_phase = PHASE_CHASE;
+    UIDisplayText(g_player, "Phase 2: The Chase\nContinue retreating westward. Draw enemies away from objective.");
+    
+    // Change enemy primary defense behavior to aggressive pursuit
+    UnitGroupOrder(g_enemyPrimaryDefense, c_orderAttack, g_lureStart, c_orderQueueOverwrite);
+    
+    // Setup check for strike distance
+    TriggerAddEventTimerPeriodic(TriggerCreate("CheckStrikeDistance"), 0.5);
+}
+
+void StartStrikePhase() {
+    if (g_phase != PHASE_CHASE) return;
+    
+    g_phase = PHASE_STRIKE;
+    g_strikeStarted = 1;
+    UIDisplayText(g_player, "Phase 3: The Strike!\nDestroy objective guards within 60 seconds!");
+    
+    // Reveal strike force
+    UnitGroupSetState(g_playerStrikeForce, c_unitStateUnselectable, false);
+    UnitGroupSetState(g_playerStrikeForce, c_unitStateInvulnerable, false);
+    
+    // Order strike force to attack objective
+    UnitGroupOrder(g_playerStrikeForce, c_orderAttack, g_objectiveCenter, c_orderQueueOverwrite);
+    
+    // Start strike timer
+    g_strikeTimer = STRIKE_TIME_LIMIT;
+    TimerStart(g_strikeCountdownTimer, 1.0, true, "UpdateStrikeTimer");
+    
+    // Try to recall primary defenders
+    UnitGroupOrder(g_enemyPrimaryDefense, c_orderAttack, g_objectiveCenter, c_orderQueueOverwrite);
+}
+
+// ========== TRIGGERS ==========
+void OnPlayerUnitDied() {
+    unit u = TriggerGetUnit();
+    int player = UnitGetOwner(u);
+    
+    if (player != g_player) return;
+    
+    g_playerUnitsLost++;
+    
+    // Check if unit was in lure force
+    if (UnitGroupContains(g_playerLureForce, u)) {
+        g_lureUnitsLost++;
+        UnitGroupRemove(g_playerLureForce, u);
+    }
+    
+    // Check if unit was in strike force
+    if (UnitGroupContains(g_playerStrikeForce, u)) {
+        g_strikeUnitsLost++;
+        UnitGroupRemove(g_playerStrikeForce, u);
+        
+        // Check defeat condition: all strike force dead
+        if (UnitGroupCount(g_playerStrikeForce) == 0) {
+            Defeat("Strike force eliminated!");
+        }
+        
+        // Check secondary condition: too many strike losses
+        if (g_strikeUnitsLost > MAX_STRIKE_LOSSES) {
+            UIDisplayText(g_player, "Warning: Too many strike force losses! Bonus failed.");
+        }
+    }
+    
+    // Check total losses defeat condition
+    if (g_playerUnitsLost > MAX_TOTAL_LOSSES) {
+        Defeat("Too many units lost!");
+    }
+    
+    // Check bonus condition: all lure force alive
+    if (g_lureUnitsLost > 0) {
+        UIDisplayText(g_player, "Bonus failed: Lure force took casualties.");
+    }
+}
+
+void OnEnemyUnitDied() {
+    unit u = TriggerGetUnit();
+    int player = UnitGetOwner(u);
+    
+    if (player != g_enemy) return;
+    
+    // Remove from appropriate groups
+    UnitGroupRemove(g_allEnemyUnits, u);
+    
+    if (UnitGroupContains(g_enemyObjectiveGuard, u)) {
+        UnitGroupRemove(g_enemyObjectiveGuard, u);
+        
+        // Check victory condition: all objective guards destroyed
+        if (UnitGroupCount(g_enemyObjectiveGuard) == 0) {
+            if (g_strikeStarted) {
+                Victory();
+            }
+        }
+    }
+    
+    if (UnitGroupContains(g_enemyPrimaryDefense, u)) {
+        UnitGroupRemove(g_enemyPrimaryDefense, u);
+    }
+}
+
+void OnEnemyDamaged() {
+    if (g_phase != PHASE_CHASE) return;
+    
+    unit attacker = TriggerGetUnit();
+    unit target = TriggerGetTargetUnit();
+    
+    // If player damages enemy primary defender during chase phase, reinforce pursuit
+    if (UnitGetOwner(attacker) == g_player && UnitGroupContains(g_enemyPrimaryDefense, target)) {
+        // Make this unit focus on the attacker
+        UnitOrder(target, c_orderAttack, attacker, c_orderQueueOverwrite);
+    }
+}
+
+void CheckStrikeDistance() {
+    if (g_phase != PHASE_CHASE || g_strikeStarted) return;
+    
+    // Check if primary defenders are far enough from objective
+    bool allFar = true;
+    unitgroup temp = UnitGroupFromUnit(UnitGroupGetRandom(g_enemyPrimaryDefense));
+    
+    if (UnitGroupCount(g_enemyPrimaryDefense) > 0) {
+        unit u = UnitGroupGetRandom(g_enemyPrimaryDefense);
+        while (u != null) {
+            point unitPos = UnitGetPosition(u);
+            float dist = PointDistance(unitPos, g_objectiveCenter);
+            
+            if (dist < LURE_DISTANCE_THRESHOLD) {
+                allFar = false;
+                break;
+            }
+            
+            u = UnitGroupGetNext(temp);
+        }
+    }
+    
+    UnitGroupDestroy(temp);
+    
+    if (allFar && UnitGroupCount(g_enemyPrimaryDefense) > 0) {
+        StartStrikePhase();
+    }
+}
+
+void UpdateStrikeTimer() {
+    g_strikeTimer--;
+    
+    // Update UI
+    UISetText("StrikeTimer", "Time remaining: " + IntToString(g_strikeTimer) + "s");
+    
+    if (g_strikeTimer <= 0) {
+        TimerStop(g_strikeCountdownTimer);
+        Defeat("Failed to destroy objective within time limit!");
+    }
+}
+
+void OnEnterObjectiveZone() {
+    actor a = TriggerGetActor();
+    // Could add visual/audio cues when units enter objective zone
+}
+
+void OnLeaveObjectiveZone() {
+    actor a = TriggerGetActor();
+    // Tracking logic if needed
+}
+
+// ========== VICTORY/DEFEAT ==========
+void Victory() {
+    TimerStop(g_phaseTimer);
+    TimerStop(g_strikeCountdownTimer);
+    
+    string message = "Mission Accomplished!\n";
+    
+    // Bonus conditions
+    if (g_lureUnitsLost == 0) {
+        message += "Bonus: All lure force units survived!\n";
+    }
+    if (g_strikeUnitsLost <= MAX_STRIKE_LOSSES) {
+        message += "Secondary objective: Strike force preserved!\n";
+    }
+    
+    UIDisplayText(g_player, message);
+    VictoryPanel(g_player, true);
+}
+
+void Defeat(string reason) {
+    TimerStop(g_phaseTimer);
+    TimerStop(g_strikeCountdownTimer);
+    
+    UIDisplayText(g_player, "Mission Failed: " + reason);
+    VictoryPanel(g_player, false);
+}
+
+// ========== UTILITY FUNCTIONS ==========
+void SetupUI() {
+    // Create UI text elements
+    UISetText("PhaseDisplay", "Phase 1: The Lure");
+    UISetText("StrikeTimer", "");
+    UISetText("UnitStatus", "Lure Force: 6/6 | Strike Force: 4/4");
+    
+    // Create minimap pings for key locations
+    MinimapPing(g_player, g_objectiveCenter, 5.0, "Objective", true);
+    MinimapPing(g_player, g_lureStart, 5.0, "Lure Start", true);
+    MinimapPing(g_player, g_strikeStart, 5.0, "Strike Start", true);
+}
+
+void UpdateUI() {
+    // Update unit counts
+    int lureCount = UnitGroupCount(g_playerLureForce);
+    int strikeCount = UnitGroupCount(g_playerStrikeForce);
+    UISetText("UnitStatus", "Lure Force: " + IntToString(lureCount) + "/6 | Strike Force: " + IntToString(strikeCount) + "/4");
+    
+    // Update phase display
+    string phaseText = "";
+    if (g_phase == PHASE_LURE) phaseText = "Phase 1: The Lure";
+    else if (g_phase == PHASE_CHASE) phaseText = "Phase 2: The Chase";
+    else if (g_phase == PHASE_STRIKE) phaseText = "Phase 3: The Strike";
+    UISetText("PhaseDisplay", phaseText);
+}
+
+// ========== MAIN ==========
+void main() {
+    InitMap();
+    SetupUI();
+    
+    // Main game loop
+    while (true) {
+        UpdateUI();
+        Wait(0.1);
+    }
+}
+```

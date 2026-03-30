@@ -1,0 +1,572 @@
+```galaxy
+// MapScript.galaxy for "Shadows of the Abyss"
+// Operation: Decoy Strike - A feint east, strike west scenario
+
+// Include necessary libraries
+include "TriggerLibs/NativeLib"
+include "TriggerLibs/GameLib"
+include "TriggerLibs/UnitLib"
+
+// Global variables
+int g_playerMainForceCount = 6;
+int g_playerDiversionCount = 4;
+int g_zergEastDefenseCount = 6;
+int g_zergWestGuardCount = 4;
+int g_playerUnitsLost = 0;
+int g_zergUnitsLost = 0;
+bool g_feintEngaged = false;
+bool g_mainStrikeLaunched = false;
+bool g_evolutionChamberDestroyed = false;
+timer g_missionTimer = null;
+region g_easternRegion = null;
+region g_westernRegion = null;
+region g_centralHighGround = null;
+unit g_zergEvolutionChamber = null;
+unit g_zergQueen = null;
+unit g_sporeCrawler = null;
+unit g_spineCrawler = null;
+unit g_playerMedivac = null;
+unit g_playerReaper = null;
+point g_playerStart = null;
+point g_easternChoke = null;
+point g_westernApproach = null;
+point g_evolutionChamberLoc = null;
+
+// Player and enemy constants
+int c_player = 1;
+int c_enemy = 2;
+string c_playerRace = "Terran";
+string c_enemyRace = "Zerg";
+
+// Unit type constants
+string c_unitMarauder = "Marauder";
+string c_unitMarine = "Marine";
+string c_unitMedivac = "Medivac";
+string c_unitReaper = "Reaper";
+string c_unitSCV = "SCV";
+string c_unitRoach = "Roach";
+string c_unitZergling = "Zergling";
+string c_unitQueen = "Queen";
+string c_unitSporeCrawler = "SporeCrawler";
+string c_unitSpineCrawler = "SpineCrawler";
+string c_unitEvolutionChamber = "EvolutionChamber";
+
+// Region constants
+string c_regionEasternApproach = "EasternApproach";
+string c_regionWesternApproach = "WesternApproach";
+string c_regionCentralHighGround = "CentralHighGround";
+string c_regionPlayerStart = "PlayerStart";
+string c_regionZergMain = "ZergMain";
+
+// Trigger declarations
+trigger t_missionInit = null;
+trigger t_unitDeath = null;
+trigger t_regionEnterEastern = null;
+trigger t_regionEnterWestern = null;
+trigger t_evolutionChamberDeath = null;
+trigger t_timerExpired = null;
+trigger t_feintCheck = null;
+trigger t_mainStrikeCheck = null;
+
+// Function declarations
+void InitMission();
+void SetupStartingUnits();
+void SetupZergDefenses();
+void CreateRegions();
+void SetupVictoryConditions();
+void CleanupMission();
+void CheckVictory();
+void CheckDefeat();
+void DisplayMissionBriefing();
+void UpdateObjectiveText();
+void StartMissionTimer();
+void HandleUnitDeath(unit deadUnit);
+void HandleEasternRegionEnter(unit enteringUnit);
+void HandleWesternRegionEnter(unit enteringUnit);
+void LaunchMainStrike();
+void RetreatDiversion();
+void SpawnZergReinforcements();
+
+// Main initialization function
+void InitMission() {
+    // Create triggers
+    t_missionInit = TriggerCreate("OnMissionInit");
+    TriggerAddEventMapInit(t_missionInit);
+    
+    t_unitDeath = TriggerCreate("OnUnitDeath");
+    TriggerAddEventUnitDied(t_unitDeath);
+    
+    t_regionEnterEastern = TriggerCreate("OnEasternRegionEnter");
+    t_regionEnterWestern = TriggerCreate("OnWesternRegionEnter");
+    
+    t_evolutionChamberDeath = TriggerCreate("OnEvolutionChamberDeath");
+    
+    t_timerExpired = TriggerCreate("OnTimerExpired");
+    
+    t_feintCheck = TriggerCreate("OnFeintCheck");
+    t_mainStrikeCheck = TriggerCreate("OnMainStrikeCheck");
+    
+    // Set up periodic checks
+    TriggerAddEventTimeElapsed(t_feintCheck, 30.0, c_timePeriodic);
+    TriggerAddEventTimeElapsed(t_mainStrikeCheck, 10.0, c_timePeriodic);
+}
+
+// Trigger: Mission Initialization
+void OnMissionInit() {
+    // Clear any existing units
+    UnitClear(c_player, c_playerRace);
+    UnitClear(c_enemy, c_enemyRace);
+    
+    // Create regions
+    CreateRegions();
+    
+    // Set up starting positions
+    g_playerStart = RegionGetCenter(Region(c_regionPlayerStart));
+    g_easternChoke = Point(64.0, 32.0); // Approximate eastern choke point
+    g_westernApproach = Point(16.0, 64.0); // Approximate western approach
+    g_evolutionChamberLoc = RegionGetCenter(Region(c_regionZergMain));
+    
+    // Set up units
+    SetupStartingUnits();
+    SetupZergDefenses();
+    
+    // Set up victory conditions
+    SetupVictoryConditions();
+    
+    // Display mission briefing
+    DisplayMissionBriefing();
+    
+    // Start mission timer
+    StartMissionTimer();
+    
+    // Update objective text
+    UpdateObjectiveText();
+}
+
+// Set up player starting units
+void SetupStartingUnits() {
+    point startPos = g_playerStart;
+    
+    // Main Strike Force (6 units)
+    UnitCreate(c_player, c_playerRace, c_unitMarauder, startPos, 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitMarauder, PointGetOffset(startPos, 2.0, 0.0), 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitMarine, PointGetOffset(startPos, 4.0, 0.0), 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitMarine, PointGetOffset(startPos, 6.0, 0.0), 0, c_origin);
+    
+    g_playerMedivac = UnitCreate(c_player, c_playerRace, c_unitMedivac, PointGetOffset(startPos, 8.0, 0.0), 0, c_origin);
+    g_playerReaper = UnitCreate(c_player, c_playerRace, c_unitReaper, PointGetOffset(startPos, 10.0, 0.0), 0, c_origin);
+    
+    // Diversionary Force (4 units)
+    UnitCreate(c_player, c_playerRace, c_unitMarine, PointGetOffset(startPos, 0.0, 2.0), 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitMarine, PointGetOffset(startPos, 0.0, 4.0), 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitMarine, PointGetOffset(startPos, 0.0, 6.0), 0, c_origin);
+    UnitCreate(c_player, c_playerRace, c_unitSCV, PointGetOffset(startPos, 0.0, 8.0), 0, c_origin);
+    
+    // Group units for easier control
+    UnitGroupClear(c_player);
+    UnitGroupAdd(c_player, UnitGetFromType(c_player, c_playerRace, c_unitMarauder));
+    UnitGroupAdd(c_player, UnitGetFromType(c_player, c_playerRace, c_unitMarine));
+    UnitGroupAdd(c_player, UnitGetFromType(c_player, c_playerRace, c_unitMedivac));
+    UnitGroupAdd(c_player, UnitGetFromType(c_player, c_playerRace, c_unitReaper));
+    UnitGroupAdd(c_player, UnitGetFromType(c_player, c_playerRace, c_unitSCV));
+}
+
+// Set up Zerg defenses
+void SetupZergDefenses() {
+    point eastDefensePos = RegionGetCenter(Region(c_regionEasternApproach));
+    point westGuardPos = RegionGetCenter(Region(c_regionWesternApproach));
+    point zergMainPos = g_evolutionChamberLoc;
+    
+    // Eastern Defensive Group (6 units)
+    UnitCreate(c_enemy, c_enemyRace, c_unitRoach, PointGetOffset(eastDefensePos, -5.0, 0.0), 0, c_origin);
+    UnitCreate(c_enemy, c_enemyRace, c_unitRoach, PointGetOffset(eastDefensePos, -3.0, 2.0), 0, c_origin);
+    UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(eastDefensePos, -1.0, 0.0), 0, c_origin);
+    UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(eastDefensePos, 1.0, 2.0), 0, c_origin);
+    
+    g_zergQueen = UnitCreate(c_enemy, c_enemyRace, c_unitQueen, PointGetOffset(eastDefensePos, 3.0, 0.0), 0, c_origin);
+    g_sporeCrawler = UnitCreate(c_enemy, c_enemyRace, c_unitSporeCrawler, PointGetOffset(eastDefensePos, 5.0, 0.0), 0, c_origin);
+    
+    // Western Objective Guard (4 units)
+    UnitCreate(c_enemy, c_enemyRace, c_unitHydralisk, PointGetOffset(westGuardPos, -3.0, 0.0), 0, c_origin);
+    UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(westGuardPos, -1.0, 2.0), 0, c_origin);
+    UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(westGuardPos, 1.0, 0.0), 0, c_origin);
+    
+    g_spineCrawler = UnitCreate(c_enemy, c_enemyRace, c_unitSpineCrawler, PointGetOffset(westGuardPos, 3.0, 0.0), 0, c_origin);
+    
+    // Evolution Chamber (primary objective)
+    g_zergEvolutionChamber = UnitCreate(c_enemy, c_enemyRace, c_unitEvolutionChamber, zergMainPos, 0, c_origin);
+    
+    // Set up region triggers for Zerg units
+    TriggerAddEventRegionEnter(t_regionEnterEastern, Region(c_regionEasternApproach));
+    TriggerAddEventRegionEnter(t_regionEnterWestern, Region(c_regionWesternApproach));
+    
+    // Set up evolution chamber death trigger
+    TriggerAddEventUnitDied(t_evolutionChamberDeath, g_zergEvolutionChamber);
+}
+
+// Create mission regions
+void CreateRegions() {
+    // These would be pre-placed in the map editor
+    // This function links to existing regions
+    g_easternRegion = Region(c_regionEasternApproach);
+    g_westernRegion = Region(c_regionWesternApproach);
+    g_centralHighGround = Region(c_regionCentralHighGround);
+}
+
+// Set up victory conditions
+void SetupVictoryConditions() {
+    // Timer event for 10-minute limit
+    TriggerAddEventTimeElapsed(t_timerExpired, 600.0, c_timeElapsed);
+}
+
+// Display mission briefing
+void DisplayMissionBriefing() {
+    TransmissionFromUnit(c_player, UnitGetFromType(c_player, c_playerRace, c_unitMarine), 
+        "Mission Briefing: Operation Decoy Strike", 
+        "Command, we've identified a Zerg evolution chamber deep in enemy territory. Intelligence shows heavy defenses to the east. Your orders: create a diversion with a small force to draw their attention, then strike from the west with your main force. Destroy the evolution chamber within 10 minutes. Good luck.", 
+        10.0, true, true);
+    
+    // Display objectives
+    UITextMessage(c_player, "Primary Objective: Destroy Zerg Evolution Chamber (10:00)", 10.0);
+    UITextMessage(c_player, "Secondary Objectives: - Destroy both static defenses\n- Keep Medivac alive\n- Eliminate the Zerg Queen", 10.0);
+}
+
+// Update objective text
+void UpdateObjectiveText() {
+    string objectiveText = "Primary: Destroy Evolution Chamber\n";
+    
+    if (g_feintEngaged) {
+        objectiveText = objectiveText + "Feint Engaged: Draw Zerg forces east\n";
+    }
+    
+    if (g_mainStrikeLaunched) {
+        objectiveText = objectiveText + "Main Strike: Attack from west\n";
+    }
+    
+    objectiveText = objectiveText + "Units Lost: " + IntToString(g_playerUnitsLost) + "/6 allowed\n";
+    objectiveText = objectiveText + "Time: " + IntToString(TimerGetRemaining(g_missionTimer)) + " seconds";
+    
+    UISetObjectiveText(c_player, objectiveText);
+}
+
+// Start mission timer
+void StartMissionTimer() {
+    g_missionTimer = TimerStart(600.0, false);
+    UITimerStart(g_missionTimer);
+}
+
+// Trigger: Unit Death
+void OnUnitDeath() {
+    unit deadUnit = EventUnit();
+    HandleUnitDeath(deadUnit);
+}
+
+void HandleUnitDeath(unit deadUnit) {
+    int deadUnitPlayer = UnitGetOwner(deadUnit);
+    string deadUnitType = UnitGetType(deadUnit);
+    
+    if (deadUnitPlayer == c_player) {
+        g_playerUnitsLost = g_playerUnitsLost + 1;
+        
+        // Check if Medivac was destroyed
+        if (deadUnit == g_playerMedivac) {
+            UITextMessage(c_player, "Warning: Medivac destroyed! Healing capability lost.", 5.0);
+        }
+        
+        // Check if diversion force is wiped out too early
+        if (!g_mainStrikeLaunched && g_playerUnitsLost >= 4) {
+            UITextMessage(c_player, "Critical: Diversion force eliminated! Feint failed.", 5.0);
+            CheckDefeat();
+        }
+        
+    } else if (deadUnitPlayer == c_enemy) {
+        g_zergUnitsLost = g_zergUnitsLost + 1;
+        
+        // Check for secondary objectives
+        if (deadUnit == g_zergQueen) {
+            UITextMessage(c_player, "Secondary Objective Complete: Zerg Queen eliminated!", 5.0);
+        } else if (deadUnit == g_sporeCrawler) {
+            UITextMessage(c_player, "Static Defense Destroyed: Eastern Spore Crawler eliminated!", 5.0);
+        } else if (deadUnit == g_spineCrawler) {
+            UITextMessage(c_player, "Static Defense Destroyed: Western Spine Crawler eliminated!", 5.0);
+        }
+    }
+    
+    UpdateObjectiveText();
+    CheckVictory();
+    CheckDefeat();
+}
+
+// Trigger: Eastern Region Enter
+void OnEasternRegionEnter() {
+    unit enteringUnit = EventUnit();
+    HandleEasternRegionEnter(enteringUnit);
+}
+
+void HandleEasternRegionEnter(unit enteringUnit) {
+    if (UnitGetOwner(enteringUnit) == c_player) {
+        // Player unit entering eastern region - feint detected
+        if (!g_feintEngaged) {
+            g_feintEngaged = true;
+            UITextMessage(c_player, "Feint Initiated: Zerg forces responding to eastern attack.", 5.0);
+            
+            // Make Zerg eastern forces aggressive
+            UnitGroupClear(c_enemy);
+            UnitGroupAdd(c_enemy, UnitGetFromType(c_enemy, c_enemyRace, c_unitRoach));
+            UnitGroupAdd(c_enemy, UnitGetFromType(c_enemy, c_enemyRace, c_unitZergling));
+            UnitGroupAdd(c_enemy, g_zergQueen);
+            
+            // Order Zerg units to attack player units in region
+            UnitGroupOrderTarget(c_enemy, c_orderAttack, enteringUnit);
+            
+            UpdateObjectiveText();
+        }
+    }
+}
+
+// Trigger: Western Region Enter
+void OnWesternRegionEnter() {
+    unit enteringUnit = EventUnit();
+    HandleWesternRegionEnter(enteringUnit);
+}
+
+void HandleWesternRegionEnter(unit enteringUnit) {
+    if (UnitGetOwner(enteringUnit) == c_player && g_feintEngaged && !g_mainStrikeLaunched) {
+        g_mainStrikeLaunched = true;
+        UITextMessage(c_player, "Main Strike Launched: Attack the Evolution Chamber!", 5.0);
+        
+        // Order western Zerg defenders to attack
+        unit hydralisk = UnitGetFromType(c_enemy, c_enemyRace, c_unitHydralisk);
+        unit zergling1 = UnitGetFirst(c_enemy);
+        unit zergling2 = UnitGetNext(c_enemy);
+        
+        if (hydralisk != null) {
+            UnitOrderTarget(hydralisk, c_orderAttack, enteringUnit);
+        }
+        
+        UpdateObjectiveText();
+    }
+}
+
+// Trigger: Evolution Chamber Death
+void OnEvolutionChamberDeath() {
+    g_evolutionChamberDestroyed = true;
+    UITextMessage(c_player, "Primary Objective Complete: Evolution Chamber destroyed!", 5.0);
+    CheckVictory();
+}
+
+// Trigger: Timer Expired
+void OnTimerExpired() {
+    if (!g_evolutionChamberDestroyed) {
+        UITextMessage(c_player, "Mission Failed: Time limit exceeded.", 5.0);
+        CheckDefeat();
+    }
+}
+
+// Trigger: Feint Check (periodic)
+void OnFeintCheck() {
+    if (g_feintEngaged && !g_mainStrikeLaunched) {
+        // Check if enough Zerg units are committed to eastern defense
+        int zergEastCount = 0;
+        unit currentUnit = UnitGetFirst(c_enemy);
+        
+        while (currentUnit != null) {
+            point unitPos = UnitGetPosition(currentUnit);
+            if (RegionContainsPoint(g_easternRegion, unitPos)) {
+                zergEastCount = zergEastCount + 1;
+            }
+            currentUnit = UnitGetNext(c_enemy);
+        }
+        
+        if (zergEastCount >= 4) {
+            UITextMessage(c_player, "Opportunity: Zerg committed to eastern defense. Launch main strike now!", 5.0);
+        }
+    }
+}
+
+// Trigger: Main Strike Check (periodic)
+void OnMainStrikeCheck() {
+    if (g_mainStrikeLaunched && !g_evolutionChamberDestroyed) {
+        // Check if main strike force needs assistance
+        int mainForceCount = 0;
+        unit currentUnit = UnitGetFirst(c_player);
+        
+        while (currentUnit != null) {
+            string unitType = UnitGetType(currentUnit);
+            point unitPos = UnitGetPosition(currentUnit);
+            
+            if ((unitType == c_unitMarauder || unitType == c_unitMarine || 
+                 unitType == c_unitMedivac || unitType == c_unitReaper) &&
+                RegionContainsPoint(g_westernRegion, unitPos)) {
+                mainForceCount = mainForceCount + 1;
+            }
+            currentUnit = UnitGetNext(c_player);
+        }
+        
+        if (mainForceCount <= 2) {
+            UITextMessage(c_player, "Warning: Main strike force critically depleted!", 5.0);
+        }
+    }
+}
+
+// Launch main strike force
+void LaunchMainStrike() {
+    if (!g_mainStrikeLaunched && g_feintEngaged) {
+        g_mainStrikeLaunched = true;
+        
+        // Order main strike force to attack evolution chamber
+        UnitGroupClear(c_player);
+        
+        // Add main strike force units
+        unit marauder1 = UnitGetFromType(c_player, c_playerRace, c_unitMarauder);
+        unit marauder2 = UnitGetNext(c_player);
+        unit marine1 = UnitGetFromType(c_player, c_playerRace, c_unitMarine);
+        unit marine2 = UnitGetNext(c_player);
+        
+        if (marauder1 != null) UnitGroupAdd(c_player, marauder1);
+        if (marauder2 != null) UnitGroupAdd(c_player, marauder2);
+        if (marine1 != null) UnitGroupAdd(c_player, marine1);
+        if (marine2 != null) UnitGroupAdd(c_player, marine2);
+        if (g_playerMedivac != null) UnitGroupAdd(c_player, g_playerMedivac);
+        if (g_playerReaper != null) UnitGroupAdd(c_player, g_playerReaper);
+        
+        UnitGroupOrderTarget(c_player, c_orderAttack, g_zergEvolutionChamber);
+        
+        UITextMessage(c_player, "Main strike force advancing on Evolution Chamber!", 5.0);
+        UpdateObjectiveText();
+    }
+}
+
+// Retreat diversion force
+void RetreatDiversion() {
+    // Order diversion force to retreat to safety
+    UnitGroupClear(c_player);
+    
+    // Add diversion force units
+    unit marine1 = UnitGetFromType(c_player, c_playerRace, c_unitMarine);
+    unit marine2 = UnitGetNext(c_player);
+    unit marine3 = UnitGetNext(c_player);
+    unit scv = UnitGetFromType(c_player, c_playerRace, c_unitSCV);
+    
+    if (marine1 != null) UnitGroupAdd(c_player, marine1);
+    if (marine2 != null) UnitGroupAdd(c_player, marine2);
+    if (marine3 != null) UnitGroupAdd(c_player, marine3);
+    if (scv != null) UnitGroupAdd(c_player, scv);
+    
+    UnitGroupOrderPoint(c_player, c_orderMove, g_playerStart, true);
+    
+    UITextMessage(c_player, "Diversion force retreating!", 5.0);
+}
+
+// Spawn Zerg reinforcements (if objective not attacked by 7 minutes)
+void SpawnZergReinforcements() {
+    if (!g_mainStrikeLaunched && TimerGetElapsed(g_missionTimer) >= 420.0) {
+        point spawnPoint = RegionGetCenter(g_westernRegion);
+        
+        UnitCreate(c_enemy, c_enemyRace, c_unitRoach, PointGetOffset(spawnPoint, -2.0, 0.0), 0, c_origin);
+        UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(spawnPoint, 0.0, 2.0), 0, c_origin);
+        UnitCreate(c_enemy, c_enemyRace, c_unitZergling, PointGetOffset(spawnPoint, 2.0, 0.0), 0, c_origin);
+        
+        UITextMessage(c_player, "Warning: Zerg reinforcements have arrived!", 5.0);
+    }
+}
+
+// Check victory conditions
+void CheckVictory() {
+    if (g_evolutionChamberDestroyed) {
+        // Check unit loss condition
+        if (g_playerUnitsLost <= 6) {
+            // Primary victory achieved
+            UITextMessage(c_player, "Mission Accomplished: Evolution Chamber destroyed with acceptable losses!", 10.0);
+            
+            // Check secondary objectives
+            int secondaryCount = 0;
+            string secondaryText = "Secondary Objectives: ";
+            
+            if (!UnitIsAlive(g_sporeCrawler)) {
+                secondaryCount = secondaryCount + 1;
+                secondaryText = secondaryText + "Spore Crawler destroyed. ";
+            }
+            
+            if (!UnitIsAlive(g_spineCrawler)) {
+                secondaryCount = secondaryCount + 1;
+                secondaryText = secondaryText + "Spine Crawler destroyed. ";
+            }
+            
+            if (UnitIsAlive(g_playerMedivac)) {
+                secondaryCount = secondaryCount + 1;
+                secondaryText = secondaryText + "Medivac survived. ";
+            }
+            
+            if (!UnitIsAlive(g_zergQueen)) {
+                secondaryCount = secondaryCount + 1;
+                secondaryText = secondaryText + "Zerg Queen eliminated. ";
+            }
+            
+            UITextMessage(c_player, secondaryText + "(" + IntToString(secondaryCount) + "/4 completed)", 10.0);
+            
+            // Victory
+            GameVictory(c_player);
+        } else {
+            UITextMessage(c_player, "Mission Failed: Too many units lost.", 5.0);
+            CheckDefeat();
+        }
+    }
+}
+
+// Check defeat conditions
+void CheckDefeat() {
+    bool defeat = false;
+    string defeatReason = "";
+    
+    // Check if all player units destroyed
+    if (UnitGetCount(c_player) == 0) {
+        defeat = true;
+        defeatReason = "All units destroyed.";
+    }
+    
+    // Check if timer expired without destroying evolution chamber
+    if (!g_evolutionChamberDestroyed && TimerGetRemaining(g_missionTimer) <= 0) {
+        defeat = true;
+        defeatReason = "Time limit exceeded.";
+    }
+    
+    // Check if diversion force wiped out before main strike
+    if (!g_mainStrikeLaunched && g_playerUnitsLost >= 4) {
+        defeat = true;
+        defeatReason = "Diversion force eliminated before main strike.";
+    }
+    
+    // Check if too many units lost (even if evolution chamber destroyed)
+    if (g_playerUnitsLost > 6) {
+        defeat = true;
+        defeatReason = "Unacceptable losses.";
+    }
+    
+    if (defeat) {
+        UITextMessage(c_player, "Mission Failed: " + defeatReason, 10.0);
+        GameDefeat(c_player, defeatReason);
+    }
+}
+
+// Clean up mission resources
+void CleanupMission() {
+    TriggerDestroy(t_missionInit);
+    TriggerDestroy(t_unitDeath);
+    TriggerDestroy(t_regionEnterEastern);
+    TriggerDestroy(t_regionEnterWestern);
+    TriggerDestroy(t_evolutionChamberDeath);
+    TriggerDestroy(t_timerExpired);
+    TriggerDestroy(t_feintCheck);
+    TriggerDestroy(t_mainStrikeCheck);
+    
+    if (g_missionTimer != null) {
+        TimerDestroy(g_missionTimer);
+    }
+}
+
+// Main function
+void main() {
+    InitMission();
+}
+```

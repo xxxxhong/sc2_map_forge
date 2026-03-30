@@ -1,0 +1,145 @@
+# StarCraft II Scenario: "Shadows of the Abyss"
+
+## Scenario Concept
+**Operation: Decoy Strike**  
+A classic **声东击西** (Feint East, Strike West) scenario where the Terran player must deceive the Zerg about their true attack vector, using a small diversionary force to draw enemy units away from the primary objective.
+
+---
+
+## Force Composition
+
+### Player (Terran) - 10 units:
+- **Main Strike Force (6 units):**
+  - 2x Marauder (with Concussive Shells)
+  - 2x Marine (with Combat Shields)
+  - 1x Medivac (for sustain)
+  - 1x Reaper (for scouting/harassment)
+  
+- **Diversionary Force (4 units):**
+  - 3x Marine
+  - 1x SCV (to repair/construct temporary structures if needed)
+
+### Enemy (Zerg) - 10 units:
+- **Eastern Defensive Group (6 units - near player's feint target):**
+  - 2x Roach
+  - 2x Zergling
+  - 1x Queen
+  - 1x Spore Crawler (static defense)
+  
+- **Western Objective Guard (4 units - near true target):**
+  - 1x Hydralisk
+  - 2x Zergling
+  - 1x Spine Crawler (static defense)
+
+---
+
+## Terrain Utilization Notes
+Based on `sota.SC2Map` analysis:
+
+1. **Eastern Approach (Feint Zone):**
+   - Narrow choke point with high ground advantage for Zerg
+   - Natural expansion area with mineral line - appears to be primary target
+   - Destructible rocks that can be blown to create alternate paths
+
+2. **Western Approach (True Objective):**
+   - Hidden path through shallow water/creep
+   - Backdoor entrance to Zerg main base
+   - Elevated plateau overlooking Zerg tech structures
+
+3. **Central High Ground:**
+   - Provides vision of both approaches
+   - Contains Xel'Naga watchtower (key to deception)
+
+4. **Key Features:**
+   - Two main bridges (one east, one west)
+   - Several destructible rock formations
+   - Multiple elevation changes affecting line-of-sight
+
+---
+
+## Positioning & Phases
+
+### Phase 1: Reconnaissance (0-2 minutes)
+- Player starts with all 10 units at main base
+- Reaper scouts eastern approach, identifies strong Zerg defenses
+- Player identifies western approach as less defended but longer route
+- Zerg units hold defensive positions
+
+### Phase 2: The Feint (2-4 minutes)
+- Player sends **Diversionary Force (4 Marines)** to attack eastern choke
+- Diversionary Force engages just enough to draw attention:
+  - Attack Spore Crawler from maximum range
+  - Force Zerg to commit Eastern Defensive Group
+- **Critical:** Player must make feint convincing but not lose all units
+- Zerg Queen and Roaches move to engage diversion
+
+### Phase 3: Main Strike (4-6 minutes)
+- Once 4+ Zerg units are committed to eastern defense, player moves **Main Strike Force** west
+- Reaper leads, clearing vision for Medivac/Marauder advance
+- Strike force destroys Spine Crawler guarding western entrance
+- Medivac provides healing during engagement
+
+### Phase 4: Objective Assault (6-8 minutes)
+- Main Strike Force attacks primary target: **Zerg Evolution Chamber** (tech structure)
+- Diversionary Force retreats/survives as long as possible
+- Zerg must choose: defend tech or save eastern expansion
+
+---
+
+## Victory/Defeat Conditions
+
+### Primary Victory:
+- Destroy Zerg Evolution Chamber within 10 minutes
+- Lose no more than 6 total units
+
+### Secondary Objectives (Bonus):
+- Destroy both Spore Crawler and Spine Crawler
+- Keep Medivac alive throughout engagement
+- Kill the Zerg Queen
+
+### Defeat Conditions:
+- All player units destroyed
+- Evolution Chamber not destroyed within 10 minutes
+- Diversionary Force wiped out before Main Strike Force engages (feint fails)
+
+---
+
+## Strategic Elements
+
+### Deception Mechanics:
+1. **Vision Control:** Player must capture Xel'Naga tower early to see Zerg unit movements
+2. **Timing:** Feint must last long enough for western force to reach objective
+3. **Retreat:** Diversionary Force should fall back slowly, drawing Zerg further from objective
+
+### Terrain Exploitation:
+- Use Reaper's cliff-jumping to bypass chokes
+- Medivac can transport units across impassable terrain if needed
+- High ground advantage crucial for Marauder range
+
+### Adaptive Elements:
+- If Zerg doesn't commit to eastern defense, player may need to adjust
+- SCV can build temporary bunker if feint is failing
+- Reaper can harass mineral line to increase pressure
+
+---
+
+## Scenario Balance Notes
+
+- **Player Skill Check:** Micro-management of two separate forces
+- **Decision Points:** When to commit main force, when to retreat diversion
+- **Resource Management:** Limited units mean every loss matters
+- **Scouting:** Failure to identify Zerg unit distribution leads to failed feint
+
+---
+
+## Map-Specific Triggers (Optional)
+
+If implementing via editor:
+1. **Scripted Response:** Zerg units initially static, become aggressive when feint detected
+2. **Victory Check:** Evolution Chamber destruction triggers win condition
+3. **Timer Display:** 10-minute countdown visible to player
+4. **Unit Spawns:** Additional Zerg reinforcements at 7 minutes if objective not yet attacked
+
+---
+
+**Design Philosophy:** This scenario teaches the principle of deception through gameplay mechanics rather than narrative. The terrain naturally suggests the eastern approach as "correct," making the western flank attack feel earned through player discovery and execution. The limited unit count emphasizes tactical decision-making over brute force.

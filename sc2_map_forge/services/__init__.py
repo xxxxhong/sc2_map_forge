@@ -94,6 +94,34 @@ def create_llm_client(provider: ProviderConfig):
         raise RuntimeError("请先安装 openai: pip install openai")
 
 
+# def call_llm(
+#     client,
+#     model: str,
+#     prompt: str,
+#     temperature: float = 1.0,
+#     max_tokens: int = 8096,
+# ) -> str:
+#     """
+#     通用 LLM 调用，返回纯文本响应。
+#     """
+#     #logger.info(f"[LLM] 调用 model={model}, prompt长度={len(prompt)}, max_tokens={max_tokens}")
+#     logger.info(f"[LLM] 调用 model={model}, base_url={client.base_url}, prompt长度={len(prompt)}, max_tokens={max_tokens}")
+#     try:
+#         response = client.chat.completions.create(
+#             model=model,
+#             messages=[{"role": "user", "content": prompt}],
+#             temperature=temperature,
+#             max_tokens=max_tokens,
+#             stream=False,
+#         )
+#         content = response.choices[0].message.content
+#         logger.info(f"[LLM] 返回 {len(content)} 字符")
+#         return content
+#     except Exception as e:
+#         logger.error(f"[LLM] 调用失败: {e}")
+#         raise
+
+
 def call_llm(
     client,
     model: str,
@@ -103,23 +131,34 @@ def call_llm(
 ) -> str:
     """
     通用 LLM 调用，返回纯文本响应。
+    自动适配新版 OpenAI 模型的参数差异。
     """
-    logger.info(f"[LLM] 调用 model={model}, prompt长度={len(prompt)}, max_tokens={max_tokens}")
+    logger.info(f"[LLM] 调用 model={model}, base_url={client.base_url}, prompt长度={len(prompt)}, max_tokens={max_tokens}")
+
+    # o系列 和 gpt-5+ 使用 max_completion_tokens，且不支持 temperature
+    NEW_MODELS = ("o1", "o3", "o4", "gpt-5")
+    is_new_model = any(model.startswith(p) for p in NEW_MODELS)
+
+    kwargs = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+    }
+    if is_new_model:
+        kwargs["max_completion_tokens"] = max_tokens
+        # o系列不支持自定义 temperature，跳过
+    else:
+        kwargs["max_tokens"] = max_tokens
+        kwargs["temperature"] = temperature
+
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=False,
-        )
+        response = client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
         logger.info(f"[LLM] 返回 {len(content)} 字符")
         return content
     except Exception as e:
         logger.error(f"[LLM] 调用失败: {e}")
         raise
-
 
 # ── 生成流程 (对应原 generate.py 的四个阶段) ──
 

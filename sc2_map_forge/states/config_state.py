@@ -13,7 +13,9 @@ import reflex as rx
 
 from ..constants import API_PROVIDERS
 
-CONFIG_FILE = "smac_ast_config.json"
+# CONFIG_FILE = "smac_ast_config.json"
+import pathlib
+CONFIG_FILE = str(pathlib.Path.home() / ".smac_ast" / "config.json")
 
 # Provider keys — used to generate computed vars
 _PROVIDER_KEYS = [p["key"] for p in API_PROVIDERS]
@@ -210,6 +212,7 @@ class ConfigState(rx.State):
     def save_api_config(self):
         """保存 API 配置到文件"""
         self._init_providers()
+        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
         config = {
             "default_provider": self.default_provider,
             "temperature": self.temperature,
@@ -242,6 +245,7 @@ class ConfigState(rx.State):
 
     def save_path_config(self):
         """保存路径配置"""
+        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
         config = {}
         if os.path.exists(CONFIG_FILE):
             try:

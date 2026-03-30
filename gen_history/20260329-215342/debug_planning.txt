@@ -1,0 +1,424 @@
+Below is a structured **StarCraft II battle scenario plan** built around the stratagem **“借刀杀人”** (“Kill with a borrowed knife” / manipulate others into destroying your enemy for you), using the provided terrain map **`sota.SC2Map`** as the battlefield basis.
+
+---
+
+# Scenario Title
+**Borrowed Blades**
+
+# Core Stratagem
+**借刀杀人**  
+The Terran player is too weak to defeat the Zerg head-on. Instead, they must exploit the battlefield and provoke hostile forces/environmental defenses into damaging or destroying the Zerg for them, then strike at the right moment.
+
+This is represented through:
+- Terran using bait, positioning, and tactical withdrawal
+- Zerg overcommitting into a dangerous area
+- Terrain or neutral defensive elements acting as the “borrowed knife”
+- Terran finishing the weakened enemy with a compact strike force
+
+---
+
+# 1. Scenario Overview
+
+## Narrative Premise
+A small Terran recon-detachment has been trapped near an abandoned fortified sector on **sota.SC2Map**. A Zerg raiding pack is hunting them. The Terrans cannot win a direct engagement, but they discover that the old defensive zone and local battlefield hazards can be used against the Zerg. By luring the swarm into a kill zone, the Terrans can let the environment or neutral automated defenses tear into the Zerg before committing their own force.
+
+## Intended Gameplay
+- Small-scale tactical skirmish
+- Emphasis on movement, baiting, and timing
+- Player should avoid direct early confrontation
+- Success comes from **drawing the Zerg into crossfire/chokepoints/hazard zones**
+
+---
+
+# 2. Force Composition
+
+Unit counts are kept around the requested **10 vs 10**.
+
+## Player Force: Terran
+Recommended composition: **10 units**
+
+1. **1x Reaper**
+   - Primary bait/scout unit
+   - Used to provoke enemy aggro and retreat safely over terrain
+
+2. **2x Marines**
+   - Basic ranged support
+   - Hold narrow approaches and finish weakened targets
+
+3. **2x Marauders**
+   - Anchor frontline
+   - Good versus tougher Zerg units and useful in choke fighting
+
+4. **2x Hellions**
+   - Harassment and kiting tools
+   - Excellent for leading Zerg into a trap and softening light targets
+
+5. **1x Siege Tank**
+   - Main punishment unit
+   - Deployed at the kill zone to capitalize once Zerg are funneled
+
+6. **1x Medivac**
+   - Sustains the small force
+   - Allows tactical repositioning or emergency extraction
+
+7. **1x Widow Mine**
+   - Hidden trigger element in the trap
+   - Helps sell the idea of layered, indirect killing
+
+### Terran Design Intent
+This force is not meant to overpower the Zerg in open ground. It is built around:
+- Mobility
+- Baiting
+- Chokepoint control
+- Bursting weakened enemies after trap activation
+
+---
+
+## Enemy Force: Zerg
+Recommended composition: **10 units**
+
+1. **1x Roach**
+   - Durable frontliner
+   - Leads the push and survives long enough to reach the trap area
+
+2. **1x Ravager**
+   - Adds pressure with ranged siege threat
+   - Forces Terran not to camp too openly
+
+3. **4x Zerglings**
+   - Fast pursuit units
+   - Most likely to chase bait and rush into danger first
+
+4. **2x Hydralisks**
+   - Main damage dealers
+   - Dangerous if preserved, so they should be key trap targets
+
+5. **1x Baneling**
+   - High-threat punish unit against clustered Terran infantry
+   - Encourages player to use spacing and indirect kills
+
+6. **1x Queen**
+   - Slight sustain/synaptic anchor presence
+   - Can represent the central command organism of the raiding party
+
+### Zerg Design Intent
+The Zerg force should feel:
+- Aggressive
+- Pursuit-oriented
+- Strong in a direct skirmish
+- Vulnerable when compressed into terrain hazards and artillery zones
+
+---
+
+# 3. Terrain Utilization Concept
+
+Because the exact XML layout is tied to **`sota.SC2Map`**, this scenario assumes the map includes some combination of:
+- Narrow access lanes or ramps
+- Elevated terrain
+- A ruined installation, outpost, or fortified pocket
+- Open ground where Zerg can mass, contrasted with a tight kill zone
+
+## Key Battlefield Areas
+Define 4 practical zones on the map:
+
+### A. Terran Forward Contact Zone
+- Mid-map or slightly Terran-side open terrain
+- Where the Reaper/Hellions first spot and bait the Zerg
+- Should be open enough that the player can safely retreat
+
+### B. Funnel Approach
+- A ramp, canyon, wreck corridor, bridge, or narrow pass
+- Critical for the stratagem
+- Limits Zerg surround potential and compresses their formation
+
+### C. Borrowed Knife Zone
+This is the core of the scenario. It should be one of the following depending on what the terrain supports:
+
+**Preferred options:**
+- An abandoned defense platform with neutral auto-turrets
+- A line-of-fire corridor overlooked by high ground emplacements
+- A destructible debris lane that channels enemy movement into Tank fire
+- A hazardous area such as fire vents, unstable ground, or explosive objects
+
+This zone represents the “knife” not originally belonging to the Terran force.
+
+### D. Terran Ambush Position
+- Behind or beside the kill zone
+- Siege Tank, Marines, and Marauders establish here
+- Medivac supports from the rear
+- Widow Mine is buried near the approach or center of the funnel
+
+---
+
+# 4. Scenario Flow and Phases
+
+## Phase 1: Contact and Recognition
+**Objective:** Discover the enemy and identify the trap opportunity.
+
+- The Terran player begins with units split:
+  - Reaper and Hellions forward
+  - Main force near a defensive fallback point
+- Zerg are initially patrolling or advancing from their side of the map
+- The player should quickly realize that direct engagement is unfavorable
+
+### Gameplay Notes
+- Reaper gains vision of the Zerg pack
+- Optional dialogue/intel hint:
+  - “Those ruins still have active defense signatures.”
+  - “Don’t fight them here. Pull them into the old perimeter.”
+
+### Tactical Purpose
+This phase teaches the player:
+- The Zerg are stronger in a straight fight
+- Retreat is not failure; it is the strategy
+
+---
+
+## Phase 2: The Lure
+**Objective:** Draw the Zerg into pursuit.
+
+- Reaper/Hellions poke the Zerg, dealing minor damage
+- Zerg aggro activates and they begin chasing
+- The player must withdraw toward the funnel approach
+
+### Important Design Behavior
+- Zerglings and Baneling should surge ahead
+- Roach/Ravager/Queen/Hydralisks trail slightly behind
+- This creates natural stagger and makes the trap visually satisfying
+
+### Failure Risk
+- If player overcommits in open terrain, Hydralisks and Ravager can punish them
+- If the player retreats too slowly, Zerglings may surround the forward units
+
+---
+
+## Phase 3: Borrowed Knife Trigger
+**Objective:** Force the Zerg into external damage.
+
+Once the Zerg enter the designated kill zone:
+- Neutral turrets activate against the nearest biological hostiles
+- Or environmental hazards erupt
+- Or line-of-fire from elevated emplacements begins striking the clustered Zerg
+- Widow Mine triggers on the vanguard
+- Siege Tank begins shelling the compressed formation
+
+### Best Expected Target Order
+1. Zerglings
+2. Baneling
+3. Hydralisks
+4. Ravager / Queen
+5. Roach last
+
+### Visual and Tactical Outcome
+The player should see:
+- Frontline Zerg evaporate or scatter
+- The enemy formation lose cohesion
+- The dangerous ranged core become exposed
+
+This is the heart of **借刀杀人**:
+- The Terrans are not winning with their own blade alone
+- They weaponize the battlefield and enemy momentum
+
+---
+
+## Phase 4: Counterstrike
+**Objective:** Clean up surviving Zerg.
+
+After trap activation:
+- Terran Marines and Marauders step forward
+- Tank remains sieged if lane control remains safe
+- Medivac stabilizes any wounded frontline units
+- Hellions circle or chase weakened Hydralisks/Queen
+- Reaper can jump behind to finish damaged units or deny retreat
+
+### Tactical Shift
+This phase transitions from:
+- Avoidance and manipulation
+to
+- Decisive local superiority
+
+The player should feel rewarded for patience and setup.
+
+---
+
+## Phase 5: Final Resolution
+**Objective:** Eliminate the remaining Zerg command presence.
+
+Usually the last survivors should be one or more of:
+- Roach
+- Queen
+- Ravager
+
+These units are sturdy enough to create a brief final exchange, but not enough to reverse the battle if the trap worked correctly.
+
+---
+
+# 5. Positioning Plan
+
+## Terran Initial Positioning
+- **Reaper + 2 Hellions**: Forward reconnaissance route near central lanes
+- **Siege Tank + 2 Marines + 2 Marauders + Medivac**: Behind the choke, near the ambush line
+- **Widow Mine**: Burrowed at the mouth of the funnel or just inside the kill zone
+
+## Zerg Initial Positioning
+- Entire Zerg force begins on opposite side of the map in a loose advancing pack
+- Suggested front-to-back order:
+  - Zerglings
+  - Baneling
+  - Roach
+  - Ravager
+  - Hydralisks
+  - Queen
+
+This arrangement naturally causes:
+- Fast units to enter first
+- Backline units to step into danger after the chase begins
+
+---
+
+# 6. Victory and Defeat Conditions
+
+## Primary Victory Condition
+- **Destroy all Zerg combat units**
+
+## Secondary/Optional Victory Conditions
+These reinforce the stratagem:
+1. **Trigger the kill zone before losing more than 2 Terran units**
+2. **Kill at least 4 Zerg units using neutral defenses or environmental hazards**
+3. **Keep the Siege Tank alive**
+4. **Preserve the Reaper** as the designated lure operative
+
+## Defeat Conditions
+1. **All Terran units destroyed**
+2. **Siege Tank destroyed before the kill zone is triggered**
+   - Optional if you want a stricter puzzle feel
+3. **More than 5 Terran units lost before Phase 4**
+   - Represents failure to execute the stratagem properly
+4. **Zerg breach the Terran fallback zone**
+   - If using a defendable bunker/outpost endpoint
+
+---
+
+# 7. Terrain Utilization Notes
+
+Since the map file is provided externally, below are implementation notes tied to common SC2 terrain logic.
+
+## Chokepoints
+- Use any narrow pass, bridge, or ramp as the main funnel
+- Ideal width should limit a full Zerg surround
+- Ensure Hydralisks cannot all fire at once until they step forward
+
+## High Ground
+- Put the Siege Tank and Marines on elevated ground if available
+- This reinforces the sense of a prepared ambush
+- Reaper can exploit cliff paths to maintain bait pressure without being trapped
+
+## Neutral Defenses / Borrowed Knife Elements
+Recommended implementations:
+- **2 neutral missile/auto-turret structures** covering a corridor
+- **Line of explosive barrels** near choke entrance
+- **Periodic flame vents** or **collapsible debris** in pursuit lane
+- **Watchtower or sensor zone** revealing enemy movement before trap activation
+
+The neutral danger should be strong enough to matter, but not so strong that it wins automatically without Terran support.
+
+## Sight Lines
+- Use blockers and corners so the player cannot simply attack from max range immediately
+- The trap should require enemy commitment into the zone
+- Vision from Reaper or watchtower can help prepare timing
+
+## Retreat Paths
+- The lure route must be readable and survivable
+- Reaper jump ledges and Hellion maneuver space are valuable
+- Avoid dead-end retreat routes unless the scenario is intentionally puzzle-hard
+
+## Destructibles
+If the map contains destructible rocks/debris:
+- Use them to create alternate routes that are initially closed
+- Optional interaction:
+  - Terran can break side debris before battle to open a safe firing lane
+  - Zerg default path remains through the dangerous central zone
+
+---
+
+# 8. Suggested Trigger/Encounter Logic
+
+## Trigger Set A: Aggro
+- When Terran forward unit enters detection radius or attacks Zerg:
+  - Zerg pack becomes hostile
+  - Patrol switches to pursuit
+
+## Trigger Set B: Trap Activation
+- When 4+ Zerg units enter the kill zone:
+  - Neutral defenses awaken / hazards activate
+  - Audio cue: “Perimeter grid online.”
+  - Siege Tank AI hint or objective update appears
+
+## Trigger Set C: Counterattack Prompt
+- When Zerg lose 30–40% of their force in the trap:
+  - Objective updates: “Enemy formation disrupted. Engage now.”
+
+## Trigger Set D: Fail State
+- If Terran engages in open field and loses key units too early:
+  - The battle becomes much harder but not instantly impossible
+  - Optional difficulty tuning
+
+---
+
+# 9. Difficulty Tuning Notes
+
+## Easier Version
+- Remove Ravager
+- Replace with 1 extra Zergling or Roach
+- Make neutral defenses stronger
+- Give Terran one bunker or more Marine support
+
+## Harder Version
+- Add a second Baneling or second Roach
+- Reduce neutral defense damage
+- Force the player to manually activate the trap
+- Place Hydralisks farther back so they survive the first blast unless the lure is perfect
+
+---
+
+# 10. Why This Fits “借刀杀人”
+
+This scenario embodies the stratagem because:
+- The Terran player is not expected to overpower the Zerg directly
+- They must manipulate enemy aggression
+- The real killing blow comes from **borrowed force**:
+  - neutral defenses,
+  - preexisting battlefield hazards,
+  - terrain funneling,
+  - and enemy overextension
+- The player’s role is to engineer the conditions for destruction rather than brute-force the win
+
+---
+
+# 11. Compact Scenario Summary
+
+## Terran
+- Reaper, Marines, Marauders, Hellions, Siege Tank, Medivac, Widow Mine
+- Small, tactical, trap-oriented force
+
+## Zerg
+- Zerglings, Baneling, Roach, Ravager, Hydralisks, Queen
+- Aggressive pursuit force stronger in direct combat
+
+## Flow
+1. Scout Zerg
+2. Bait with Reaper/Hellions
+3. Retreat through choke
+4. Trigger neutral defenses/hazards
+5. Siege Tank and hidden mine punish clustered Zerg
+6. Terran counterpush to finish survivors
+
+## Win Condition
+- Destroy all Zerg
+
+## Lose Condition
+- Terran wiped out, or trap fails and key units are lost too early
+
+---
+
+If you want, I can also convert this into a **trigger scripting outline**, a **Galaxy Editor implementation checklist**, or a **more map-specific version** if you provide the terrain XML contents.

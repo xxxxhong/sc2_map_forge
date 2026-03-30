@@ -1,0 +1,92 @@
+# StarCraft II Scenario: "The Distant Roar"
+
+## Scenario Overview
+**Stratagem:** 调虎离山 (Lure the Tiger from the Mountain)  
+**Theme:** A small Protoss reconnaissance force must lure the main Zerg defenders away from a critical objective, allowing a secondary force to strike.
+
+## Force Composition
+
+### Player (Protoss) - 10 Units
+- **Main Lure Force (6 units):**
+  - 2 Stalkers (mobile, can blink)
+  - 2 Adepts (shade ability for positioning)
+  - 1 Sentry (force field/guardian shield)
+  - 1 Oracle (revelation, mobility)
+- **Secondary Strike Force (4 units):**
+  - 2 Zealots (charge ability)
+  - 1 Dark Templar (permanent cloaking)
+  - 1 High Templar (psi storm)
+
+### Enemy (Zerg) - 10 Units
+- **Primary Defense (6 units):**
+  - 2 Roaches (tanky, ranged)
+  - 2 Hydralisks (anti-air, ranged)
+  - 1 Queen (transfusion, creep spread)
+  - 1 Ravager (corrosive bile)
+- **Objective Guard (4 units):**
+  - 2 Zerglings (fast, melee)
+  - 1 Baneling (explosive)
+  - 1 Spore Crawler (static defense)
+
+## Terrain Utilization (Based on sota.SC2Map)
+**Key Terrain Features:**
+- **Central Choke Point:** Narrow pass with high ground on both sides
+- **Eastern Plateau:** Elevated position overlooking objective
+- **Western Ravine:** Concealed approach path
+- **Objective Zone:** Small clearing with mineral-like crystals (target)
+
+## Phases & Positioning
+
+### Phase 1: The Lure (0:00-1:30)
+**Player Positioning:**
+- Lure Force (6 units): Western edge of central choke
+- Strike Force (4 units): Hidden in ravine (invisible due to terrain)
+
+**Enemy Positioning:**
+- Primary Defense (6 units): Patrolling central area
+- Objective Guard (4 units): Stationed at objective zone
+
+**Action:** Player uses Oracle to reveal enemy positions. Stalkers/Adepts engage Zerg defense force from range, then retreat through choke point. Sentry places force field to split enemy forces.
+
+### Phase 2: The Chase (1:30-3:00)
+**Player Action:** Lure Force continues retreating, using blink and shade abilities to maintain distance while taking potshots. Goal: Draw all 6 primary defenders westward away from objective.
+
+**Enemy Response:** Zerg forces pursue aggressively. Queen uses transfusion on damaged units. Ravager attempts corrosive bile on choke points.
+
+### Phase 3: The Strike (3:00-4:00)
+**Player Action:** Once primary defenders are sufficiently distant (minimum 2 screens away), Strike Force emerges from ravine. Dark Templar eliminates spore crawler. Zealots charge zerglings. High Templar uses psi storm on clustered defenders.
+
+**Enemy Response:** Objective Guard defends automatically. Primary defenders may attempt to return if player fails to maintain engagement.
+
+## Victory/Defeat Conditions
+
+### Victory:
+- **Primary:** Destroy all 4 Objective Guard units within 60 seconds of engagement
+- **Secondary:** Lose no more than 3 units from Strike Force
+- **Bonus:** Keep all Lure Force units alive
+
+### Defeat:
+- Lose all Strike Force units
+- Fail to destroy Objective Guard within time limit
+- Lose more than 5 total units
+
+## Terrain-Specific Notes
+1. **High Ground Advantage:** Use eastern plateau for initial Oracle scouting
+2. **Choke Points:** Force fields in central choke can delay returning Zerg
+3. **Concealment:** Ravine provides visual cover until units emerge
+4. **Pathing:** Zerglings fastest through narrow paths; position force fields accordingly
+5. **Elevation:** Stalkers on high ground have extended vision range
+
+## Player Tips
+1. **Micro Management:** Use blink to dodge ravager biles; shade to block paths
+2. **Ability Timing:** Save psi storm for when zerglings cluster
+3. **Vision Control:** Keep Oracle alive for revelation of returning forces
+4. **Engagement Discipline:** Lure Force should damage but not overcommit
+
+## Scenario Balance Notes
+- Zerg units have 15% increased health to compensate for player micro advantage
+- Objective zone has limited entry points favoring defenders
+- Time pressure prevents turtling strategies
+- Player success depends on spatial awareness and multitasking
+
+This scenario emphasizes the classic "lure and strike" tactic, requiring players to master unit preservation while executing a timed assault. The terrain naturally supports the stratagem with clear separation between lure and strike paths.

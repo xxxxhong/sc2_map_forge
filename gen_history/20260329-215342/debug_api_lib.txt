@@ -1,0 +1,3330 @@
+[Galaxy API Functions - 147 loaded]
+
+
+Function: Unit Ability By Filters
+Identifier: libNtve_gf_UnitAbilityByFilters
+
+Description:
+Returns —string<gamelink::Abil>
+
+Return Type:
+string<gamelink::Abil>
+
+Parameters:
+- Unit: unit
+- Ability Class: int<preset::AbilityClass>
+- Alias: string
+
+Prototype:
+string libNtve_gf_UnitAbilityByFilters(unit lp_unit,int lp_abilityClass,string lp_alias,);
+
+Function: Enable/Disable Ability For Unit
+Identifier: UnitAbilityEnable
+
+Description:
+Enables or disables an ability on a unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Ability: string<gamelink::Abil>
+- Enable: bool<preset::Enable_Disable_Option>
+
+Prototype:
+native void UnitAbilityEnable(unit inUnit,string inAbil,bool inEnable,);
+
+Function: Query Radius
+Identifier: libNtve_gf_QueryRadius
+
+Description:
+Constructs and returns a QueryRadius actor message.  This message will search a radius equal to the Radius parameter around an actor, and send an actor message determined by the Response Actor parameter to any actors it finds in that radius.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Radius: fixed
+- Response Actor: string<gamelink::Actor>
+
+Prototype:
+string libNtve_gf_QueryRadius(fixed lp_radius,string lp_responseActor,);
+
+Function: Query Region
+Identifier: libNtve_gf_QueryRegion
+
+Description:
+Constructs and returns a QueryRegion actor message.  This message searches a region actor determined by the Region Actor parameter and sends a message determined by the Response Actor parameter to any actors found inside of the region actor.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Region Actor: string<gamelink::Actor>
+- Response Actor: string<gamelink::Actor>
+
+Prototype:
+string libNtve_gf_QueryRegion(string lp_regionActor,string lp_responseActor,);
+
+Function: Query Persistent
+Identifier: libNtve_gf_QueryPersistent
+
+Description:
+Constructs and returns a QueryPersistent actor message.  This message will instruct a region actor to send a message to other actors when they enter or leave that region actor.  The Enter Response Actor parameter determines what message will be sent to actors entering the region actor, and the Leave Response Actor determines the actor message sent to actors exiting the region actor.  This message only works on region actors.
+
+Return Type:
+string<actormsg>
+
+Parameters:
+- Enter Response Actor: string<gamelink::Actor>
+- Leave Respone Actor: string<gamelink::Actor>
+
+Prototype:
+string libNtve_gf_QueryPersistent(string lp_enterResponseActor,string lp_leaveResponeActor,);
+
+Function: Remove Doodads in Region
+Identifier: libNtve_gf_RemoveDoodadsinRegion
+
+Description:
+Instantly removes all doodads of the specified type from a game region.  If the doodad being removed has a footprint, that footprint will still linger, even though the doodad’s actor has been destroyed.
+
+Return Type:
+void
+
+Parameters:
+- Target: region
+- Doodad Type: string<gamelink::Actor>
+
+Prototype:
+void libNtve_gf_RemoveDoodadsinRegion(region lp_target,string lp_doodadType,);
+
+Function: Triggering Wave
+Identifier: EventPlayerWave
+
+Description:
+Returns the triggering attack wave in response to“Player Sends AI Wave”events.
+
+Return Type:
+wave
+
+Parameters:
+(none)
+
+Prototype:
+native wave EventPlayerWave();
+
+Function: Set Target Patrol For Attack Waves
+Identifier: AIAttackWaveSetTargetPatrol
+
+Description:
+Sets the target of a player’s attack waves to patrol.
+
+Return Type:
+void
+
+Parameters:
+- Attacker: int
+- ReplaceType: int<preset::ReplaceType>
+
+Prototype:
+native void AIAttackWaveSetTargetPatrol(int player,int replaceType,);
+
+Function: Add Attack Wave Unit Types (Swarm)
+Identifier: AIAttackWaveAddUnits3
+
+Description:
+Adds a type of unit to the next attack wave for a player; allowing you to specify a different number of units per difficulty level.
+
+Return Type:
+void
+
+Parameters:
+- Easy Count: int
+- Normal Count: int
+- Advanced Count: int
+- Type: string<gamelink::Unit>
+
+Prototype:
+void AIAttackWaveAddUnits3(int n1,int n2,int n3,string unitType,);
+
+Function: Escorts Of Unit
+Identifier: AIGetAllEscorts
+
+Description:
+Returns a group of all of the units assigned to escort a unit.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native unitgroup AIGetAllEscorts(unit u);
+
+Function: Issue AI Order
+Identifier: libNtve_gf_AICast
+
+Description:
+Suggests an order to a unit.  If the computer that controls the unit has the ability to execute the order (with respect to its current APM constraint), then it will do so.  The order will eventually be dropped if the computer is unable to execute it for a few seconds after it was issued.  If you need a unit to do something immediately, use Issue Order instead.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Order: order
+
+Prototype:
+void libNtve_gf_AICast(unit lp_unit, order lp_order);
+
+Function: Set Defense Radii
+Identifier: AISetDefenseRadii
+
+Description:
+Sets the basic defense call for help radii.  The threat must attack a building or come within MaxThreateningRange to trigger a defense call for help. Defenders that are within BuildingCallForHelpRange of the building or ThreatCallForHelpRange of the threat will respond. (ie the defender must be near the building or near the threat). By default Melee is (p#, 15.0, 10.0, 12.0) and Campaign is (p#, 6.0, 7.0, 9.0)
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Max Threating Range: fixed
+- Building Call For Help Range: fixed
+- Threat Call For Help Range: fixed
+
+Prototype:
+native void AISetDefenseRadii(int player,fixed maxThreatRange,fixed buildingCallRange,fixed threatCallRange,);
+
+Function: Get Defense Gather Location
+Identifier: AIGetGatherDefLocation
+
+Description:
+Returns the default defensive gather location for a town of a player.
+
+Return Type:
+point
+
+Parameters:
+- Player: int
+- Town: int
+
+Prototype:
+native point AIGetGatherDefLocation(int player, int town);
+
+Function: Get Cloaked Attacker
+Identifier: AIGetCloakedAttacker
+
+Description:
+Returns the position of the last attack from a cloaked unit against a player specified by the Player parameter.
+
+Return Type:
+point
+
+Parameters:
+- Player: int
+
+Prototype:
+native point AIGetCloakedAttacker(int p);
+
+Function: Get Best Attack Target Point
+Identifier: AIGetBestTarget
+
+Description:
+Get the best target point to attack for a player, optionally considering only the specified enemies.
+
+Return Type:
+point
+
+Parameters:
+- Player: int
+- Enemies: playergroup
+- Gather Point: point
+- Flags: int<preset::AIBestTargetFlags>
+
+Prototype:
+native point AIGetBestTarget(int player,playergroup enemies,point gatherPoint,int flags,);
+
+Function: Lane Waypoint Get Calc Data Closest Point
+Identifier: AILaneWaypointGetCalcDataClosestPoint
+
+Description:
+Returns the closest point along the lane calculated by the last call to“Lane Waypoint Calc Closest Data For Lane”.
+
+Return Type:
+point
+
+Parameters:
+(none)
+
+Prototype:
+native point AILaneWaypointGetCalcDataClosestPoint();
+
+Function: Lane Waypoint Get Calc Data Closest Dist
+Identifier: AILaneWaypointGetCalcDataClosestDist
+
+Description:
+Returns the distance to the closest point along the lane calculated by the last call to“Lane Waypoint Calc Closest Data For Lane”.
+
+Return Type:
+fixed
+
+Parameters:
+(none)
+
+Prototype:
+native fixed AILaneWaypointGetCalcDataClosestDist();
+
+Function: Unit Behavior
+Identifier: UnitBehaviorGet
+
+Description:
+Returns the behavior at the specified index on the specified unit.
+
+Return Type:
+string<gamelink::Behavior>
+
+Parameters:
+- Unit: unit
+- Index: int
+
+Prototype:
+native string UnitBehaviorGet(unit inUnit, int inIndex);
+
+Function: Remove Behavior (Player)
+Identifier: UnitBehaviorRemovePlayer
+
+Description:
+Removes a behavior from the specified unit, setting the casting player to the specified player.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Behavior: string<gamelink::Behavior>
+- Player: int
+- Count: int
+
+Prototype:
+native void UnitBehaviorRemovePlayer(unit inUnit,string inBehavior,int inPlayer,int inCount,);
+
+Function: Unit Behavior Effect Unit
+Identifier: UnitBehaviorEffectUnit
+
+Description:
+Returns —unit
+
+Return Type:
+unit
+
+Parameters:
+- Unit: unit
+- Behavior: string<gamelink::Behavior>
+- Location: int<preset::EffectUnit>
+- Stack Index: int
+
+Prototype:
+native unit UnitBehaviorEffectUnit(unit inUnit,string inBehavior,int inLocation,int inIndex,);
+
+Function: Unit Behavior Changes
+Identifier: TriggerAddEventUnitBehaviorChange
+
+Description:
+Returns —void
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Behavior: string<gamelink::Behavior>
+- Type: int<preset::BehaviorChange>
+
+Prototype:
+native void TriggerAddEventUnitBehaviorChange(trigger t,unitref u,string behavior,int inChangeType,);
+
+Function: Unit Behavior Effect Player
+Identifier: UnitBehaviorEffectPlayer
+
+Description:
+Returns —int
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+- Behavior: string<gamelink::Behavior>
+- Player: int<preset::EffectPlayer>
+- Stack Index: int
+
+Prototype:
+native int UnitBehaviorEffectPlayer(unit inUnit,string inBehavior,int inLocation,int inIndex,);
+
+Function: Camera Target Of Player
+Identifier: CameraGetTarget
+
+Description:
+Returns the current camera target of a player.  Camera targets are tracked for all players in a multiplayer game, but the queried locations will be slightly old due to network latency.
+
+Return Type:
+point
+
+Parameters:
+- Player: int
+
+Prototype:
+native point CameraGetTarget(int player);
+
+Function: Pan Camera
+Identifier: CameraPan
+
+Description:
+Pans the camera to the center of a region or point.  If smart panning is enabled, the camera will not pan if it is already looking at the target point.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Point: point
+- Duration: fixed
+- Initial Velocity: fixed
+- Decelerate: fixed
+- Smart: bool<preset::Do_Do_Not_Option>
+
+Prototype:
+native void CameraPan(int player,point p,fixed duration,fixed velocity,fixed decelerate,bool smart,);
+
+Function: Catalog Entry Class
+Identifier: CatalogEntryClass
+
+Description:
+Returns the scope (essentially, the type) of the specified entry in integer form.  Use catalog lookup functions to retrieve a data value or other information from the game data.
+
+Return Type:
+int
+
+Parameters:
+- Catalog: int<preset::CatalogType>
+- Entry: string<catalogentry>
+
+Prototype:
+native int CatalogEntryClass(int catalog, string entry);
+
+Function: Catalog Field Value Get
+Identifier: CatalogFieldValueGet
+
+Description:
+Returns the value of a field for an entry.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the unit for the first index of a train ability, your field path string would be“InfoArray[0].Unit”.
+
+Return Type:
+string
+
+Parameters:
+- Catalog: int<preset::CatalogType>
+- Entry: string<catalogentry>
+- Field Path: string<catalogfieldpath>
+- Player: int
+
+Prototype:
+native string CatalogFieldValueGet(int catalog,string entry,string fieldPath,int player,);
+
+Function: Catalog Field Value Count
+Identifier: CatalogFieldValueCount
+
+Description:
+Returns the count of the values for a field for an entry.  Returns 0 if the specified field is not an array.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the number of active indicies for a train ability, your field path string would be“InfoArray”.
+
+Return Type:
+int
+
+Parameters:
+- Catalog: int<preset::CatalogType>
+- Entry: string<catalogentry>
+- Field Path: string<catalogfieldpath>
+- Player: int
+
+Prototype:
+native int CatalogFieldValueCount(int catalog,string entry,string fieldPath,int player,);
+
+Function: Catalog Reference Get
+Identifier: CatalogReferenceGet
+
+Description:
+Returns the value of a field for an entry.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the unit for the first index of a train ability, your field path string would be“InfoArray[0].Unit”.
+
+Return Type:
+string
+
+Parameters:
+- Reference: string<reference>
+- Player: int
+
+Prototype:
+native string CatalogReferenceGet(string reference,int player,);
+
+Function: Catalog Reference Count
+Identifier: CatalogReferenceCount
+
+Description:
+Returns the count of the values for a field for an entry.  Returns 0 if the specified field is not an array.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the number of active indicies for a train ability, your field path string would be“InfoArray”.
+
+Return Type:
+int
+
+Parameters:
+- Reference: string<reference>
+- Player: int
+
+Prototype:
+native int CatalogReferenceCount(string reference,int player,);
+
+Function: Catalog Reference Get As Real
+Identifier: libNtve_gf_CatalogReferenceGetAsReal
+
+Description:
+Returns the value of a field for an entry as an real.  Use catalog lookup functions to retrieve a data value or other information from the game data.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to get the unit for the first index of a train ability, your field path string would be“InfoArray[0].Unit”.
+
+Return Type:
+fixed
+
+Parameters:
+- Reference: string<reference>
+- Player: int
+
+Prototype:
+fixed libNtve_gf_CatalogReferenceGetAsReal(string lp_reference,int lp_player,);
+
+Function: Catalog Field Value Set
+Identifier: CatalogFieldValueSet
+
+Description:
+Sets the value of a field for an entry.  To find the name of a field path, open the data editor and turn on View Raw Data.  For example, if you wanted to set the unit for the first index of a train ability, your field path string would be“InfoArray[0].Unit”.
+
+Return Type:
+bool
+
+Parameters:
+- Catalog: int<preset::CatalogType>
+- Entry: string<catalogentry>
+- Field Path: string<catalogfieldpath>
+- Player: int
+- Value: string
+
+Prototype:
+native bool CatalogFieldValueSet(int catalog,string entry,string fieldPath,int player,string value,);
+
+Function: Save Data Table Value (Planet) - Instance
+Identifier: DataTableInstanceSetPlanet
+
+Description:
+Returns —void
+
+Return Type:
+void
+
+Parameters:
+- Instance: int<datatable>
+- Name: string
+- Value: int<planet>
+
+Prototype:
+native void DataTableInstanceSetPlanet(int instance,string name,int value,);
+
+Function: Synchronous Game Start Time
+Identifier: SynchronousGameStartTimeGet
+
+Description:
+Returns the best guess of when the game started for players in the real world as a server-timezone adjusted UNIX epoch (seconds since January 1, 1970). Returns the time the game started loading if called on the loading screen and the time gameplay started later.
+
+Return Type:
+int
+
+Parameters:
+(none)
+
+Prototype:
+native int SynchronousGameStartTimeGet();
+
+Function: Triggering Effect Launch Unit
+Identifier: EventPlayerEffectUsedUnitLaunch
+
+Description:
+Returns —unit
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+native unit EventPlayerEffectUsedUnitLaunch();
+
+Function: Triggering Effect Unit Owner
+Identifier: EventPlayerEffectUsedUnitOwner
+
+Description:
+Returns —int
+
+Return Type:
+int
+
+Parameters:
+- Location: int<preset::EffectPlayer>
+
+Prototype:
+native int EventPlayerEffectUsedUnitOwner(int inLocation);
+
+Function: Map Initialization
+Identifier: TriggerAddEventMapInit
+
+Description:
+This event fires when a map starts running.
+
+Return Type:
+void
+
+Parameters:
+(none)
+
+Prototype:
+native void TriggerAddEventMapInit(trigger t);
+
+Function: Mission Time
+Identifier: GameGetMissionTime
+
+Description:
+Returns the elapsed Mission Time in seconds
+
+Return Type:
+fixed
+
+Parameters:
+(none)
+
+Prototype:
+native fixed GameGetMissionTime();
+
+Function: Set Objective Text
+Identifier: ObjectiveSetName
+
+Description:
+Sets the text of an objective.
+
+Return Type:
+void
+
+Parameters:
+- Objective: int<objective>
+- Text: text
+
+Prototype:
+native void ObjectiveSetName(int inObjective, text inName);
+
+Function: Objective Text
+Identifier: ObjectiveGetName
+
+Description:
+Returns the text of an objective.
+
+Return Type:
+text
+
+Parameters:
+- Objective: int<objective>
+
+Prototype:
+native text ObjectiveGetName(int inObjective);
+
+Function: Objective Description
+Identifier: ObjectiveGetDescription
+
+Description:
+Returns the description text of an objective.
+
+Return Type:
+text
+
+Parameters:
+- Objective: int<objective>
+
+Prototype:
+native text ObjectiveGetDescription(int inObjective);
+
+Function: Revive Order Targeting Point
+Identifier: libNtve_gf_ReviveOrderTargetingPoint
+
+Description:
+Returns an order targeting a point and will revive a specific unit. This is primarily for use in“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Target Point: point
+- Revive Unit: unit
+
+Prototype:
+order libNtve_gf_ReviveOrderTargetingPoint(abilcmd lp_abilCmd,point lp_p,unit lp_reviveUnit,);
+
+Function: Order Targeting Point
+Identifier: OrderTargetingPoint
+
+Description:
+Returns an order targeting a point.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Target Point: point
+
+Prototype:
+native order OrderTargetingPoint(abilcmd inAbilCmd,point inPoint,);
+
+Function: Order Targeting Unit Group
+Identifier: OrderTargetingUnitGroup
+
+Description:
+Returns an order targeting a unit group.  This is primarily for use in“Issue Order”and“Issue Order To Unit Group”actions.
+
+Return Type:
+order
+
+Parameters:
+- Ability Command: abilcmd
+- Unit Group: unitgroup
+
+Prototype:
+native order OrderTargetingUnitGroup(abilcmd inAbilCmd,unitgroup inUnitGroup,);
+
+Function: Ability Command For Order
+Identifier: OrderGetAbilityCommand
+
+Description:
+Returns the ability command for the order.
+
+Return Type:
+abilcmd
+
+Parameters:
+- Order: order
+
+Prototype:
+native abilcmd OrderGetAbilityCommand(order inOrder);
+
+Function: Target Position For Order
+Identifier: OrderGetTargetPosition
+
+Description:
+Returns the position of the target for an order, regardless of what type of target it is.
+
+Return Type:
+point
+
+Parameters:
+- Order: order
+
+Prototype:
+native point OrderGetTargetPosition(order inOrder);
+
+Function: Ability Command
+Identifier: AbilityCommand
+
+Description:
+Constructs an ability command from an ability and an index.  An ability command is the combination of an ability and an index for a command within that ability.  Command indexes are 0 based.
+
+Return Type:
+abilcmd
+
+Parameters:
+- Ability: string<gamelink::Abil>
+- Command: int
+
+Prototype:
+native abilcmd AbilityCommand(string inAbil,int inCmdIndex,);
+
+Function: Ping Minimap Possible Enemy Start Locations
+Identifier: MinimapPingPossibleEnemyStartLocations
+
+Description:
+Pings the minimap at each possible enemy spawn location of the local player.  This ping cannot be modified after it is created.  Use a“Create Ping”action to create a more customizable ping that can be modified after creation.
+
+Return Type:
+void
+
+Parameters:
+- Duration: fixed
+- Model Link: string<gamelink::Model>
+- Color: color
+
+Prototype:
+native void MinimapPingPossibleEnemyStartLocations(fixed duration,string inModelLink,color c,);
+
+Function: Ping Minimap
+Identifier: MinimapPing
+
+Description:
+Pings the minimap using a standard ping model.  This ping cannot be modified after it is created.  Use a“Create Ping”action to create a more customizable ping that can be modified after creation.
+
+Return Type:
+void
+
+Parameters:
+- Players: playergroup
+- Position: point
+- Duration: fixed
+- Color: color
+
+Prototype:
+native void MinimapPing(playergroup players,point position,fixed duration,color c,);
+
+Function: Last Created Ping
+Identifier: PingLastCreated
+
+Description:
+Returns the last minimap ping created via a“Create Ping”action.
+
+Return Type:
+int<ping>
+
+Parameters:
+(none)
+
+Prototype:
+native int PingLastCreated();
+
+Function: Set Alliance (One-Way)
+Identifier: libNtve_gf_SetAllianceOneWay
+
+Description:
+Sets the alliance settings of one player towards another player, but not vice-versa.  This action will determine how the Source Player treats the Target Player, such as whether or not the Source Player*“s units fight the Target Player"s units.  Pushable means that the Target Player"s units are allowed to push the Source Player”*s units out of the way if they are trying to path through them.
+
+Return Type:
+void
+
+Parameters:
+- Source Player: int
+- Target Player: int
+- Alliance Setting: int<preset::AllianceSetting>
+
+Prototype:
+void libNtve_gf_SetAllianceOneWay(int lp_sourcePlayer,int lp_targetPlayer,int lp_alliance,);
+
+Function: Allies/Enemies Of Player (Count Inactive And Self)
+Identifier: libNtve_gf_AlliesEnemiesOfPlayerCountInactiveAndSelf
+
+Description:
+Returns all players that are considered allies or enemies, determined by the Alliance parameter, of the specified player. (Count inactive players, and the player itself would be count as a ally)
+
+Return Type:
+playergroup
+
+Parameters:
+- Alliance: int<preset::PlayerRelation>
+- Player: int
+
+Prototype:
+playergroup libNtve_gf_AlliesEnemiesOfPlayerCountInactiveAndSelf(int lp_alliance,int lp_player,);
+
+Function: Point From XY
+Identifier: Point
+
+Description:
+Returns a 2D location as a point.  This allows you to specify any location on the map grid as a viable value for a point parameter.
+
+Return Type:
+point
+
+Parameters:
+- X: fixed
+- Y: fixed
+
+Prototype:
+native point Point(fixed x, fixed y);
+
+Function: Distance Squared Between Points
+Identifier: DistanceSquaredBetweenPoints
+
+Description:
+Returns the squared distance between two points as a real value.
+
+Return Type:
+fixed
+
+Parameters:
+- Point 1: point
+- Point 2: point
+
+Prototype:
+native fixed DistanceSquaredBetweenPoints(point p1,point p2,);
+
+Function: Entire Map
+Identifier: RegionEntireMap
+
+Description:
+Returns the entire map.
+
+Return Type:
+region
+
+Parameters:
+(none)
+
+Prototype:
+native region RegionEntireMap();
+
+Function: Playable Map Area
+Identifier: RegionPlayableMap
+
+Description:
+Returns the playable map area.
+
+Return Type:
+region
+
+Parameters:
+(none)
+
+Prototype:
+native region RegionPlayableMap();
+
+Function: Unit Attached To Region
+Identifier: RegionGetAttachUnit
+
+Description:
+Returns a unit attached to a region.
+
+Return Type:
+unit
+
+Parameters:
+- Region: region
+
+Prototype:
+native unit RegionGetAttachUnit(region r);
+
+Function: Center Of Region
+Identifier: RegionGetCenter
+
+Description:
+Returns the center point of a region.
+
+Return Type:
+point
+
+Parameters:
+- Region: region
+
+Prototype:
+native point RegionGetCenter(region r);
+
+Function: Top-Right Of Region Bounds
+Identifier: RegionGetBoundsMax
+
+Description:
+Returns the maximum bounds of a region. For a rectangle region, this is the top-right corner of the rectangle. In the general case, this is a point comprising the right-most X coordinate and the top-most Y coordinate of the region.
+
+Return Type:
+point
+
+Parameters:
+- Region: region
+
+Prototype:
+native point RegionGetBoundsMax(region r);
+
+Function: Restore Unit Selection
+Identifier: libNtve_gf_RestoreUnitSelection
+
+Description:
+Restores the last stored unit selection for a given player.  Use the“Store Unit Selection”action to store a unit selection.
+
+Return Type:
+void
+
+Parameters:
+- forPlayer: int
+
+Prototype:
+void libNtve_gf_RestoreUnitSelection(int lp_forPlayer);
+
+Function: Store Unit Selection
+Identifier: libNtve_gf_StoreUnitSelection
+
+Description:
+Stores which units a given player has selected.  Use the“Restore Unit Selection”action to restore this selection.
+
+Return Type:
+void
+
+Parameters:
+- forPlayer: int
+- storeOption: int<preset::UnitSelectionStoreOption>
+
+Prototype:
+void libNtve_gf_StoreUnitSelection(int lp_forPlayer,int lp_storeOption,);
+
+Function: Unit Is Clicked
+Identifier: TriggerAddEventUnitClick
+
+Description:
+This event fires when a unit is clicked by a player.  Use“Triggering Unit”to refer to the unit being clicked.  Use“Triggering Player”to get the player.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Player: int
+
+Prototype:
+native void TriggerAddEventUnitClick(trigger t,unitref u,int player,);
+
+Function: Play Sound  (Deprecated)
+Identifier: SoundPlay
+
+Description:
+Plays a sound for the specified player group.  Use the“Last Played Sound”function to refer to this sound.
+
+Return Type:
+void
+
+Parameters:
+- Sound Link: soundlink
+- Players: playergroup
+- Volume: fixed
+- Offset: fixed
+
+Prototype:
+void SoundPlay(soundlink lp_soundLink,playergroup lp_players,fixed lp_volume,fixed lp_offset,);
+
+Function: Play Sound On Unit (Deprecated)
+Identifier: SoundPlayOnUnit
+
+Description:
+Plays a sound at a unit for the specified player group.  Use the“Last Played Sound”function to refer to this sound.
+
+Return Type:
+void
+
+Parameters:
+- Sound Link: soundlink
+- Players: playergroup
+- Unit: unit
+- Height: fixed
+- Volume: fixed
+- Offset: fixed
+
+Prototype:
+void SoundPlayOnUnit(soundlink lp_soundLink,playergroup lp_players,unit lp_unit,fixed lp_height,fixed lp_volume,fixed lp_offset,);
+
+Function: Sound Subtitle Text
+Identifier: SoundSubtitleText
+
+Description:
+Returns Subtitle text for the given Sound Link.
+
+Return Type:
+text
+
+Parameters:
+- Sound Link: soundlink
+
+Prototype:
+native text SoundSubtitleText(soundlink link);
+
+Function: Planet Panel Launched
+Identifier: TriggerAddEventPlanetMissionLaunched
+
+Description:
+This event fires when the specified player opens the planet panel.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+
+Prototype:
+native void TriggerAddEventPlanetMissionLaunched(trigger t,int player,);
+
+Function: Planet Panel Contact Button State
+Identifier: PlanetPanelGetContactButtonState
+
+Description:
+Returns the current state of the contact button on the planet panel.
+
+Return Type:
+int<preset::PlanetState3>
+
+Parameters:
+- Player: int
+
+Prototype:
+native int PlanetPanelGetContactButtonState(int player);
+
+Function: Planet Panel Planet Selected
+Identifier: TriggerAddEventPlanetMissionSelected
+
+Description:
+This event fires when a player clicks on a planet on the planet panel.  Use“Clicked Planet”to get the planet that was clicked.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+- Planet: int<planet>
+
+Prototype:
+native void TriggerAddEventPlanetMissionSelected(trigger t,int player,int planetId,);
+
+Function: Planet Panel Death Complete
+Identifier: TriggerAddEventPlanetPanelDeathComplete
+
+Description:
+This event fires when the planet panel finishes playing its death animation.
+
+Return Type:
+void
+
+Parameters:
+- Player: int
+
+Prototype:
+native void TriggerAddEventPlanetPanelDeathComplete(trigger t,int player,);
+
+Function: Destroy All Planets
+Identifier: PlanetDestroyAll
+
+Description:
+Removes all planets from the planet panel for the specified players.
+
+Return Type:
+void
+
+Parameters:
+- PlayerGroup: playergroup
+
+Prototype:
+native void PlanetDestroyAll(playergroup inPlayerGroup);
+
+Function: Enable/Disable Planet Panel Dismiss Button
+Identifier: PlanetPanelSetDismissButtonEnabled
+
+Description:
+Enables or disables the dismiss button on the planet panel for the specified players.
+
+Return Type:
+void
+
+Parameters:
+- PlayerGroup: playergroup
+- Enable: bool<preset::Enable_Disable_Option>
+
+Prototype:
+native void PlanetPanelSetDismissButtonEnabled(playergroup players,bool inEnabled,);
+
+Function: Destroy Planet
+Identifier: PlanetDestroy
+
+Description:
+Removes the specified planet from the planet panel.
+
+Return Type:
+void
+
+Parameters:
+- Planet: int<planet>
+
+Prototype:
+native void PlanetDestroy(int inPlanetId);
+
+Function: Selected Mission Difficulty
+Identifier: EventPlanetPanelDifficultySelected
+
+Description:
+Returns the desired difficulty at which the player wanted to play the mission.
+
+Return Type:
+int<difficulty>
+
+Parameters:
+(none)
+
+Prototype:
+native int EventPlanetPanelDifficultySelected();
+
+Function: Add Mission Archive Achievement
+Identifier: BattleReportAddAchievement
+
+Description:
+This will only work on Blizzard maps.
+
+Return Type:
+void
+
+Parameters:
+- Mission Archive Id: int<preset::MissionArchive>
+- Achievement: string<gamelink::Achievement>
+
+Prototype:
+native void BattleReportAddAchievement(int inBattleReportId,string inAchievement,);
+
+Function: Show Mission Archive in Missions Completed Total
+Identifier: BattleReportSetShownInMissionTotal
+
+Description:
+If this mission archive is flagged as a mission, this will determine if this mission is counted in the missions completed section of the mission archive panel.
+
+Return Type:
+void
+
+Parameters:
+- Mission Archive Id: int<preset::MissionArchive>
+- Shown: bool<preset::ShowHideOption>
+
+Prototype:
+native void BattleReportSetShownInMissionTotal(int inBattleReportId,bool inShown,);
+
+Function: Get Mission Archive Priority
+Identifier: BattleReportGetPriority
+
+Description:
+Gets the priority for the specified mission archive.
+
+Return Type:
+int
+
+Parameters:
+- Mission Archive Id: int<preset::MissionArchive>
+
+Prototype:
+native int BattleReportGetPriority(int inBattleReportId);
+
+Function: Selected Mission Archive Difficulty
+Identifier: EventBattleReportPanelDifficultySelected
+
+Description:
+Returns the mission archive mission difficulty that was last selected.  Only valid in response to“Mission Archives Panel Play Mission”events.
+
+Return Type:
+int<difficulty>
+
+Parameters:
+(none)
+
+Prototype:
+native int EventBattleReportPanelDifficultySelected();
+
+Function: Set Victory Panel Mission Title
+Identifier: VictoryPanelSetMissionTitle
+
+Description:
+Sets the mission title on the victory panel.
+
+Return Type:
+void
+
+Parameters:
+- Text: text
+
+Prototype:
+native void VictoryPanelSetMissionTitle(text inText);
+
+Function: Set Victory Panel Mission Text
+Identifier: VictoryPanelSetMissionText
+
+Description:
+Sets the mission text on the victory panel.
+
+Return Type:
+void
+
+Parameters:
+- Text: text
+
+Prototype:
+native void VictoryPanelSetMissionText(text inText);
+
+Function: Time Elapsed
+Identifier: TriggerAddEventTimeElapsed
+
+Description:
+This event fires once the specified amount of time has passed in game.
+
+Return Type:
+void
+
+Parameters:
+- Duration: fixed
+- Time Type: int<preset::TimeType>
+
+Prototype:
+native void TriggerAddEventTimeElapsed(trigger inTrigger,fixed inTime,int inTimeType,);
+
+Function: Periodic Event
+Identifier: TriggerAddEventTimePeriodic
+
+Description:
+This event fires periodically whenever the time specified elapses.
+
+Return Type:
+void
+
+Parameters:
+- Duration: fixed
+- Time Type: int<preset::TimeType>
+
+Prototype:
+native void TriggerAddEventTimePeriodic(trigger inTrigger,fixed inTime,int inTimeType,);
+
+Function: Movie Transmission Source
+Identifier: TransmissionSourceFromMovie
+
+Description:
+Applies a movie as the transmission source for use in the transmission portrait.
+
+Return Type:
+transmissionsource
+
+Parameters:
+- Movie: string<filepath>
+- Subtitles: bool<preset::OnOffOption>
+
+Prototype:
+native transmissionsource TransmissionSourceFromMovie(string assetLink,bool subtitles,);
+
+Function: Current Trigger Thread SetFlags
+Identifier: TriggerCurrentTriggerThreadSetFlags
+
+Description:
+This is only used to set flags on the current galaxy thread so that the internal execution can know what type of thread is being executed.
+
+Return Type:
+void
+
+Parameters:
+- Flags: int<preset::ThreadFlags>
+- On: bool
+
+Prototype:
+native void TriggerCurrentTriggerThreadSetFlags(int f,bool on,);
+
+Function: New Trigger
+Identifier: TriggerCreate
+
+Description:
+Returns —trigger
+
+Return Type:
+trigger
+
+Parameters:
+- Function Name: string
+
+Prototype:
+native trigger TriggerCreate(string inFunction);
+
+Function: Trigger Function Name
+Identifier: TriggerGetFunction
+
+Description:
+Returns the name of the script function defined for the given trigger.
+
+Return Type:
+string
+
+Parameters:
+- Trigger: trigger
+
+Prototype:
+native string TriggerGetFunction(trigger t);
+
+Function: _Store Game UI Visible States
+Identifier: libNtve_gf__StoreGameUIVisibleStates
+
+Description:
+Returns —void
+
+Return Type:
+void
+
+Parameters:
+- Store/Restore: bool<preset::undefined>
+- Players: playergroup
+- Index: int<preset::undefined>
+
+Prototype:
+void libNtve_gf__StoreGameUIVisibleStates(bool lp_storeRestore,playergroup lp_players,int lp_index,);
+
+Function: Get Path Display Destination Point
+Identifier: PathGetDestinationPoint
+
+Description:
+Returns —point
+
+Return Type:
+point
+
+Parameters:
+- Path Display: int<path>
+
+Prototype:
+native point PathGetDestinationPoint(int inPathId);
+
+Function: Unit Can Path To Point
+Identifier: UnitPathableToPoint
+
+Description:
+This returns whether or not the unit can path to the specified point.
+
+Return Type:
+bool
+
+Parameters:
+- Source Unit: unit
+- Target: point
+- Range: fixed
+- Max Distance: fixed
+
+Prototype:
+native bool UnitPathableToPoint(unit u,point inTarget,fixed inRange,fixed inMaxDistance,);
+
+Function: Create Units With Default Facing
+Identifier: libNtve_gf_CreateUnitsWithDefaultFacing
+
+Description:
+Creates units using the default facing angle of the unit.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+void
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+
+Prototype:
+void libNtve_gf_CreateUnitsWithDefaultFacing(int lp_count,string lp_type,int lp_style,int lp_player,point lp_p,);
+
+Function: Create Units With Point Facing
+Identifier: libNtve_gf_CreateUnitsAtPoint2
+
+Description:
+Creates units using the facing angle of a point.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+void
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+
+Prototype:
+void libNtve_gf_CreateUnitsAtPoint2(int lp_count,string lp_type,int lp_flags,int lp_player,point lp_p,);
+
+Function: Create Units Facing Angle
+Identifier: UnitCreate
+
+Description:
+Creates units facing a specified angle.  Use the“Last Created Unit”and“Last Created Units”functions to refer to the created units.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Count: int
+- Type: string<gamelink::Unit>
+- Flags: int<preset::Unit_Create_Style2>
+- Player: int
+- Point: point
+- Angle: fixed
+
+Prototype:
+native unitgroup UnitCreate(int inCount,string inUnitType,int inCreateStyle,int inPlayer,point inPos,fixed inFacing,);
+
+Function: Old Unit Owner
+Identifier: EventUnitOwnerOld
+
+Description:
+Returns the previous owner of a unit, when used in response to“Unit Owner Changes”.
+
+Return Type:
+int
+
+Parameters:
+(none)
+
+Prototype:
+native int EventUnitOwnerOld();
+
+Function: Change Owner
+Identifier: UnitSetOwner
+
+Description:
+Changes the ownership of a unit to another player.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Player: int
+- Color Change: bool<preset::Unit_Color_Change_Option>
+
+Prototype:
+native void UnitSetOwner(unit inUnit,int inPlayer,bool inChangeColor,);
+
+Function: Facing Angle Of Unit
+Identifier: UnitGetFacing
+
+Description:
+Returns the facing angle of the unit.
+
+Return Type:
+fixed
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native fixed UnitGetFacing(unit inUnit);
+
+Function: Unit Group Is Dead
+Identifier: libNtve_gf_UnitGroupIsDead
+
+Description:
+Returns true if all units in the unit group are dead.  An empty unit group is considered to be dead.
+
+Return Type:
+bool
+
+Parameters:
+- Units: unitgroup
+
+Prototype:
+bool libNtve_gf_UnitGroupIsDead(unitgroup lp_units);
+
+Function: Remove Unit
+Identifier: UnitRemove
+
+Description:
+Removes a unit from the game.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native void UnitRemove(unit inUnit);
+
+Function: Position Of Unit
+Identifier: UnitGetPosition
+
+Description:
+Returns the position of a unit.
+
+Return Type:
+point
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native point UnitGetPosition(unit inUnit);
+
+Function: Move Unit Instantly
+Identifier: UnitSetPosition
+
+Description:
+Moves a unit instantly to the specified point.  The Blend parameter causes the unit art to be interpolated between its old position and the new position over the duration of the next game loop.  Without blending, the unit art will instantly pop to the new location.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Point: point
+- Blend: bool<preset::Enable_Disable_Option2>
+
+Prototype:
+native void UnitSetPosition(unit inUnit,point inPos,bool blend,);
+
+Function: Make Unit Face Angle
+Identifier: UnitSetFacing
+
+Description:
+Makes a unit face a specified angle.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Angle: fixed
+- Duration: fixed
+
+Prototype:
+native void UnitSetFacing(unit inUnit,fixed inFacing,fixed inDuration,);
+
+Function: Pause/Unpause All Units
+Identifier: UnitPauseAll
+
+Description:
+Pauses or unpauses all units on the map.
+
+Return Type:
+void
+
+Parameters:
+- Pause: bool<preset::PauseUnpauseOption>
+
+Prototype:
+native void UnitPauseAll(bool inPause);
+
+Function: Sleep/WakeUp Unit
+Identifier: libNtve_gf_SleepUnit
+
+Description:
+Sleeps or wakes up the specified unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Sleep/WakeUp: bool<preset::SleepWakeUpOption>
+
+Prototype:
+void libNtve_gf_SleepUnit(unit lp_unit,bool lp_sleepWakeUp,);
+
+Function: Goal Position Of Unit
+Identifier: UnitGetGoalPosition
+
+Description:
+Returns the goal (target) position of a unit.
+
+Return Type:
+point
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native point UnitGetGoalPosition(unit inUnit);
+
+Function: Unit Is Hidden
+Identifier: libNtve_gf_UnitIsHidden
+
+Description:
+Returns true if a unit is hidden.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+
+Prototype:
+bool libNtve_gf_UnitIsHidden(unit lp_u);
+
+Function: Show/Hide Unit
+Identifier: libNtve_gf_ShowHideUnit
+
+Description:
+Shows or hides a unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Show/Hide: bool<preset::ShowHideOption>
+
+Prototype:
+void libNtve_gf_ShowHideUnit(unit lp_unit,bool lp_showHide,);
+
+Function: Set Unit Custom Value
+Identifier: UnitSetCustomValue
+
+Description:
+Sets a unit’s custom value.  This is an arbitrary property that can be recalled using“Custom Value Of Unit”.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Index: int
+- Value: fixed
+
+Prototype:
+native void UnitSetCustomValue(unit inUnit,int inIndex,fixed inVal,);
+
+Function: Unit Enters/Leaves Point
+Identifier: TriggerAddEventUnitRangePoint
+
+Description:
+This event fires when a unit enters or leaves a certain distance around a point.  Use“Triggering Unit”to get the unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Point: point
+- Distance: fixed
+- State: bool<preset::RegionEnterLeaveState>
+
+Prototype:
+native void TriggerAddEventUnitRangePoint(trigger t,unitref u,point p,fixed distance,bool state,);
+
+Function: Triggering Region
+Identifier: EventUnitRegion
+
+Description:
+Returns the triggering region.  Use in response to“Unit Enters/Leaves Region”.
+
+Return Type:
+region
+
+Parameters:
+(none)
+
+Prototype:
+native region EventUnitRegion();
+
+Function: Pause/Unpause Unit
+Identifier: libNtve_gf_PauseUnit
+
+Description:
+Pauses or unpauses the specified unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Pause/Unpause: bool<preset::PauseUnpauseOption>
+
+Prototype:
+void libNtve_gf_PauseUnit(unit lp_unit,bool lp_pauseUnpause,);
+
+Function: Unit Enters/Leaves Region
+Identifier: TriggerAddEventUnitRegion
+
+Description:
+This event fires when a unit enters or leaves a region.  Use“Triggering Player”to get the player that was controlling the unit.  Use“Triggering Region”to get the region that the unit either entered or left.  Use“Triggering Unit”to get the unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Region: region
+- State: bool<preset::RegionEnterLeaveState>
+
+Prototype:
+native void TriggerAddEventUnitRegion(trigger t,unitref u,region r,bool state,);
+
+Function: Unit In Region
+Identifier: libNtve_gf_UnitInRegion
+
+Description:
+Returns true if a unit is in the specified region.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+- Region: region
+
+Prototype:
+bool libNtve_gf_UnitInRegion(unit lp_u, region lp_regioin);
+
+Function: Triggering Unit
+Identifier: EventUnit
+
+Description:
+Returns the triggering unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+native unit EventUnit();
+
+Function: Unit Dies
+Identifier: TriggerAddEventUnitDied
+
+Description:
+This event fires when a unit dies.  Use“Damage Source Position”to get the position of the unit that dealt the killing blow.  Use“Killing Player”to get the owner of the unit that dealt the killing blow.  Use“Killing Unit”to get the unit that dealt the killing blow.  Use“Triggering Death Type Check”to get the death type.  Use“Triggering Player”to get the owner of the unit that died.  Use“Triggering Unit”to get the unit that died.  Use“Experience Level Of Unit”to get the experience level of the unit that died.  Use“Total Experience Of Unit”to get the total number of experience points the unit had before it died.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+
+Prototype:
+native void TriggerAddEventUnitDied(trigger t, unitref u);
+
+Function: Killing Unit
+Identifier: libNtve_gf_KillingUnit
+
+Description:
+Returns the killing unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+unit libNtve_gf_KillingUnit();
+
+Function: Unit Absorbs Damage
+Identifier: TriggerAddEventUnitDamageAbsorbed
+
+Description:
+This event fires when a unit absorbs damage due to a behavior damage response.  Use“Triggering Unit”to get the unit that absorbed damage.  Use“Triggering Behavior”to get the behavior that absorbed damage on the unit.  Use“Triggering Damage Absorbed”to get the amount of damage absorbed.  Use“Damaging Unit”and“Damaging Player”to get the unit and player that caused the damage.  Use“Damaging Effect”to get the effect that caused the damage.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Behavior: string<gamelink::Behavior>
+
+Prototype:
+native void TriggerAddEventUnitDamageAbsorbed(trigger inTrigger,unitref inUnit,string inBehavior,);
+
+Function: Unit Starts Attacking (Deprecated)
+Identifier: TriggerAddEventUnitStartedAttack
+
+Description:
+This event fires when a unit starts attacking.  Use“Attacking Unit”or“Triggering Unit”to get the attacker.  Use“Triggering Player”to get the owner of the attacker.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+
+Prototype:
+native void TriggerAddEventUnitStartedAttack(trigger t,unitref u,);
+
+Function: Unit Takes Damage
+Identifier: TriggerAddEventUnitDamaged
+
+Description:
+This event fires when a unit takes damage.  Use“Damage Source Position”to get the position of the damage source.  Use“Damaging Player”to get the owner of the unit that is dealing damage.  Use“Damaging Unit”to get the unit that is dealing damage.  Use“Triggering Damage Amount”to get the amount of damage being dealt.  Use“Triggering Player”to get the owner of the unit that is taking damage.  Use“Triggering Unit”to get the unit that is taking damage.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Damage Type: int<preset::DamageType>
+- Damage Fatal Option: int<preset::DamageFatalOption>
+- Damage Effect: string<gamelink::Effect>
+
+Prototype:
+native void TriggerAddEventUnitDamaged(trigger inTrigger,unitref inUnit,int inDamageType,int inDamageFatal,string inEffect,);
+
+Function: Unit Is Attacked (Deprecated)
+Identifier: TriggerAddEventUnitAttacked
+
+Description:
+This event fires when a unit is attacked.  Use“Attacking Unit”to refer to the unit performing the attack.  Use“Triggering Unit”to refer to the unit being attacked.  Use“Triggering Player”to get the owner of the unit being attacked.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+
+Prototype:
+native void TriggerAddEventUnitAttacked(trigger t,unitref u,);
+
+Function: Damaging Unit
+Identifier: EventUnitDamageSourceUnit
+
+Description:
+Returns the damaging unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+native unit EventUnitDamageSourceUnit();
+
+Function: Damage Source Position
+Identifier: EventUnitDamageSourcePoint
+
+Description:
+Returns the damage source position or where the unit who is dealing damage is standing at.
+
+Return Type:
+point
+
+Parameters:
+(none)
+
+Prototype:
+native point EventUnitDamageSourcePoint();
+
+Function: Healing Effect
+Identifier: EventUnitHealEffect
+
+Description:
+Returns the healing effect.
+
+Return Type:
+string<gamelink::Effect>
+
+Parameters:
+(none)
+
+Prototype:
+native string EventUnitHealEffect();
+
+Function: Unit is Healed
+Identifier: TriggerAddEventUnitHealed
+
+Description:
+This event fires when a unit is healed through effects. Use“Healing Unit”to get the unit casting the heal.  Use“Healing Player”to get the owner of the unit that is dealing damage. Use“Triggering Heal Given”to get the amount healed. Use“Triggering Heal Vital Type”to get the vital type that was healed. Use“Triggering Player”to get the owner of the unit that is healed. Use“Triggering Unit”to get the unit that is healed.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Vital Type: int<preset::UnitVitalType>
+- Heal Effect: string<gamelink::Effect>
+
+Prototype:
+native void TriggerAddEventUnitHealed(trigger inTrigger,unitref inUnit,int inHealType,string inEffect,);
+
+Function: Acquired Target
+Identifier: libNtve_gf_AcquiredTarget
+
+Description:
+Returns the acquired target of a unit.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+unit libNtve_gf_AcquiredTarget();
+
+Function: Unit Acquires Target
+Identifier: TriggerAddEventUnitAcquiredTarget
+
+Description:
+This event fires when a unit acquires a target.  Use“Acquired Target”to get the target that was acquired.  Use“Triggering Player”to get the owner of the unit that acquired a target.  Use“Triggering Unit”to get the unit that acquired a target.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+
+Prototype:
+native void TriggerAddEventUnitAcquiredTarget(trigger t,unitref u,);
+
+Function: Issue Order To Unit Group
+Identifier: UnitGroupIssueOrder
+
+Description:
+Issues an order to all the units in the specified unit group.
+
+Return Type:
+bool
+
+Parameters:
+- Group: unitgroup
+- Order: order
+- Queue: int<preset::Unit_Order_Queue_Option>
+
+Prototype:
+native bool UnitGroupIssueOrder(unitgroup inGroup,order inOrder,int inQueueType,);
+
+Function: Unit Is Issued Order
+Identifier: TriggerAddEventUnitOrder
+
+Description:
+This event fires when a unit is issued an order.  Use“Triggering Order”to get the order.  Use“Triggering Player”to get the player that issued the order.  Use“Triggering Unit”to get the unit that was issued the order.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- Command: abilcmd
+
+Prototype:
+native void TriggerAddEventUnitOrder(trigger t,unitref u,abilcmd a,);
+
+Function: Unit Type Of Unit
+Identifier: UnitGetType
+
+Description:
+Returns the unit type for the specified unit.
+
+Return Type:
+string<gamelink::Unit>
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native string UnitGetType(unit inUnit);
+
+Function: Unit Is Invulnerable
+Identifier: libNtve_gf_UnitIsInvulnerable
+
+Description:
+Returns true if a unit is invulnerable.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+
+Prototype:
+bool libNtve_gf_UnitIsInvulnerable(unit lp_u);
+
+Function: Unit Resources
+Identifier: libNtve_gf_UnitGetPropertyResources
+
+Description:
+Returns the amount of resources a unit has.
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+- Current: bool<preset::CurrentDefaultOption>
+
+Prototype:
+int libNtve_gf_UnitGetPropertyResources(unit lp_u,bool lp_current,);
+
+Function: Unit Kills
+Identifier: libNtve_gf_UnitGetPropertyKills
+
+Description:
+Returns the amount of kills a unit possesses.
+
+Return Type:
+int
+
+Parameters:
+- Unit: unit
+- Current: bool<preset::CurrentDefaultOption>
+
+Prototype:
+int libNtve_gf_UnitGetPropertyKills(unit lp_u,bool lp_current,);
+
+Function: Clear Unit Info
+Identifier: UnitClearInfoText
+
+Description:
+Clears the info text for the specified unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+
+Prototype:
+native void UnitClearInfoText(unit inUnit);
+
+Function: Unit Loads/Unloads Cargo
+Identifier: TriggerAddEventUnitCargo
+
+Description:
+This event fires when a unit loads or unloads cargo.  Use“Triggering Cargo Unit”to get the unit that was loaded or unloaded.  Use“Triggering Player”to get the owner of the transport unit.  Use“Triggering Unit”to get the transport unit.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unitref<unit>
+- State: bool<preset::CargoLoadUnloadState>
+
+Prototype:
+native void TriggerAddEventUnitCargo(trigger t,unitref u,bool state,);
+
+Function: Weapon Is Enabled
+Identifier: UnitWeaponIsEnabled
+
+Description:
+Returns true if a weapon is enabled for a unit.
+
+Return Type:
+bool
+
+Parameters:
+- Unit: unit
+- Weapon: int
+
+Prototype:
+native bool UnitWeaponIsEnabled(unit inUnit, int inIndex);
+
+Function: Triggering Progress Effect
+Identifier: libNtve_gf_TriggeringProgressEffect
+
+Description:
+Returns the triggering progress effect.  Use in response to“Unit Specialization Progress”.
+
+Return Type:
+string<gamelink::Effect>
+
+Parameters:
+(none)
+
+Prototype:
+string libNtve_gf_TriggeringProgressEffect();
+
+Function: Triggering Progress Upgrade
+Identifier: libNtve_gf_TriggeringProgressUpgrade
+
+Description:
+Returns the triggering progress upgrade.  Used in response to“Unit Research Progress”.
+
+Return Type:
+string<gamelink::Upgrade>
+
+Parameters:
+(none)
+
+Prototype:
+string libNtve_gf_TriggeringProgressUpgrade();
+
+Function: Remove Charge Used For Unit
+Identifier: libNtve_gf_UnitRemoveChargeUsed
+
+Description:
+Clears the number of used charges for the specified unit charge link.
+
+Return Type:
+void
+
+Parameters:
+- Unit: unit
+- Charge: string<charge>
+
+Prototype:
+void libNtve_gf_UnitRemoveChargeUsed(unit lp_inUnit,string lp_inCharge,);
+
+Function: Units In Region With Alliance To Player Matching Condition
+Identifier: libNtve_gf_UnitsInRegionWithAllianceToPlayerMatchingCondition
+
+Description:
+Returns a unit group containing all units within the alliance filter specified and match the specified unit filters.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type 1: string<gamelink::Unit>
+- Unit Type 2: string<gamelink::Unit>
+- Unit Type 3: string<gamelink::Unit>
+- Player: int
+- Alliance: int<preset::UnitAllianceWithSelf>
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+unitgroup libNtve_gf_UnitsInRegionWithAllianceToPlayerMatchingCondition(string lp_type,string lp_type2,string lp_type22,int lp_player,int lp_alliance,region lp_reg,unitfilter lp_unitFilter,int lp_count,);
+
+Function: Units In Region Matching Condition
+Identifier: UnitGroup
+
+Description:
+Returns a unit group containing all units that match the specified filters.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native unitgroup UnitGroup(string type,int player,region r,unitfilter filter,int maxCount,);
+
+Function: Units Near Point Matching Condition
+Identifier: UnitGroupSearch
+
+Description:
+Returns a unit group containing all units that match the specified filters within the radius of the specified point.  The player parameter determines the player used for the Unit Filter comparisons.  For example, if you specify Enemy in the Unit Filter, it will get units that are an enemy to the specified player.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Point: point
+- Radius: fixed
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native unitgroup UnitGroupSearch(string type,int player,point p,fixed radius,unitfilter filter,int maxCount,);
+
+Function: Add Unit To Unit Group
+Identifier: UnitGroupAdd
+
+Description:
+Adds the specified unit to the specified unit group.
+
+Return Type:
+void
+
+Parameters:
+- Unit Group: unitgroup
+- Unit: unit
+
+Prototype:
+native void UnitGroupAdd(unitgroup inGroup, unit inUnit);
+
+Function: Units In Unit Group Within Region
+Identifier: UnitGroupFilterRegion
+
+Description:
+Returns a unit group that contains units that are in a certain region from another unit group.
+
+Return Type:
+unitgroup
+
+Parameters:
+- Group: unitgroup
+- Region: region
+- Count: int
+
+Prototype:
+native unitgroup UnitGroupFilterRegion(unitgroup g,region r,int maxCount,);
+
+Function: Unit Count In Region Matching Condition
+Identifier: UnitCount
+
+Description:
+Returns a count of units that match the specified filters.
+
+Return Type:
+int
+
+Parameters:
+- Unit Type: string<gamelink::Unit>
+- Player: int
+- Region: region
+- Unit Filter: unitfilter
+- Count: int
+
+Prototype:
+native int UnitCount(string type,int player,region r,unitfilter filter,int maxCount,);
+
+Function: Add Unit Group To Unit Group Old
+Identifier: libNtve_gf_AddUnitGroupToUnitGroup
+
+Description:
+Adds all the units in the source unit group to the target unit group.
+
+Return Type:
+void
+
+Parameters:
+- Source Unit Group: unitgroup
+- Target Unit Group: unitgroup
+
+Prototype:
+void libNtve_gf_AddUnitGroupToUnitGroup(unitgroup lp_sourceUnitGroup,unitgroup lp_targetUnitGroup,);
+
+Function: Remove Unit From Unit Group
+Identifier: UnitGroupRemove
+
+Description:
+Removes the specified unit from the specified unit group.
+
+Return Type:
+void
+
+Parameters:
+- Unit Group: unitgroup
+- Unit: unit
+
+Prototype:
+native void UnitGroupRemove(unitgroup inGroup,unit inUnit,);
+
+Function: Remove Unit Group From Unit Group Old
+Identifier: libNtve_gf_RemoveUnitGroupFromUnitGroup
+
+Description:
+Removes all the units in the source unit group from the target unit group.
+
+Return Type:
+void
+
+Parameters:
+- Source Unit Group: unitgroup
+- Target Unit Group: unitgroup
+
+Prototype:
+void libNtve_gf_RemoveUnitGroupFromUnitGroup(unitgroup lp_sourceUnitGroup,unitgroup lp_targetUnitGroup,);
+
+Function: Unit From Unit Group
+Identifier: UnitGroupUnit
+
+Description:
+Returns a specific unit, by index, from the unit group.  Use the“Number Of Units In Unit Group”function to determine how many units are in the unit group.
+
+Return Type:
+unit
+
+Parameters:
+- Group: unitgroup
+- Index: int
+
+Prototype:
+native unit UnitGroupUnit(unitgroup inGroup, int inIndex);
+
+Function: Number Of Units In Unit Group
+Identifier: UnitGroupCount
+
+Description:
+Returns the total number of units in the specified unit group.
+
+Return Type:
+int
+
+Parameters:
+- Unit Group: unitgroup
+- Type: int<preset::UnitCountType>
+
+Prototype:
+native int UnitGroupCount(unitgroup inGroup, int inType);
+
+Function: Picked Unit Deprecated
+Identifier: UnitGroupLoopCurrentDeprecated
+
+Description:
+Returns the current unit picked in a“Pick Each Unit In Unit Group”loop.
+
+Return Type:
+unit
+
+Parameters:
+(none)
+
+Prototype:
+native unit UnitGroupLoopCurrentDeprecated();
+
+Function: Enable/Disable Visibility
+Identifier: VisEnable
+
+Description:
+Enables/Disables the specified visibility type.
+
+Return Type:
+void
+
+Parameters:
+- Type: int<preset::VisibilityType>
+- Enable: bool<preset::Enable_Disable_Option>
+
+Prototype:
+native void VisEnable(int visType, bool enable);
+
+
+[Galaxy Presets - 45 loaded]
+
+
+Preset: Attach Points
+
+Base Type: string
+
+Values:
+- Pos - Set Location (identifier: “Pos_SetLocation”, code: —)
+- Pos - Set Location 01 (identifier: “Pos_SetLocation 01”, code: —)
+- Pos - Set Location 02 (identifier: “Pos_SetLocation 02”, code: —)
+- Pos - Set Location 03 (identifier: “Pos_SetLocation 03”, code: —)
+- Pos - Set Location 04 (identifier: “Pos_SetLocation 04”, code: —)
+- Pos - Set Location 05 (identifier: “Pos_SetLocation 05”, code: —)
+- Pos - Set Location 06 (identifier: “Pos_SetLocation 06”, code: —)
+- Pos - Set Location 07 (identifier: “Pos_SetLocation 07”, code: —)
+- Pos - Set Location 08 (identifier: “Pos_SetLocation 08”, code: —)
+- Pos - Set Location 09 (identifier: “Pos_SetLocation 09”, code: —)
+- Pos - Set Location 10 (identifier: “Pos_SetLocation 10”, code: —)
+- Pos - Set Location 11 (identifier: “Pos_SetLocation 11”, code: —)
+- Pos - Set Location 12 (identifier: “Pos_SetLocation 12”, code: —)
+- Pos - Set Location 13 (identifier: “Pos_SetLocation 13”, code: —)
+- Pos - Set Location 14 (identifier: “Pos_SetLocation 14”, code: —)
+- Pos - Set Location 15 (identifier: “Pos_SetLocation 15”, code: —)
+- Pos - Raynor To Tychus (identifier: “Pos_RaynorToTychus”, code: —)
+- Pos - Tychus To Raynor (identifier: “Pos_TychusToRaynor”, code: —)
+- Pos - Raynor To Horner (identifier: “Pos_RaynorToHorner”, code: —)
+- Pos - Horner To Raynor (identifier: “Pos_HornerToRaynor”, code: —)
+- Pos - Raynor To Hanson (identifier: “Pos_RaynorToHanson”, code: —)
+- Pos - Hanson To Raynor (identifier: “Pos_HansonToRaynor”, code: —)
+- Pos - Raynor To Tosh (identifier: “Pos_RaynorToTosh”, code: —)
+- Pos - Tosh To Raynor (identifier: “Pos_ToshToRaynor”, code: —)
+- Pos - Raynor To Swann (identifier: “Pos_RaynorToSwann”, code: —)
+- Pos - Swann To Raynor (identifier: “Pos_SwannToRaynor”, code: —)
+- Pos - Raynor To Adjutant (identifier: “Pos_RaynorToAdjutant”, code: —)
+- Pos - Adjutant To Raynor (identifier: “Pos_AdjutantToRaynor”, code: —)
+- Pos - Raynor (identifier: “Pos_Raynor”, code: —)
+- Pos - Tychus (identifier: “Pos_Tychus”, code: —)
+- Pos - Horner (identifier: “Pos_Horner”, code: —)
+- Pos - Hanson (identifier: “Pos_Hanson”, code: —)
+- Pos - Swann (identifier: “Pos_Swann”, code: —)
+- Pos - Adjutant (identifier: “Pos_Adjutant”, code: —)
+- Pos - Jessica Hall (identifier: “Pos_JessicaHall”, code: —)
+- Pos - Marcus Cade (identifier: “Pos_MarcusCade”, code: —)
+- Pos - Warfield (identifier: “Pos_Warfield”, code: —)
+- Pos - Hill (identifier: “Pos_Hill”, code: —)
+- Pos - Merc 03 (identifier: “Pos_Merc03”, code: —)
+- Pos - Tosh (identifier: “Pos_Tosh”, code: —)
+- Pos - Firebat (identifier: “Pos_Firebat”, code: —)
+- Pos - Siege Tank (identifier: “Pos_SiegeTank”, code: —)
+- Pos - Dropship (identifier: “Pos_Dropship”, code: —)
+- Pos - Viking (identifier: “Pos_Viking”, code: —)
+- Pos - Spidermine (identifier: “Pos_Spidermine”, code: —)
+- Pos - Ghost (identifier: “Pos_Ghost”, code: —)
+- Pos - Banshee (identifier: “Pos_Banshee”, code: —)
+- Pos - Marauder (identifier: “Pos_Marauder”, code: —)
+- Pos - Stetmann (identifier: “Pos_Stetmann”, code: —)
+- Pos - Marine (identifier: “Pos_Marine”, code: —)
+- Pos - Bartender (identifier: “Pos_Bartender”, code: —)
+- Pos - Kerrigan (identifier: “Pos_Kerrigan”, code: —)
+- Pos - Evolution Master (identifier: “Pos_EvolutionMaster”, code: —)
+- Pos - Zagara (identifier: “Pos_Zagara”, code: —)
+- Pos - Primal (identifier: “Pos_Primal”, code: —)
+- Pos - Protoss Scientist (identifier: “Pos_ProtossScientist”, code: —)
+- Pos - Stukov (identifier: “Pos_Stukov”, code: —)
+- Origin (identifier: “Ref_Origin”, code: —)
+- Center (identifier: “Ref_Center”, code: —)
+- Attacher (identifier: “Ref_Attacher”, code: —)
+- Attacher 01 (identifier: “Ref_Attacher 01”, code: —)
+- Attacher 02 (identifier: “Ref_Attacher 02”, code: —)
+- Attacher 03 (identifier: “Ref_Attacher 03”, code: —)
+- Attacher 04 (identifier: “Ref_Attacher 04”, code: —)
+- Attacher 05 (identifier: “Ref_Attacher 05”, code: —)
+- Attacher 06 (identifier: “Ref_Attacher 06”, code: —)
+- Attacher 07 (identifier: “Ref_Attacher 07”, code: —)
+- Attacher 08 (identifier: “Ref_Attacher 08”, code: —)
+- Attacher 09 (identifier: “Ref_Attacher 09”, code: —)
+- Attacher 10 (identifier: “Ref_Attacher 10”, code: —)
+- Attacher 11 (identifier: “Ref_Attacher 11”, code: —)
+- Attacher 12 (identifier: “Ref_Attacher 12”, code: —)
+- Attacher 13 (identifier: “Ref_Attacher 13”, code: —)
+- Attacher 14 (identifier: “Ref_Attacher 14”, code: —)
+- Attacher 15 (identifier: “Ref_Attacher 15”, code: —)
+- Attacher 16 (identifier: “Ref_Attacher 16”, code: —)
+- Attacher 17 (identifier: “Ref_Attacher 17”, code: —)
+- Attacher 18 (identifier: “Ref_Attacher 18”, code: —)
+- Attacher 19 (identifier: “Ref_Attacher 19”, code: —)
+- Chest (identifier: “Ref_Chest”, code: —)
+- Chest Left (identifier: “Ref_Chest Left”, code: —)
+- Chest Right (identifier: “Ref_Chest Right”, code: —)
+- Chest Mount (identifier: “Ref_Chest Mount”, code: —)
+- Chest Mount Left (identifier: “Ref_Chest Mount Left”, code: —)
+- Chest Mount Right (identifier: “Ref_Chest Mount Right”, code: —)
+- Chest Mount Rear (identifier: “Ref_Chest Mount Rear”, code: —)
+- Damage (identifier: “Ref_Damage”, code: —)
+- Damage 01 (identifier: “Ref_Damage 01”, code: —)
+- Damage 02 (identifier: “Ref_Damage 02”, code: —)
+- Damage 03 (identifier: “Ref_Damage 03”, code: —)
+- Damage 04 (identifier: “Ref_Damage 04”, code: —)
+- Damage 05 (identifier: “Ref_Damage 05”, code: —)
+- Damage 06 (identifier: “Ref_Damage 06”, code: —)
+- Damage 07 (identifier: “Ref_Damage 07”, code: —)
+- Damage 08 (identifier: “Ref_Damage 08”, code: —)
+- Damage 09 (identifier: “Ref_Damage 09”, code: —)
+- Damage 10 (identifier: “Ref_Damage 10”, code: —)
+- Damage 11 (identifier: “Ref_Damage 11”, code: —)
+- Damage 12 (identifier: “Ref_Damage 12”, code: —)
+- Damage 13 (identifier: “Ref_Damage 13”, code: —)
+- Damage 14 (identifier: “Ref_Damage 14”, code: —)
+- Damage 15 (identifier: “Ref_Damage 15”, code: —)
+- Damage 16 (identifier: “Ref_Damage 16”, code: —)
+- Damage 17 (identifier: “Ref_Damage 17”, code: —)
+- Damage 18 (identifier: “Ref_Damage 18”, code: —)
+- Damage 19 (identifier: “Ref_Damage 19”, code: —)
+- Elevator (identifier: “Ref_Elevator”, code: —)
+- Engine (identifier: “Ref_Engine”, code: —)
+- Foot Left (identifier: “Ref_Foot Left”, code: —)
+- Foot Left Rear (identifier: “Ref_Foot Left Rear”, code: —)
+- Foot Right (identifier: “Ref_Foot Right”, code: —)
+- Foot Right Rear (identifier: “Ref_Foot Right Rear”, code: —)
+- Hardpoint (identifier: “Ref_Hardpoint”, code: —)
+- Hardpoint 01 (identifier: “Ref_Hardpoint 01”, code: —)
+- Hardpoint 02 (identifier: “Ref_Hardpoint 02”, code: —)
+- Hardpoint 03 (identifier: “Ref_Hardpoint 03”, code: —)
+- Hardpoint 04 (identifier: “Ref_Hardpoint 04”, code: —)
+- Hardpoint 05 (identifier: “Ref_Hardpoint 05”, code: —)
+- Hardpoint 06 (identifier: “Ref_Hardpoint 06”, code: —)
+- Hardpoint 07 (identifier: “Ref_Hardpoint 07”, code: —)
+- Hardpoint 08 (identifier: “Ref_Hardpoint 08”, code: —)
+- Hardpoint 09 (identifier: “Ref_Hardpoint 09”, code: —)
+- Hardpoint 10 (identifier: “Ref_Hardpoint 10”, code: —)
+- Hardpoint 11 (identifier: “Ref_Hardpoint 11”, code: —)
+- Hardpoint 12 (identifier: “Ref_Hardpoint 12”, code: —)
+- Hardpoint 13 (identifier: “Ref_Hardpoint 13”, code: —)
+- Hardpoint 14 (identifier: “Ref_Hardpoint 14”, code: —)
+- Hardpoint 15 (identifier: “Ref_Hardpoint 15”, code: —)
+- Hardpoint 16 (identifier: “Ref_Hardpoint 16”, code: —)
+- Hardpoint 17 (identifier: “Ref_Hardpoint 17”, code: —)
+- Hardpoint 18 (identifier: “Ref_Hardpoint 18”, code: —)
+- Hardpoint 19 (identifier: “Ref_Hardpoint 19”, code: —)
+- Hardpoint Left (identifier: “Ref_Hardpoint Left”, code: —)
+- Hardpoint Right (identifier: “Ref_Hardpoint Right”, code: —)
+- Head (identifier: “Ref_Head”, code: —)
+- Head Mount (identifier: “Ref_Head Mount”, code: —)
+- Hand Left (identifier: “Ref_Hand Left”, code: —)
+- Hand Right (identifier: “Ref_Hand Right”, code: —)
+- Hit (identifier: “Ref_Hit”, code: —)
+- Hit 01 (identifier: “Ref_Hit 01”, code: —)
+- Hit 02 (identifier: “Ref_Hit 02”, code: —)
+- Hit 03 (identifier: “Ref_Hit 03”, code: —)
+- Hit 04 (identifier: “Ref_Hit 04”, code: —)
+- Hit 05 (identifier: “Ref_Hit 05”, code: —)
+- Hit 06 (identifier: “Ref_Hit 06”, code: —)
+- Hit 07 (identifier: “Ref_Hit 07”, code: —)
+- Hit 08 (identifier: “Ref_Hit 08”, code: —)
+- Hit 09 (identifier: “Ref_Hit 09”, code: —)
+- Mount (identifier: “Ref_Mount”, code: —)
+- Overhead (identifier: “Ref_Overhead”, code: —)
+- Planet - Agria (identifier: “Ref_Agria”, code: —)
+- Planet - Aiur (identifier: “Ref_Aiur”, code: —)
+- Planet - Albion (identifier: “Ref_Albion”, code: —)
+- Planet - Avernus (identifier: “Ref_Avernus”, code: —)
+- Planet - Bel Shir (identifier: “Ref_BelShir”, code: —)
+- Planet - Castanar (identifier: “Ref_Castanar”, code: —)
+- Planet - Char (identifier: “Ref_Char”, code: —)
+- Planet - Dylar (identifier: “Ref_Dylar”, code: —)
+- Planet - Haven (identifier: “Ref_Haven”, code: —)
+- Planet - Korhal (identifier: “Ref_Korhal”, code: —)
+- Planet - Mar Sara (identifier: “Ref_MarSara”, code: —)
+- Planet - Meinhoff (identifier: “Ref_Meinhoff”, code: —)
+- Planet - Monlyth (identifier: “Ref_Monlyth”, code: —)
+- Planet - Moria (identifier: “Ref_Moria”, code: —)
+- Planet - New Folsom (identifier: “Ref_NewFolsom”, code: —)
+- Planet - Port Zion (identifier: “Ref_PortZion”, code: —)
+- Planet - PU72516J (identifier: “Ref_PU72516J”, code: —)
+- Planet - Redstone (identifier: “Ref_Redstone”, code: —)
+- Planet - Tarsonis (identifier: “Ref_Tarsonis”, code: —)
+- Planet - Tyrador (identifier: “Ref_Tyrador”, code: —)
+- Planet - Umoja (identifier: “Ref_Umoja”, code: —)
+- Planet - Valhalla (identifier: “Ref_Valhalla”, code: —)
+- Planet - Xil (identifier: “Ref_Xil”, code: —)
+- Rally Point (identifier: “Ref_RallyPoint”, code: —)
+- Shield (identifier: “Ref_Shield”, code: —)
+- Status Bar (identifier: “Ref_StatusBar”, code: —)
+- Status Bar 01 (identifier: “Ref_StatusBar 01”, code: —)
+- Status Bar 02 (identifier: “Ref_StatusBar 02”, code: —)
+- Status Bar 03 (identifier: “Ref_StatusBar 03”, code: —)
+- Status Bar 04 (identifier: “Ref_StatusBar 04”, code: —)
+- Status Bar 05 (identifier: “Ref_StatusBar 05”, code: —)
+- Status Bar 06 (identifier: “Ref_StatusBar 06”, code: —)
+- Status Bar 07 (identifier: “Ref_StatusBar 07”, code: —)
+- Status Bar 08 (identifier: “Ref_StatusBar 08”, code: —)
+- Status Bar 09 (identifier: “Ref_StatusBar 09”, code: —)
+- Status Bar 10 (identifier: “Ref_StatusBar 10”, code: —)
+- Status Bar 11 (identifier: “Ref_StatusBar 11”, code: —)
+- Status Bar 12 (identifier: “Ref_StatusBar 12”, code: —)
+- Status Bar 13 (identifier: “Ref_StatusBar 13”, code: —)
+- Status Bar 14 (identifier: “Ref_StatusBar 14”, code: —)
+- Status Bar 15 (identifier: “Ref_StatusBar 15”, code: —)
+- Status Bar 16 (identifier: “Ref_StatusBar 16”, code: —)
+- Status Bar 17 (identifier: “Ref_StatusBar 17”, code: —)
+- Status Bar 18 (identifier: “Ref_StatusBar 18”, code: —)
+- Status Bar 19 (identifier: “Ref_StatusBar 19”, code: —)
+- Target (identifier: “Ref_Target”, code: —)
+- Target 01 (identifier: “Ref_Target 01”, code: —)
+- Target 02 (identifier: “Ref_Target 02”, code: —)
+- Target 03 (identifier: “Ref_Target 03”, code: —)
+- Target 04 (identifier: “Ref_Target 04”, code: —)
+- Target 05 (identifier: “Ref_Target 05”, code: —)
+- Target 06 (identifier: “Ref_Target 06”, code: —)
+- Target 07 (identifier: “Ref_Target 07”, code: —)
+- Target 08 (identifier: “Ref_Target 08”, code: —)
+- Target 09 (identifier: “Ref_Target 09”, code: —)
+- Target 10 (identifier: “Ref_Target 10”, code: —)
+- Target 11 (identifier: “Ref_Target 11”, code: —)
+- Target 12 (identifier: “Ref_Target 12”, code: —)
+- Target 13 (identifier: “Ref_Target 13”, code: —)
+- Target 14 (identifier: “Ref_Target 14”, code: —)
+- Target 15 (identifier: “Ref_Target 15”, code: —)
+- Target 16 (identifier: “Ref_Target 16”, code: —)
+- Target 17 (identifier: “Ref_Target 17”, code: —)
+- Target 18 (identifier: “Ref_Target 18”, code: —)
+- Target 19 (identifier: “Ref_Target 19”, code: —)
+- Target 20 (identifier: “Ref_Target 20”, code: —)
+- Target 21 (identifier: “Ref_Target 21”, code: —)
+- Target 22 (identifier: “Ref_Target 22”, code: —)
+- Target 23 (identifier: “Ref_Target 23”, code: —)
+- Target 24 (identifier: “Ref_Target 24”, code: —)
+- Target 25 (identifier: “Ref_Target 25”, code: —)
+- Target 26 (identifier: “Ref_Target 26”, code: —)
+- Target 27 (identifier: “Ref_Target 27”, code: —)
+- Target 28 (identifier: “Ref_Target 28”, code: —)
+- Target 29 (identifier: “Ref_Target 29”, code: —)
+- Target 30 (identifier: “Ref_Target 30”, code: —)
+- Target 31 (identifier: “Ref_Target 31”, code: —)
+- Target 32 (identifier: “Ref_Target 32”, code: —)
+- Target 33 (identifier: “Ref_Target 33”, code: —)
+- Target 34 (identifier: “Ref_Target 34”, code: —)
+- Target 35 (identifier: “Ref_Target 35”, code: —)
+- Target 36 (identifier: “Ref_Target 36”, code: —)
+- Target 37 (identifier: “Ref_Target 37”, code: —)
+- Target 38 (identifier: “Ref_Target 38”, code: —)
+- Target 39 (identifier: “Ref_Target 39”, code: —)
+- Target 40 (identifier: “Ref_Target 40”, code: —)
+- Target Final (identifier: “Ref_Target Final”, code: —)
+- Target Heavy (identifier: “Ref_Target Heavy”, code: —)
+- Target Light (identifier: “Ref_Target Light”, code: —)
+- Target Medium (identifier: “Ref_Target Medium”, code: —)
+- Target Shield (identifier: “Ref_Target Shield”, code: —)
+- Transmission (identifier: “Ref_Transmission”, code: —)
+- Turret (identifier: “Ref_Turret”, code: —)
+- Turret Y (identifier: “Ref_TurretY”, code: —)
+- Turret Z (identifier: “Ref_TurretZ”, code: —)
+- Upgrade (identifier: “Ref_Upgrade”, code: —)
+- Upgrade Armor (identifier: “Ref_Upgrade Armor”, code: —)
+- Upgrade Engine (identifier: “Ref_Upgrade Engine”, code: —)
+- Upgrade Engine Bottom (identifier: “Ref_Upgrade Engine Bottom”, code: —)
+- Upgrade Engine Left (identifier: “Ref_Upgrade Engine Left”, code: —)
+- Upgrade Engine Right (identifier: “Ref_Upgrade Engine Right”, code: —)
+- Upgrade Weapon (identifier: “Ref_Upgrade Weapon”, code: —)
+- Upgrade Weapon Bottom (identifier: “Ref_Upgrade Weapon Bottom”, code: —)
+- Upgrade Weapon Left (identifier: “Ref_Upgrade Weapon Left”, code: —)
+- Upgrade Weapon Right (identifier: “Ref_Upgrade Weapon Right”, code: —)
+- Weapon (identifier: “Ref_Weapon”, code: —)
+- Weapon 01 (identifier: “Ref_Weapon 01”, code: —)
+- Weapon 02 (identifier: “Ref_Weapon 02”, code: —)
+- Weapon 03 (identifier: “Ref_Weapon 03”, code: —)
+- Weapon 04 (identifier: “Ref_Weapon 04”, code: —)
+- Weapon 05 (identifier: “Ref_Weapon 05”, code: —)
+- Weapon 06 (identifier: “Ref_Weapon 06”, code: —)
+- Weapon 07 (identifier: “Ref_Weapon 07”, code: —)
+- Weapon 08 (identifier: “Ref_Weapon 08”, code: —)
+- Weapon 09 (identifier: “Ref_Weapon 09”, code: —)
+- Weapon 10 (identifier: “Ref_Weapon 10”, code: —)
+- Weapon 11 (identifier: “Ref_Weapon 11”, code: —)
+- Weapon 12 (identifier: “Ref_Weapon 12”, code: —)
+- Weapon 13 (identifier: “Ref_Weapon 13”, code: —)
+- Weapon 14 (identifier: “Ref_Weapon 14”, code: —)
+- Weapon 15 (identifier: “Ref_Weapon 15”, code: —)
+- Weapon 16 (identifier: “Ref_Weapon 16”, code: —)
+- Weapon 17 (identifier: “Ref_Weapon 17”, code: —)
+- Weapon 18 (identifier: “Ref_Weapon 18”, code: —)
+- Weapon 19 (identifier: “Ref_Weapon 19”, code: —)
+- Weapon 20 (identifier: “Ref_Weapon 20”, code: —)
+- Weapon 21 (identifier: “Ref_Weapon 21”, code: —)
+- Weapon 22 (identifier: “Ref_Weapon 22”, code: —)
+- Weapon 23 (identifier: “Ref_Weapon 23”, code: —)
+- Weapon 24 (identifier: “Ref_Weapon 24”, code: —)
+- Weapon 25 (identifier: “Ref_Weapon 25”, code: —)
+- Weapon 26 (identifier: “Ref_Weapon 26”, code: —)
+- Weapon 27 (identifier: “Ref_Weapon 27”, code: —)
+- Weapon 28 (identifier: “Ref_Weapon 28”, code: —)
+- Weapon 29 (identifier: “Ref_Weapon 29”, code: —)
+- Weapon 30 (identifier: “Ref_Weapon 30”, code: —)
+- Weapon Bottom (identifier: “Ref_Weapon Bottom”, code: —)
+- Weapon Left (identifier: “Ref_Weapon Left”, code: —)
+- Weapon Right (identifier: “Ref_Weapon Right”, code: —)
+
+Preset: No Doodad
+
+Base Type: doodad
+
+Values:
+- No Doodad (identifier: null, code: —)
+
+Preset: AI Beacon Type
+
+Base Type: int
+
+Values:
+- Beacon Defend (identifier: c_beaconDefend, code: 1)
+- Beacon Attack (identifier: c_beaconAttack, code: 2)
+- Beacon Harass (identifier: c_beaconHarass, code: 3)
+- Beacon Idle (identifier: c_beaconIdle, code: 4)
+- Beacon Auto (identifier: c_beaconAuto, code: 5)
+- Beacon Detect (identifier: c_beaconDetect, code: 6)
+- Beacon Scout (identifier: c_beaconScout, code: 7)
+- Beacon Claim (identifier: c_beaconClaim, code: 8)
+- Beacon Expand (identifier: c_beaconExpand, code: 9)
+- Beacon Rally (identifier: c_beaconRally, code: 10)
+- Beacon Custom1 (identifier: c_beaconCustom1, code: 11)
+- Beacon Custom2 (identifier: c_beaconCustom2, code: 12)
+- Beacon Custom3 (identifier: c_beaconCustom3, code: 13)
+- Beacon Custom4 (identifier: c_beaconCustom4, code: 14)
+
+Preset: AI Mode
+
+Base Type: bool
+
+Values:
+- Campaign (identifier: true, code: —)
+- Melee (identifier: false, code: —)
+
+Preset: Camera Direction
+
+Base Type: int
+
+Values:
+- X (identifier: c_cameraDirectionX, code: 0)
+- Y (identifier: c_cameraDirectionY, code: 1)
+- Z (identifier: c_cameraDirectionZ, code: 2)
+- XY (identifier: c_cameraDirectionXY, code: 3)
+- XZ (identifier: c_cameraDirectionXZ, code: 4)
+- YZ (identifier: c_cameraDirectionYZ, code: 5)
+- XYZ (identifier: c_cameraDirectionXYZ, code: 6)
+
+Preset: Catalog Type
+
+Base Type: int
+
+Values:
+- Abilities (identifier: c_gameCatalogAbil, code: 0)
+- Accumulator (identifier: c_gameCatalogAccumulator, code: 105)
+- Achievements (identifier: c_gameCatalogAchievement, code: 1)
+- Achievement Terms (identifier: c_gameCatalogAchievementTerm, code: 2)
+- Actors (identifier: c_gameCatalogActor, code: 3)
+- Actor Support (identifier: c_gameCatalogActorSupport, code: 4)
+- Alerts (identifier: c_gameCatalogAlert, code: 5)
+- Army Category (identifier: c_gameCatalogArmyCategory, code: 6)
+- Army Unit (identifier: c_gameCatalogArmyUnit, code: 7)
+- Army Upgrade (identifier: c_gameCatalogArmyUpgrade, code: 8)
+- Artifact (identifier: c_gameCatalogArtifact, code: 9)
+- Attach Methods (identifier: c_gameCatalogAttachMethod, code: 11)
+- Bank Conditions (identifier: c_gameCatalogBankCondition, code: 12)
+- Beams (identifier: c_gameCatalogBeam, code: 13)
+- Behaviors (identifier: c_gameCatalogBehavior, code: 14)
+- Buttons (identifier: c_gameCatalogButton, code: 17)
+- Cameras (identifier: c_gameCatalogCamera, code: 18)
+- Characters (identifier: c_gameCatalogCharacter, code: 20)
+- Cliffs (identifier: c_gameCatalogCliff, code: 21)
+- Cliff Meshes (identifier: c_gameCatalogCliffMesh, code: 22)
+- Commander (identifier: c_gameCatalogCommander, code: 24)
+- Configs (identifier: c_gameCatalogConfig, code: 25)
+- Conversations (identifier: c_gameCatalogConversation, code: 27)
+- Conversation States (identifier: c_gameCatalogConversationState, code: 28)
+- Cursors (identifier: c_gameCatalogCursor, code: 29)
+- Data Collection (identifier: c_gameCatalogDataCollection, code: 107)
+- Data Collection Pattern (identifier: c_gameCatalogDataCollectionPattern, code: 108)
+- Digital Sound Processing (identifier: c_gameCatalogDSP, code: 31)
+- Effects (identifier: c_gameCatalogEffect, code: 32)
+- Errors (identifier: c_gameCatalogError, code: 35)
+- Footprints (identifier: c_gameCatalogFootprint, code: 36)
+- Fog of War (identifier: c_gameCatalogFoW, code: 37)
+- Game (identifier: c_gameCatalogGame, code: 38)
+- Game UI (identifier: c_gameCatalogGameUI, code: 39)
+- Herd (identifier: c_gameCatalogHerd, code: 40)
+- Herd Nodes (identifier: c_gameCatalogHerdNode, code: 41)
+- Hero (identifier: c_gameCatalogHero, code: 42)
+- Hero Ability (identifier: c_gameCatalogHeroAbil, code: 43)
+- Hero Statistic (identifier: c_gameCatalogHeroStat, code: 44)
+- Items (identifier: c_gameCatalogItem, code: 45)
+- Item Classes (identifier: c_gameCatalogItemClass, code: 46)
+- Item Containers (identifier: c_gameCatalogItemContainer, code: 47)
+- Lights (identifier: c_gameCatalogLight, code: 50)
+- Location (identifier: c_gameCatalogLocation, code: 51)
+- Loot (identifier: c_gameCatalogLoot, code: 52)
+- Map (identifier: c_gameCatalogMap, code: 53)
+- Models (identifier: c_gameCatalogModel, code: 54)
+- Mounts (identifier: c_gameCatalogMount, code: 55)
+- Movers (identifier: c_gameCatalogMover, code: 56)
+- Objective (identifier: c_gameCatalogObjective, code: 57)
+- Physics Materials (identifier: c_gameCatalogPhysicsMaterial, code: 58)
+- Player Response (identifier: c_gameCatalogPlayerResponse, code: 106)
+- Preload (identifier: c_gameCatalogPreload, code: 61)
+- Races (identifier: c_gameCatalogRace, code: 63)
+- Tech Tree Requirements (identifier: c_gameCatalogRequirement, code: 65)
+- Tech Tree Requirement Nodes (identifier: c_gameCatalogRequirementNode, code: 66)
+- Reverb (identifier: c_gameCatalogReverb, code: 67)
+- Rewards (identifier: c_gameCatalogReward, code: 68)
+- Score Results (identifier: c_gameCatalogScoreResult, code: 69)
+- Score Value (identifier: c_gameCatalogScoreValue, code: 70)
+- Skins (identifier: c_gameCatalogSkin, code: 72)
+- Sounds (identifier: c_gameCatalogSound, code: 74)
+- Soundtrack (identifier: c_gameCatalogSoundtrack, code: 77)
+- Stim Pack (identifier: c_gameCatalogStimPack, code: 104)
+- Tactical Cooldowns (identifier: c_gameCatalogTacCooldown, code: 80)
+- Tactical AI (identifier: c_gameCatalogTactical, code: 81)
+- Talent (identifier: c_gameCatalogTalent, code: 82)
+- Talent Profile (identifier: c_gameCatalogTalentProfile, code: 83)
+- Target Find (identifier: c_gameCatalogTargetFind, code: 84)
+- Target Sort (identifier: c_gameCatalogTargetSort, code: 85)
+- Terrain (identifier: c_gameCatalogTerrain, code: 86)
+- Terrain Objects (identifier: c_gameCatalogTerrainObject, code: 87)
+- Terrain Textures (identifier: c_gameCatalogTerrainTex, code: 88)
+- Textures (identifier: c_gameCatalogTexture, code: 89)
+- Terrain Tiles (identifier: c_gameCatalogTile, code: 91)
+- Turrets (identifier: c_gameCatalogTurret, code: 93)
+- Units (identifier: c_gameCatalogUnit, code: 94)
+- Upgrades (identifier: c_gameCatalogUpgrade, code: 95)
+- User Data (identifier: c_gameCatalogUser, code: 96)
+- Validators (identifier: c_gameCatalogValidator, code: 97)
+- Voice Over (identifier: c_gameCatalogVoiceOver, code: 98)
+- Water (identifier: c_gameCatalogWater, code: 102)
+- Weapons (identifier: c_gameCatalogWeapon, code: 103)
+
+Preset: Dialog Item Type
+
+Base Type: int
+
+Values:
+- Label (identifier: c_triggerControlTypeLabel, code: 1)
+- Image (identifier: c_triggerControlTypeImage, code: 2)
+- Button (identifier: c_triggerControlTypeButton, code: 3)
+- Check Box (identifier: c_triggerControlTypeCheckBox, code: 4)
+- List Box (identifier: c_triggerControlTypeListBox, code: 5)
+- Pulldown (identifier: c_triggerControlTypePulldown, code: 6)
+- Progress Bar (identifier: c_triggerControlTypeProgressBar, code: 7)
+- Slider (identifier: c_triggerControlTypeSlider, code: 8)
+- Edit Box (identifier: c_triggerControlTypeEditBox, code: 9)
+- Flash (identifier: c_triggerControlTypeFlash, code: 10)
+- Achievement (identifier: c_triggerControlTypeAchievement, code: 11)
+- Panel (identifier: c_triggerControlTypePanel, code: 12)
+- Movie (identifier: c_triggerControlTypeMovie, code: 13)
+- Tooltip (identifier: c_triggerControlTypeTooltip, code: 14)
+- Unit Status (identifier: c_triggerControlTypeUnitStatus, code: 15)
+- Portrait (identifier: c_triggerControlTypePortrait, code: 16)
+- Unit Model (identifier: c_triggerControlTypeUnitModel, code: 17)
+- Offscreen Unit (identifier: c_triggerControlTypeOffscreenUnit, code: 18)
+- Unit Target (identifier: c_triggerControlTypeUnitTarget, code: 19)
+- Unit Status Bar (identifier: c_triggerControlTypeUnitStatusBar, code: 20)
+- Unit Status Duration Bar (identifier: c_triggerControlTypeUnitStatusDurationBar, code: 21)
+- Cutscene (identifier: c_triggerControlTypeCutscene, code: 22)
+- Command Panel (identifier: c_triggerControlTypeCommandPanel, code: 23)
+- Hero Cutscene (identifier: c_triggerControlTypeHeroCutscene, code: 24)
+- Countdown Label (identifier: c_triggerControlTypeCountdownLabel, code: 25)
+- Unit Status Label (identifier: c_triggerControlTypeUnitStatusLabel, code: 26)
+- Score Value Frame (identifier: c_triggerControlTypeScoreValueFrame, code: 27)
+- Graph Frame (identifier: c_triggerControlTypeGraphFrame, code: 28)
+- Invnentory Panel (identifier: c_triggerControlTypeInvnentoryPanel, code: 32)
+- Portrait Panel (identifier: c_triggerControlTypePortraitPanel, code: 33)
+
+Preset: Dialog Item Render Type
+
+Base Type: int
+
+Values:
+- HDR (identifier: c_triggerRenderTypeHDR, code: 1)
+- LDR (identifier: c_triggerRenderTypeLDR, code: 2)
+
+Preset: Environment Type
+
+Base Type: int
+
+Values:
+- All Environment Types (identifier: c_environmentAll, code: 0)
+- Terrain (identifier: c_environmentTerrain, code: 1)
+- Water (identifier: c_environmentWater, code: 2)
+- Doodads (identifier: c_environmentDoodads, code: 3)
+- Background (Fixed) (identifier: c_environmentBackgroundFixed, code: 4)
+- Background (Terrain) (identifier: c_environmentBackgroundTerrain, code: 5)
+
+Preset: Creep Speed Type
+
+Base Type: int
+
+Values:
+- Growth (identifier: c_creepSpeedGrowth, code: 0)
+- Decay (identifier: c_creepSpeedDecay, code: 1)
+- Blend (identifier: c_creepSpeedBlend, code: 2)
+
+Preset: Explosion Type
+
+Base Type: int
+
+Values:
+- Terran (identifier: libNtve_ge_ExplosionType_Terran, code: 0)
+- Protoss (identifier: libNtve_ge_ExplosionType_Protoss, code: 1)
+- Zerg (identifier: libNtve_ge_ExplosionType_Zerg, code: 2)
+
+Preset: Damage Location
+
+Base Type: int
+
+Values:
+- Attacker (identifier: c_damageLocationAttacker, code: 0)
+- Defender (identifier: c_damageLocationDefender, code: 1)
+
+Preset: Resource Type
+
+Base Type: int
+
+Values:
+- Minerals (identifier: c_resourceTypeMinerals, code: 0)
+- Vespene (identifier: c_resourceTypeVespene, code: 1)
+- Terrazine (identifier: c_resourceTypeTerrazine, code: 2)
+- Custom Resource (identifier: c_resourceTypeCustom, code: 3)
+
+Preset: Map Type
+
+Base Type: int
+
+Values:
+- Mission (identifier: c_mapKindMission, code: 0)
+- Story (identifier: c_mapKindStory, code: 1)
+- Upgrade (identifier: c_mapKindUpgrade, code: 2)
+
+Preset: Pause/Unpause Option
+
+Base Type: bool
+
+Values:
+- Pause (identifier: true, code: —)
+- Unpause (identifier: false, code: —)
+
+Preset: No Objective
+
+Base Type: objective
+
+Values:
+- No Objective (identifier: c_invalidObjectiveId, code: 0)
+
+Preset: Order Target Type
+
+Base Type: int
+
+Values:
+- None (identifier: c_orderTargetNone, code: 0)
+- Point (identifier: c_orderTargetPoint, code: 1)
+- Unit (identifier: c_orderTargetUnit, code: 2)
+- Item (identifier: c_orderTargetItem, code: 3)
+
+Preset: Player Property (Get)
+
+Base Type: int
+
+Values:
+- Minerals (identifier: c_playerPropMinerals, code: 0)
+- Vespene (identifier: c_playerPropVespene, code: 1)
+- Terrazine (identifier: c_playerPropTerrazine, code: 2)
+- Custom Resource (identifier: c_playerPropCustom, code: 3)
+- Supplies Used (identifier: c_playerPropSuppliesUsed, code: 4)
+- Supplies Made (identifier: c_playerPropSuppliesMade, code: 5)
+- Supplies Limit (identifier: c_playerPropSuppliesLimit, code: 6)
+- Credits (identifier: c_playerPropCredits, code: 7)
+- Credits Spent (identifier: c_playerPropCreditsSpent, code: 8)
+- Research Points (identifier: c_playerPropResearchPoints, code: 9)
+- Research Points Spent (identifier: c_playerPropResearchPointsSpent, code: 10)
+- Curriculum Score (identifier: c_playerPropCurriculumScore, code: 20)
+- Handicap (identifier: c_playerPropHandicap, code: 11)
+- Minerals Collected (identifier: c_playerPropMineralsCollected, code: 12)
+- Vespene Collected (identifier: c_playerPropVespeneCollected, code: 13)
+- Terrazine Collected (identifier: c_playerPropTerrazineCollected, code: 14)
+- Custom Resource Collected (identifier: c_playerPropCustomCollected, code: 15)
+- Percentage Damage Dealt (identifier: c_playerPropDamageDealtPercent, code: 16)
+- Percentage Damage Taken (identifier: c_playerPropDamageTakenPercent, code: 17)
+- Time Damage Last Dealt (identifier: c_playerPropDamageDealtTime, code: 18)
+- Time Damage Last Taken (identifier: c_playerPropDamageTakenTime, code: 19)
+
+Preset: Player Alliance
+
+Base Type: int
+
+Values:
+- Allies (identifier: c_playerGroupAlly, code: 0)
+- Enemies (identifier: c_playerGroupEnemy, code: 1)
+
+Preset: No Portrait
+
+Base Type: portrait
+
+Values:
+- No Portrait (identifier: c_invalidPortraitId, code: 0)
+
+Preset: Any Region
+
+Base Type: region
+
+Values:
+- Any Region (identifier: null, code: —)
+
+Preset: Unit Selection Store Option
+
+Base Type: int
+
+Values:
+- Clear Unit Selection (identifier: libNtve_ge_UnitSelectionStoreOption_ClearUnitSelection, code: 0)
+- Do Not Clear Unit Selection (identifier: libNtve_ge_UnitSelectionStoreOption_DoNotClearUnitSelection, code: 1)
+
+Preset: Global Sound
+
+Base Type: int
+
+Values:
+- Global Sound (identifier: c_maxPlayers, code: 16)
+
+Preset: Planet Panel Contact Button State
+
+Base Type: int
+
+Values:
+- Disabled (identifier: c_planetPanelContactButtonStateDisabled, code: 0)
+- Blinking (identifier: c_planetPanelContactButtonStateBlinking, code: 1)
+- Play (identifier: c_planetPanelContactButtonStatePlay, code: 2)
+- Pause (identifier: c_planetPanelContactButtonStatePause, code: 3)
+- Off (identifier: c_planetPanelContactButtonStateOff, code: 4)
+
+Preset: Mission Archive Type
+
+Base Type: int
+
+Values:
+- Mission (identifier: c_battleReportTypeMission, code: 0)
+- Scene (identifier: c_battleReportTypeScene, code: 1)
+
+Preset: Time Type
+
+Base Type: int
+
+Values:
+- Real Time (identifier: c_timeReal, code: 1)
+- Game Time (identifier: c_timeGame, code: 0)
+- AI Time (identifier: c_timeAI, code: 2)
+
+Preset: Timer Window Component
+
+Base Type: int
+
+Values:
+- Title (identifier: c_timerWindowColorTitle, code: 0)
+- Time (identifier: c_timerWindowColorTime, code: 1)
+- Background (identifier: c_timerWindowColorBackground, code: 2)
+
+Preset: Any Trigger
+
+Base Type: trigger
+
+Values:
+- Any Trigger (identifier: null, code: —)
+
+Preset: GameUIStoreIndex
+
+Base Type: int
+
+Values:
+- GameUI (identifier: libNtve_ge_GameUIStoreIndex_GameUI, code: 0)
+- CinematicMode (identifier: libNtve_ge_GameUIStoreIndex_CinematicMode, code: 1)
+- StoryMode (identifier: libNtve_ge_GameUIStoreIndex_StoryMode, code: 2)
+
+Preset: UI Hotkey
+
+Base Type: int
+
+Values:
+- Camera Follow (identifier: c_hotkeyCameraFollow, code: 78)
+- Camera Center (identifier: c_hotkeyCameraCenter, code: 77)
+- Achievements Menu (identifier: c_hotkeyMenuAchievements, code: 13)
+
+Preset: Custom Dialog Result
+
+Base Type: int
+
+Values:
+- Any (identifier: libNtve_ge_CustomDialogResult_c_customDialogResultAny, code: 0)
+- Yes (identifier: libNtve_ge_CustomDialogResult_c_customDialogResultYes, code: 1)
+- No (identifier: libNtve_ge_CustomDialogResult_c_customDialogResultNo, code: 2)
+
+Preset: Custom Dialog Type
+
+Base Type: int
+
+Values:
+- Message (identifier: libNtve_ge_CustomDialogType_c_customDialogTypeMessage, code: 0)
+- Query (identifier: libNtve_ge_CustomDialogType_c_customDialogTypeQuery, code: 1)
+
+Preset: Path Display Location
+
+Base Type: int
+
+Values:
+- All (identifier: c_pathLocationAll, code: -1)
+- World (identifier: c_pathLocationWorld, code: 0)
+- Minimap (identifier: c_pathLocationMinimap, code: 1)
+
+Preset: Status Bar Display
+
+Base Type: int
+
+Values:
+- Owner (identifier: c_unitStatusGroupOwner, code: 0)
+- Allied (identifier: c_unitStatusGroupAllied, code: 1)
+- Enemy (identifier: c_unitStatusGroupEnemy, code: 2)
+- All (identifier: c_unitStatusGroupAll, code: 3)
+- None (identifier: **, code: —)
+
+Preset: Any Weapon
+
+Base Type: gamelink
+
+Values:
+(none)
+
+Preset: Spend Location
+
+Base Type: int
+
+Values:
+- Ability (identifier: c_spendLocationAbility, code: 0)
+- Behavior (identifier: c_spendLocationBehavior, code: 1)
+- Unit (identifier: c_spendLocationUnit, code: 2)
+- Player (identifier: c_spendLocationPlayer, code: 3)
+- Global (identifier: c_spendLocationGlobal, code: 4)
+- All (identifier: c_spendLocationAll, code: -1)
+
+Preset: Unit Cost Type
+
+Base Type: int
+
+Values:
+- Minerals (identifier: c_unitCostMinerals, code: 0)
+- Vespene (identifier: c_unitCostVespene, code: 1)
+- Terrazine (identifier: c_unitCostTerrazine, code: 2)
+- Custom Resource (identifier: c_unitCostCustomResource, code: 3)
+- Sum - Minerals, Vespene (identifier: c_unitCostSumMineralsVespene, code: 4)
+
+Preset: Unit Collide
+
+Base Type: int
+
+Values:
+- Burrow (identifier: c_unitCollideLand1, code: 0)
+- Swarm (identifier: c_unitCollideLand4, code: 3)
+- Structure (identifier: c_unitCollideLand6, code: 5)
+- Flying Immobile (identifier: c_unitCollideAir2, code: 17)
+- Flying Escorts (identifier: c_unitCollideAir3, code: 18)
+- Ground (identifier: c_unitCollideLand2, code: 1)
+- Flying (identifier: c_unitCollideAir1, code: 16)
+- Colossus (identifier: c_unitCollideLand5, code: 4)
+- Larva (identifier: c_unitCollideLand3, code: 2)
+- Roach Burrow (identifier: c_unitCollideLand7, code: 6)
+- Tiny Critter (identifier: c_unitCollideLand8, code: 7)
+- Force Field (identifier: c_unitCollideLand9, code: 8)
+- Creep Tumor (identifier: c_unitCollideLand10, code: 9)
+
+Preset: Unit Damage Change Option
+
+Base Type: int
+
+Values:
+- Full (identifier: libNtve_ge_UnitDamageChangeOption_Full, code: 0)
+- No (identifier: libNtve_ge_UnitDamageChangeOption_No, code: 1)
+- Minimal (identifier: libNtve_ge_UnitDamageChangeOption_Minimal, code: 2)
+- Mega (identifier: libNtve_ge_UnitDamageChangeOption_Mega, code: 3)
+- Double (identifier: libNtve_ge_UnitDamageChangeOption_Mega2, code: 4)
+
+Preset: Unit Filter Type
+
+Base Type: int
+
+Values:
+- Air (identifier: c_targetFilterAir, code: 5)
+- Ally (identifier: c_targetFilterAlly, code: 2)
+- Armored (identifier: c_targetFilterArmored, code: 8)
+- Benign (identifier: c_targetFilterBenign, code: 41)
+- Biological (identifier: c_targetFilterBiological, code: 9)
+- Buried (identifier: c_targetFilterBuried, code: 29)
+- Can Have Energy (identifier: c_targetFilterCanHaveEnergy, code: 25)
+- Can Have Shields (identifier: c_targetFilterCanHaveShields, code: 26)
+- Cloaked (identifier: c_targetFilterCloaked, code: 30)
+- Dazed (identifier: c_targetFilterDazed, code: 51)
+- Dead (identifier: c_targetFilterDead, code: 34)
+- Destructible (identifier: c_targetFilterDestructible, code: 22)
+- Detector (identifier: c_targetFilterDetector, code: 43)
+- Enemy (identifier: c_targetFilterEnemy, code: 4)
+- Ground (identifier: c_targetFilterGround, code: 6)
+- Hallucination (identifier: c_targetFilterHallucination, code: 37)
+- Harvestable Resource (identifier: c_targetFilterHarvestableResource, code: 20)
+- Has Energy (identifier: c_targetFilterHasEnergy, code: 39)
+- Has Shields (identifier: c_targetFilterHasShields, code: 40)
+- Heroic (identifier: c_targetFilterHeroic, code: 16)
+- Hidden (identifier: c_targetFilterHidden, code: 36)
+- Hover (identifier: c_targetFilterHover, code: 15)
+- Invulnerable (identifier: c_targetFilterInvulnerable, code: 38)
+- Item (identifier: c_targetFilterItem, code: 23)
+- Light (identifier: c_targetFilterLight, code: 7)
+- Map Boss (identifier: c_targetFilterMapBoss, code: 52)
+- Massive (identifier: c_targetFilterMassive, code: 13)
+- Mechanical (identifier: c_targetFilterMechanical, code: 11)
+- Missile (identifier: c_targetFilterMissile, code: 21)
+- Neutral (identifier: c_targetFilterNeutral, code: 3)
+- Outer (identifier: c_targetFilterOuter, code: 48)
+- Passive (identifier: c_targetFilterPassive, code: 42)
+- Player (identifier: c_targetFilterPlayer, code: 1)
+- Prevent Defeat (identifier: c_targetFilterPreventDefeat, code: 27)
+- Prevent Reveal (identifier: c_targetFilterPreventReveal, code: 28)
+- Psionic (identifier: c_targetFilterPsionic, code: 12)
+- Radar (identifier: c_targetFilterRadar, code: 44)
+- Raw Resource (identifier: c_targetFilterRawResource, code: 19)
+- Resistant (identifier: c_targetFilterResistant, code: 49)
+- Revivable (identifier: c_targetFilterRevivable, code: 35)
+- Robotic (identifier: c_targetFilterRobotic, code: 10)
+- Self (identifier: c_targetFilterSelf, code: 0)
+- Silenced (identifier: c_targetFilterSilenced, code: 50)
+- Stasis (identifier: c_targetFilterStasis, code: 32)
+- Structure (identifier: c_targetFilterStructure, code: 14)
+- Stunned (identifier: c_targetFilterStunned, code: 45)
+- Summoned (identifier: c_targetFilterSummoned, code: 46)
+- Map Object (identifier: c_targetFilterUser1, code: 17)
+- Uncommandable (identifier: c_targetFilterUncommandable, code: 24)
+- Under Construction (identifier: c_targetFilterUnderConstruction, code: 33)
+- Unstoppable (identifier: c_targetFilterUnstoppable, code: 47)
+- Visible (identifier: c_targetFilterVisible, code: 31)
+- Worker (identifier: c_targetFilterWorker, code: 18)
+
+Preset: Unit Property (Get)
+
+Base Type: int
+
+Values:
+- Life (identifier: c_unitPropLife, code: 0)
+- Life (Percent) (identifier: c_unitPropLifePercent, code: 1)
+- Life Regeneration Rate (identifier: c_unitPropLifeRegen, code: 3)
+- Expected Life (identifier: c_unitPropLifeExpected, code: 38)
+- Maximum Life (identifier: c_unitPropLifeMax, code: 2)
+- Energy (identifier: c_unitPropEnergy, code: 4)
+- Energy (Percent) (identifier: c_unitPropEnergyPercent, code: 5)
+- Energy Regeneration Rate (identifier: c_unitPropEnergyRegen, code: 7)
+- Expected Energy (identifier: c_unitPropEnergyExpected, code: 39)
+- Maximum Energy (identifier: c_unitPropEnergyMax, code: 6)
+- Shields (identifier: c_unitPropShields, code: 8)
+- Shields (Percent) (identifier: c_unitPropShieldsPercent, code: 9)
+- Shields Regeneration Rate (identifier: c_unitPropShieldsRegen, code: 11)
+- Expected Shields (identifier: c_unitPropShieldsExpected, code: 40)
+- Maximum Shields (identifier: c_unitPropShieldsMax, code: 10)
+- Vitality (identifier: c_unitPropVitality, code: 15)
+- Vitality (Percent) (identifier: c_unitPropVitalityPercent, code: 16)
+- Maximum Vitality (identifier: c_unitPropVitalityMax, code: 17)
+- Radius (identifier: c_unitPropRadius, code: 23)
+- Supplies Used (identifier: c_unitPropSuppliesUsed, code: 12)
+- Supplies Made (identifier: c_unitPropSuppliesMade, code: 13)
+- Kills (identifier: c_unitPropKills, code: 14)
+- Acceleration (identifier: c_unitPropAcceleration, code: 18)
+- Height (identifier: c_unitPropHeight, code: 19)
+- Movement Speed Max (identifier: c_unitPropMovementSpeed, code: 20)
+- Turn Rate (identifier: c_unitPropTurnRate, code: 21)
+- Resources (identifier: c_unitPropResources, code: 22)
+- Experience (identifier: c_unitPropXP, code: 24)
+- Level (identifier: c_unitPropLevel, code: 25)
+- Bounty (Minerals) (identifier: c_unitPropBountyMinerals, code: 26)
+- Bounty (Vespene) (identifier: c_unitPropBountyVespene, code: 27)
+- Bounty (Terrazine) (identifier: c_unitPropBountyTerrazine, code: 28)
+- Bounty (Custom) (identifier: c_unitPropBountyCustom, code: 29)
+- Bounty (XP) (identifier: c_unitPropKillXP, code: 30)
+- Carried Minerals (identifier: c_unitPropCarriedMinerals, code: 31)
+- Carried Vespene (identifier: c_unitPropCarriedVespene, code: 32)
+- Carried Terrazine (identifier: c_unitPropCarriedTerrazine, code: 33)
+- Carried Custom Resource (identifier: c_unitPropCarriedCustom, code: 34)
+- Life Armor (identifier: c_unitPropLifeArmor, code: 35)
+- Shield Armor (identifier: c_unitPropShieldArmor, code: 36)
+- Energy Armor (identifier: c_unitPropEnergyArmor, code: 37)
+- Base Movement Speed (identifier: c_unitPropBaseMovementSpeed, code: 41)
+- Movement Speed Current (identifier: c_unitPropMovementSpeedCurrent, code: 42)
+- Expected Life (Percent) (identifier: c_unitPropLifeExpectedPercent, code: 43)
+- Expected Energy (Percent) (identifier: c_unitPropEnergyExpectedPercent, code: 44)
+- Expected Shields (Percent) (identifier: c_unitPropShieldsExpectedPercent, code: 45)
+- AI Evaluation Factor (identifier: c_unitPropAIEvaluationFactor, code: 46)
+
+Preset: Unit Property (Set)
+
+Base Type: int
+
+Values:
+- Life (identifier: c_unitPropLife, code: 0)
+- Life (Percent) (identifier: c_unitPropLifePercent, code: 1)
+- Life Regeneration Rate (identifier: c_unitPropLifeRegen, code: 3)
+- Expected Life (identifier: c_unitPropLifeExpected, code: 38)
+- Maximum Life (identifier: c_unitPropLifeMax, code: 2)
+- Energy (identifier: c_unitPropEnergy, code: 4)
+- Energy (Percent) (identifier: c_unitPropEnergyPercent, code: 5)
+- Energy Regeneration Rate (identifier: c_unitPropEnergyRegen, code: 7)
+- Expected Energy (identifier: c_unitPropEnergyExpected, code: 39)
+- Maximum Energy (identifier: c_unitPropEnergyMax, code: 6)
+- Shields (identifier: c_unitPropShields, code: 8)
+- Shields (Percent) (identifier: c_unitPropShieldsPercent, code: 9)
+- Shields Regeneration Rate (identifier: c_unitPropShieldsRegen, code: 11)
+- Expected Shields (identifier: c_unitPropShieldsExpected, code: 40)
+- Maximum Shields (identifier: c_unitPropShieldsMax, code: 10)
+- Kills (identifier: c_unitPropKills, code: 14)
+- Height (identifier: c_unitPropHeight, code: 19)
+- Movement Speed Max (identifier: c_unitPropMovementSpeed, code: 20)
+- Resources (identifier: c_unitPropResources, code: 22)
+- Experience (identifier: c_unitPropXP, code: 24)
+- Level (identifier: c_unitPropLevel, code: 25)
+- Bounty (Minerals) (identifier: c_unitPropBountyMinerals, code: 26)
+- Bounty (Vespene) (identifier: c_unitPropBountyVespene, code: 27)
+- Bounty (Terrazine) (identifier: c_unitPropBountyTerrazine, code: 28)
+- Bounty (Custom) (identifier: c_unitPropBountyCustom, code: 29)
+- Bounty (XP) (identifier: c_unitPropKillXP, code: 30)
+- Carried Minerals (identifier: c_unitPropCarriedMinerals, code: 31)
+- Carried Vespene (identifier: c_unitPropCarriedVespene, code: 32)
+- Carried Terrazine (identifier: c_unitPropCarriedTerrazine, code: 33)
+- Carried Custom Resource (identifier: c_unitPropCarriedCustom, code: 34)
+- Base Movement Speed (identifier: c_unitPropBaseMovementSpeed, code: 41)
+
+Preset: Vulnerable/Invulnerable Option
+
+Base Type: bool
+
+Values:
+- Vulnerable (identifier: false, code: —)
+- Invulnerable (identifier: true, code: —)
+
+Preset: Unit Count Type
+
+Base Type: int
+
+Values:
+- Any (identifier: c_unitCountAll, code: 0)
+- Living (identifier: c_unitCountAlive, code: 1)
+- Dead (identifier: c_unitCountDead, code: 2)
+
+Preset: No Unit Group
+
+Base Type: unitgroup
+
+Values:
+- No Unit Group (identifier: null, code: —)
